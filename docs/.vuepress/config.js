@@ -13,7 +13,7 @@ module.exports = {
   ],
   themeConfig: {
     logo: '/assets/img/cashier-mollie.svg',
-    repo: 'laravel/cashier-mollie',
+    repo: 'sandorianHQ/laravel-cashier-mollie',
     authors: [
       {
         'name': 'Mollie.com',
@@ -50,7 +50,7 @@ module.exports = {
 
     ]
   },
-  base: '/cashier-mollie/',
+  base: '/laravel-cashier-mollie/',
   plugins: [
       ['seo', {
         siteTitle: (_, $site) => $site.title,
@@ -61,7 +61,7 @@ module.exports = {
         twitterCard: _ => 'summary_large_image',
         type: $page => 'website',
         url: (_, $site, path) => ($site.themeConfig.domain || '') + path,
-        image: ($page, $site) => "https://ciungulete.github.io/cashier-mollie/assets/pages/laravelcashiermollie.jpg",
+        image: ($page, $site) => "https://sandorianhq.github.io/laravel-cashier-mollie/assets/pages/laravelcashiermollie.jpg",
         publishedAt: $page => $page.frontmatter.date && new Date($page.frontmatter.date),
         modifiedAt: $page => $page.lastUpdated && new Date($page.lastUpdated),
     }],
