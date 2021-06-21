@@ -45,7 +45,7 @@ Now pull the package in using composer:
 composer require mollie/laravel-cashier-mollie "^0.1.0"
 ```
 
-##Official Documentation
+## Official Documentation
 Documentation can be found on the [Laravel Cashier Mollie website](https://sandorianhq.github.io/laravel-cashier-mollie/).
 
 ## Contributing
