@@ -79,34 +79,30 @@ Once you have pulled in the package:
     ```
    Learn more about storing data on the Mollie Customer [here](https://docs.mollie.com/reference/v2/customers-api/create-customer#parameters).
 
-    - Implement
-```php
-Laravel\Cashier\Order\Contracts\ProvidesInvoiceInformation
-```
-      interface. For example:
+    - Implement the `Laravel\Cashier\Order\Contracts\ProvidesInvoiceInformation` interface. For example:
 
     ```php
-/**
-* Get the receiver information for the invoice.
-* Typically includes the name and some sort of (E-mail/physical) address.
-*
-* @return array An array of strings
-  */
-  public function getInvoiceInformation()
-  {
-  return [$this->name, $this->email];
-  }
+    /**
+    * Get the receiver information for the invoice.
+    * Typically includes the name and some sort of (E-mail/physical) address.
+    *
+    * @return array An array of strings
+      */
+      public function getInvoiceInformation()
+      {
+      return [$this->name, $this->email];
+      }
 
-/**
-* Get additional information to be displayed on the invoice. Typically a note provided by the customer.
-*
-* @return string|null
-  */
-  public function getExtraBillingInformation()
-  {
-  return null;
-  }
-```
+    /**
+    * Get additional information to be displayed on the invoice. Typically a note provided by the customer.
+    *
+    * @return string|null
+      */
+      public function getExtraBillingInformation()
+      {
+      return null;
+      }
+    ```
 
 6. Schedule a periodic job to execute `Cashier::run()`.
 
