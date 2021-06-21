@@ -21,17 +21,17 @@ Next, add the repository to your `composer.json`:
 
 ```json
 "repositories": [
-{
-"type": "vcs",
-"url":  "git@github.com:sandorianHQ/laravel-cashier-mollie.git"
-}
+    {
+    "type": "vcs",
+    "url":  "git@github.com:sandorianHQ/laravel-cashier-mollie.git"
+    }
 ]
 ```
 
 Now pull the package in using composer:
 
 ```bash
-composer require mollie/laravel-cashier-mollie "^0.1.0"
+composer require mollie/laravel-cashier-mollie "^0.2.0"
 ```
 
 ## Setup
@@ -91,21 +91,21 @@ Laravel\Cashier\Order\Contracts\ProvidesInvoiceInformation
 * Typically includes the name and some sort of (E-mail/physical) address.
 *
 * @return array An array of strings
-  */
-  public function getInvoiceInformation()
-  {
-  return [$this->name, $this->email];
-  }
+*/
+public function getInvoiceInformation()
+{
+return [$this->name, $this->email];
+}
 
 /**
 * Get additional information to be displayed on the invoice. Typically a note provided by the customer.
 *
 * @return string|null
-  */
-  public function getExtraBillingInformation()
-  {
-  return null;
-  }
+*/
+public function getExtraBillingInformation()
+{
+return null;
+}
 ```
 
 6. Schedule a periodic job to execute `Cashier::run()`.
