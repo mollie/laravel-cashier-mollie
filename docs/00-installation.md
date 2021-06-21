@@ -83,9 +83,9 @@ Once you have pulled in the package:
 ```php
 Laravel\Cashier\Order\Contracts\ProvidesInvoiceInformation
 ```
-      interface. For example:
+interface. For example:
 
-    ```php
+```php
 /**
 * Get the receiver information for the invoice.
 * Typically includes the name and some sort of (E-mail/physical) address.
