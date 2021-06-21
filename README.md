@@ -27,10 +27,21 @@ First, make sure to add the Mollie key to your `.env` file. You can obtain an AP
 MOLLIE_KEY="test_xxxxxxxxxxx"
 ```
 
-Next, pull this package in using composer:
+Next, add the repository to your `composer.json`:
+
+```json
+"repositories": [
+    {
+        "type": "vcs",
+        "url":  "git@github.com:sandorianHQ/laravel-cashier-mollie.git"
+    }
+]
+```
+
+Now pull the package in using composer:
 
 ```bash
-composer require laravel/cashier-mollie "^1.0"
+composer require mollie/laravel-cashier-mollie "^0.1.0"
 ```
 
 ## Setup
