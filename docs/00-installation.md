@@ -85,7 +85,7 @@ Once you have pulled in the package:
     ```
 interface. For example:
 
-    ```php
+```php
     /**
     * Get the receiver information for the invoice.
     * Typically includes the name and some sort of (E-mail/physical) address.
@@ -106,7 +106,7 @@ interface. For example:
     {
         return null;
     }
-    ```
+```
 
 6. Schedule a periodic job to execute `Cashier::run()`.
 
