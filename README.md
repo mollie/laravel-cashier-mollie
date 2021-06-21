@@ -10,6 +10,15 @@
 
 Laravel Cashier provides an expressive, fluent interface to subscriptions using [Mollie](https://www.mollie.com)'s billing services.
 
+## Early release warning
+
+This is an early release for this package. Things are likely to change before production-ready stability is reached.
+
+At this point it's strongly advised to only use this package with Mollie's **test API**.
+
+The more we learn, the faster we will get to a stable release. Help us get there faster by opening a ticket in the issue
+tracker with your comments, suggestions, questions, problems etc.. We're here to help you.
+
 ## Installation
 
 First, make sure to add the Mollie key to your `.env` file. You can obtain an API key from the [Mollie dashboard](https://www.mollie.com/dashboard/developers/api-keys):
