@@ -42,7 +42,7 @@ Next, add the repository to your `composer.json`:
 Now pull the package in using composer:
 
 ```bash
-composer require mollie/laravel-cashier-mollie "^0.1.0"
+composer require mollie/laravel-cashier-mollie "^0.2.0"
 ```
 
 ## Official Documentation
