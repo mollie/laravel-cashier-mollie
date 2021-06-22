@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Order\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentStatus;
@@ -27,7 +28,10 @@ class WebhookController extends BaseWebhookController
                     case PaymentStatus::STATUS_PAID:
                         $order->handlePaymentPaid($payment);
                         $payment->webhookUrl = route('webhooks.mollie.aftercare');
-                        $payment->update();
+
+                        /** @var UpdateMolliePayment $updateMolliePayment */
+                        $updateMolliePayment = app()->make(UpdateMolliePayment::class);
+                        $updateMolliePayment->execute($payment);
 
                         break;
                     case PaymentStatus::STATUS_FAILED:

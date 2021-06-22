@@ -9,6 +9,7 @@ use Laravel\Cashier\Events\OrderPaymentPaid;
 use Laravel\Cashier\Events\SubscriptionCancelled;
 use Laravel\Cashier\Http\Controllers\WebhookController;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
+use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Payment as LocalPayment;
@@ -204,6 +205,15 @@ class WebhookControllerTest extends BaseTestCase
             return $mock
                 ->shouldReceive('execute')
                 ->with($paymentId, [])
+                ->once()
+                ->andReturn($payment);
+        });
+
+        $this->mock(UpdateMolliePayment::class, function (UpdateMolliePayment $mock) use ($payment, $paymentId) {
+            $payment = new MolliePayment(new MollieApiClient);
+            $payment->redirectUrl = 'https://www.example.com/tr_unique_id';
+
+            return $mock->shouldReceive('execute')
                 ->once()
                 ->andReturn($payment);
         });

@@ -16,6 +16,7 @@ use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
+use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder;
 use Laravel\Cashier\SubscriptionBuilder\RedirectToCheckoutResponse;
@@ -204,6 +205,15 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
 
         $this->assertFalse($this->user->subscribed());
         $this->assertNull($this->user->mollie_mandate_id);
+
+        $this->mock(UpdateMolliePayment::class, function (UpdateMolliePayment $mock) {
+            $payment = new MolliePayment(new MollieApiClient);
+            $payment->redirectUrl = 'https://www.example.com/tr_unique_id';
+
+            return $mock->shouldReceive('execute')
+                ->once()
+                ->andReturn($payment);
+        });
 
         $response = $this->post(route('webhooks.mollie.first_payment', [
             'id' => 'tr_unique_payment_id',

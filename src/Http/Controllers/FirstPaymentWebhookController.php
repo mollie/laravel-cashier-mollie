@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Events\FirstPaymentFailed;
 use Laravel\Cashier\Events\FirstPaymentPaid;
 use Laravel\Cashier\FirstPayment\FirstPaymentHandler;
+use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Symfony\Component\HttpFoundation\Response;
 
 class FirstPaymentWebhookController extends BaseWebhookController
@@ -24,7 +25,10 @@ class FirstPaymentWebhookController extends BaseWebhookController
             if ($payment->isPaid()) {
                 $order = (new FirstPaymentHandler($payment))->execute();
                 $payment->webhookUrl = route('webhooks.mollie.aftercare');
-                $payment->update();
+
+                /** @var UpdateMolliePayment $updateMolliePayment */
+                $updateMolliePayment = app()->make(UpdateMolliePayment::class);
+                $payment = $updateMolliePayment->execute($payment);
 
                 Event::dispatch(new FirstPaymentPaid($payment, $order));
             } elseif ($payment->isFailed()) {

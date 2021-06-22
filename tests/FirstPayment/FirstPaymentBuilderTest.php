@@ -7,6 +7,7 @@ use Laravel\Cashier\FirstPayment\Actions\AddGenericOrderItem;
 use Laravel\Cashier\FirstPayment\FirstPaymentBuilder;
 use Laravel\Cashier\Mollie\Contracts\CreateMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
+use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
@@ -166,6 +167,19 @@ class FirstPaymentBuilderTest extends BaseTestCase
                 'value' => '0.00',
             ];
             $payment->mandateId = 'mdt_dummy_mandate_id';
+
+            return $mock->shouldReceive('execute')
+                ->once()
+                ->andReturn($payment);
+        });
+
+        $this->mock(UpdateMolliePayment::class, function (UpdateMolliePayment $mock) {
+            $payment = new MolliePayment(new MollieApiClient);
+            $payment->redirectUrl = 'https://www.example.com/tr_unique_id';
+            $payment->amount = (object) [
+                'currency' => 'EUR',
+                'value' => '12.34',
+            ];
 
             return $mock->shouldReceive('execute')
                 ->once()
