@@ -600,6 +600,16 @@ class Order extends Model
     }
 
     /**
+     * Initiate a new refund for this order.
+     *
+     * @return \Laravel\Cashier\Refunds\RefundBuilder
+     */
+    public function newRefund()
+    {
+        return $this->refundBuilder();
+    }
+
+    /**
      * Get a refund builder prepared to completely refund this order.
      *
      * @return \Laravel\Cashier\Refunds\RefundBuilder

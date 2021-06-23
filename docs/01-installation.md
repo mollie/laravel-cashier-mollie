@@ -51,11 +51,13 @@ Once you have pulled in the package:
     ```
    Learn more about storing data on the Mollie Customer [here](https://docs.mollie.com/reference/v2/customers-api/create-customer#parameters).
 
-    - Implement 
-```php
-Laravel\Cashier\Order\Contracts\ProvidesInvoiceInformation
-```
-      interface. For example:
+    - Implement
+    
+    ```php
+    Laravel\Cashier\Order\Contracts\ProvidesInvoiceInformation
+    ```
+    
+    interface. For example:
 
     ```php
    /**

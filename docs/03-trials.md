@@ -1,6 +1,6 @@
 # Subscription Trials
 
-## With Mandate Up Front
+## With mandate upfront
 
 If you would like to offer trial periods to your customers while still collecting payment method information up front,
 you should use the `trialDays` method when creating your subscriptions:
@@ -47,7 +47,7 @@ if ($user->subscription('main')->onTrial()) {
 }
 ```
 
-## Without Mandate Up Front
+## Without mandate upfront
 
 If you would like to offer trial periods without collecting the user's payment method information up front, you may set
 the `trial_ends_at` column on the user record to your desired trial ending date. This is typically done during user

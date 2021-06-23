@@ -1,5 +1,5 @@
 module.exports = {
-    title: 'Laravel Cashier Mollie v2.x',
+    title: 'Laravel Cashier Mollie v2',
     description: 'Laravel Cashier provides an expressive, fluent interface to subscriptions using Mollie\'s billing services.',
     head: [
         ['link', { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png"}],
@@ -37,18 +37,18 @@ module.exports = {
             ['/', 'Introduction'],
             '/00-installation',
             //'/01-installation',
-            //'/12-upgrade',
             '/02-subscriptions',
             '/03-trials',
             '/04-charges',
             '/05-metered',
             '/06-customer',
             '/07-invoices',
-            '/08-events',
-            '/09-webhook',
-            '/10-testing',
-            '/11-faq',
-
+            '/08-refunds',
+            '/09-events',
+            '/10-webhook',
+            '/11-testing',
+            '/12-faq',
+            //'/13-upgrade',
         ]
     },
     base: '/laravel-cashier-mollie/',

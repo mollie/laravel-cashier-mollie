@@ -80,25 +80,19 @@ $user->newSubscription($name, $plan)
     ->create();
 ```
 
-### Coupons
-
-
-
-::: tip Coupon configuration
-Learn more here [[TO DO include link]] about configuring your subscription coupons.
-:::
-
 ## Coupons
 
 Coupons allow you to apply special deals to subscriptions.
 
 If you would like to apply a coupon when creating the subscription, you may use the `withCoupon` method:
 
-```phpr
+```php
 $user->newSubscription($name, $plan)
     ->withCoupon('your-coupon-code')
     ->create();
 ```
+
+The coupon will be validated when being applied and can throw a `Laravel\Cashier\Exceptions\CouponException`.
 
 ### Configuring subscription coupons
 
@@ -185,7 +179,7 @@ if ($user->subscribedToPlan('monthly', 'main')) {
 }
 ```
 
-## Cancelled Subscription Status
+## Cancelled subscription status
 
 To determine if the user was once an active subscriber, but has cancelled their subscription, you may use the `cancelled` method:
 
@@ -203,7 +197,7 @@ if ($user->subscription('main')->onGracePeriod()) {
 }
 ```
 
-## Changing Plans
+## Changing plans
 
 After a user is subscribed to your application, they may occasionally want to change to a new subscription plan.
 To swap a user to a new subscription plan, pass the plan identifier to the `swap` or `swapNextCycle` method:
@@ -222,7 +216,7 @@ $user->subscription('main')->swapNextCycle('other-plan-id');
 
 If the user is on trial, the trial period will be maintained. Also, if a "quantity" exists for the subscription, that quantity will also be maintained.
 
-## Subscription Quantity
+## Subscription quantity
 
 Sometimes subscriptions are affected by "quantity". For example, your application might charge €10 per month
 **per seat**. To easily increment or decrement the subscription quantity, use the `incrementQuantity`, 
@@ -249,7 +243,7 @@ $user->subscription('main')->decrementQuantity(5);
 $user->subscription('main')->updateQuantity(10);
 ```
 
-## Subscription Taxes
+## Subscription taxes
 
 To specify the tax percentage a user pays on a subscription, implement the `taxPercentage` method on your billable model, and return a numeric value between 0 and 100, with no more than 2 decimal places.
 
@@ -261,7 +255,7 @@ public function taxPercentage() {
 
 The `taxPercentage` method enables you to apply a tax rate on a model-by-model basis, which may be helpful for a user base that spans multiple countries and tax rates.
 
-### Syncing Tax Percentages
+### Syncing tax percentages
 
 When changing the hard-coded value returned by the `taxPercentage` method, the tax settings on any existing subscriptions for the user will remain the same. If you wish to update the tax value for existing subscriptions with the returned `taxPercentage` value, you should call the `syncTaxPercentage` method on the user's subscription instance:
 
@@ -270,7 +264,7 @@ $user->subscription('main')->syncTaxPercentage();
 ```
 
 
-## Cancelling Subscriptions
+## Cancelling subscriptions
 
 To cancel a subscription, call the `cancel` method on the user's subscription:
 
@@ -299,7 +293,7 @@ If you wish to cancel a subscription immediately, call the `cancelNow` method on
 $user->subscription('main')->cancelNow();
 ```
 
-## Resuming Subscriptions
+## Resuming subscriptions
 
 If a user has cancelled their subscription, and you wish to resume it, use the `resume` method.
 The user **must** still be on their grace period in order to resume a subscription:

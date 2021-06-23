@@ -1,6 +1,6 @@
 # Customer
 
-## Updating Customer payment method
+## Updating customer payment method
 
 For updating a customer's payment mandate, use `updatePaymentMethod` on the billable instance.
 In order to authorize a new mandate, the customer will be redirected to Mollie's checkout to perform a minimal payment.

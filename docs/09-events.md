@@ -1,6 +1,6 @@
-# Cashier Events
+# Events
 
-You can listen for the following events from the Laravel\Cashier\Events namespace:
+You can listen for the following events from the `Laravel\Cashier\Events` namespace:
 
 ### `BalanceTurnedStale` event
 The user has a positive account balance, but no active subscriptions. Consider a refund.
