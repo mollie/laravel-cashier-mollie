@@ -58,7 +58,7 @@ class UpdatePaymentMethodBuilder implements Contract
     /**
      * @return $this
      */
-    public function addGenericItem()
+    public function skipBalance()
     {
         $this->skipBalance = true;
 
