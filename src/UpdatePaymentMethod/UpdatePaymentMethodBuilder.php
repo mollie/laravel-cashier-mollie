@@ -16,6 +16,7 @@ use Money\Money;
 class UpdatePaymentMethodBuilder implements Contract
 {
     use HandlesMoneyRounding;
+
     /**
      * The billable model.
      *
@@ -26,7 +27,7 @@ class UpdatePaymentMethodBuilder implements Contract
     /**
      * @var bool
      */
-    protected $addGenericItem = false;
+    protected $skipBalance = false;
 
     /**
      * UpdatePaymentMethodBuilder constructor.
@@ -59,7 +60,7 @@ class UpdatePaymentMethodBuilder implements Contract
      */
     public function addGenericItem()
     {
-        $this->addGenericItem = true;
+        $this->skipBalance = true;
 
         return $this;
     }
@@ -85,7 +86,7 @@ class UpdatePaymentMethodBuilder implements Contract
      */
     protected function getPaymentActions()
     {
-        if ($this->addGenericItem) {
+        if ($this->skipBalance) {
             return [ $this->addGenericItemAction() ];
         }
 

@@ -1,17 +1,29 @@
 # Customer
 
-## Updating Customer payment mandates
+## Updating Customer payment method
 
-The `updatePaymentMethod` method may be used to update a customer's payment method information. This method redirecting the customer to the Mollie checkout to make the payment. Amount, redirect url and description for the update payment method can be set in `cashier.php` config.
+For updating a customer's payment mandate, use `updatePaymentMethod` on the billable instance.
+In order to authorize a new mandate, the customer will be redirected to Mollie's checkout to perform a minimal payment.
+The amount, redirect url and description for the update payment method can be configured in `config/cashier.php`.
 
 ```php
-$user->updatePaymentMethod()->create(); // will add the amount to the user Balance
+use App\Models\User;
+
+$user = App\User::find(1);
+
+$response = $user->updatePaymentMethod()->create();
+
+return redirect($response);
 ```
-or
+
+By default, the amount paid will be added to the customer's balance. If you want to prevent this, apply `skipBalance`:
+
 ```php
-$user->updatePaymentMethod()
-    ->addGenericItem() // will add the amount as an Order Item
-    ->create(); 
+$response = $user->updatePaymentMethod()
+    ->skipBalance()
+    ->create();
+    
+return redirect($response); 
 ```
 
 ## Customer balance

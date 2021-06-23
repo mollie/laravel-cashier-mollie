@@ -83,36 +83,36 @@ Once you have pulled in the package:
     ```php
     Laravel\Cashier\Order\Contracts\ProvidesInvoiceInformation
     ```
-interface. For example:
+    interface. For example:
 
-```php
-    /**
-    * Get the receiver information for the invoice.
-    * Typically includes the name and some sort of (E-mail/physical) address.
-    *
-    * @return array An array of strings
-    */
-    public function getInvoiceInformation()
-    {
-        return [$this->name, $this->email];
-    }
-    
-    /**
-    * Get additional information to be displayed on the invoice. Typically a note provided by the customer.
-    *
-    * @return string|null
-    */
-    public function getExtraBillingInformation()
-    {
-        return null;
-    }
-```
+    ```php
+        /**
+        * Get the receiver information for the invoice.
+        * Typically includes the name and some sort of (E-mail/physical) address.
+        *
+        * @return array An array of strings
+        */
+        public function getInvoiceInformation()
+        {
+            return [$this->name, $this->email];
+        }
+        
+        /**
+        * Get additional information to be displayed on the invoice. Typically a note provided by the customer.
+        *
+        * @return string|null
+        */
+        public function getExtraBillingInformation()
+        {
+            return null;
+        }
+    ```
 
 6. Schedule a periodic job to execute `Cashier::run()`.
 
     ```php
     $schedule->command('cashier:run')
-        ->daily() // run as often as you like (Daily, monthly, every minute, ...)
+        ->daily() // run as often as you like (daily, monthly, every minute, ...)
         ->withoutOverlapping(); // make sure to include this
     ```
 

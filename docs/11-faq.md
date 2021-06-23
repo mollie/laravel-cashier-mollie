@@ -1,6 +1,28 @@
 # F.A.Q.
 
-### My billable model uses UUIDs, how can I get Cashier Mollie to work with this?
+## Ok. So how does this subscription magic actually work?
+
+This Cashier implementation schedules triggering payments from the client side, instead of relying on subscription management at Mollie.
+And yes, Mollie also offers a Subscription API, but it does not support all the niceties you've come to expect from Cashier,
+so this package provides its own subscription engine.
+
+From a high level perspective, this is what the process looks like:
+
+1. A `Subscription` is created using the `MandatePaymentSubscriptionBuilder` (redirecting to Mollie's checkout to create
+   a `Mandate`) or `PremandatedSubscriptionBuilder` (using an existing `Mandate`).
+2. The `Subscription` yields a scheduled `OrderItem` at the beginning of each billing cycle.
+3. `OrderItems` which are due are preprocessed and bundled into `Orders` whenever possible by a scheduled job (i.e.
+   daily). This is done, so your customer will receive a single payment/invoice for multiple items later on in the chain).
+   Preprocessing the `OrderItems` may involve applying dynamic discounts or metered billing, depending on your
+   configuration.
+4. The `Order` is processed by the same scheduled job into a payment:
+    - First, (if available) the customer's balance is processed in the `Order`.
+    - If the total due is positive, a Mollie payment is incurred.
+    - If the total due is 0, nothing happens.
+    - If the total due is negative, the amount is added to the user's balance. If the user has no active subscriptions left, the `BalanceTurnedStale` event will be raised.
+5. You can generate an `Invoice` (html/pdf) for the user.
+
+## My billable model uses UUIDs, how can I get Cashier Mollie to work with this?
 By default Cashier Mollie uses `unsignedInteger` fields for the billable model relationships.
 If required for your billable model, modify the cashier migrations for UUIDs:
 
@@ -12,7 +34,7 @@ $table->unsignedInteger('owner_id');
 $table->uuid('owner_id');  
 ```
 
-### How is prorating handled?
+## How is prorating handled?
 
 Cashier Mollie applies prorating by default. With prorating, customers are billed at the start of each billing cycle.
 
@@ -21,12 +43,12 @@ This means that when the subscription quantity is updated or is switched to anot
 1. the billing cycle is reset
 2. the customer is credited for unused time, meaning that the amount that was overpaid is added to the customer's balance.
 3. a new billing cycle is started with the new subscription settings. An Order (and payment) is generated to deal with
-   all of the previous, including applying the credited balance to the Order.
+   all the previous, including applying the credited balance to the Order.
 
 This does not apply to the `$subscription->swapNextCycle('other-plan')`, which simply waits for the next billing cycle
 to update the subscription plan. A common use case for this is downgrading the plan at the end of the billing cycle.
 
-### How can I load coupons and/or plans from database?
+## How can I load coupons and/or plans from the database?
 
 Because Cashier Mollie uses contracts a lot it's quite easy to extend Cashier Mollie and use your own implementations.
 You can load coupons/plans from database, a file or even a JSON API.
