@@ -4,10 +4,12 @@ namespace Laravel\Cashier;
 
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
+use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Order\ConvertsToMoney;
 use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Traits\HasOwner;
 use Mollie\Api\Resources\Payment as MolliePayment;
+use Mollie\Api\Types\PaymentStatus;
 use Money\Money;
 
 /**
@@ -131,7 +133,17 @@ class Payment extends Model
             return $payment;
         }
 
-        return self::createFromMolliePayment($molliePayment, $owner, $actions);
+        $newPayment = self::createFromMolliePayment($molliePayment, $owner, $actions);
+
+        if ($newPayment->mollie_payment_status === PaymentStatus::STATUS_PAID) {
+            $molliePayment->webhookUrl = route('webhooks.mollie.aftercare');
+
+            /** @var UpdateMolliePayment $updateMolliePayment */
+            $updateMolliePayment = app()->make(UpdateMolliePayment::class);
+            $updateMolliePayment->execute($molliePayment);
+        }
+
+        return $newPayment;
     }
 
     /**
