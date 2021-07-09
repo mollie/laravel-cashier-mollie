@@ -431,7 +431,9 @@ class Order extends Model
                 'credit_used' => 0,
             ]);
 
-            $localPayment = Payment::findByPaymentIdOrFail($molliePayment->id);
+            // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
+            // In that case we create a record here.
+            $localPayment = Payment::findByMolliePaymentOrCreate($molliePayment, $this->owner);
             $localPayment->update([
                 'mollie_payment_status' => 'failed',
             ]);
@@ -494,7 +496,9 @@ class Order extends Model
         return DB::transaction(function () use ($molliePayment) {
             $this->update(['mollie_payment_status' => 'paid']);
 
-            $localPayment = Payment::findByPaymentIdOrFail($molliePayment->id);
+            // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
+            // In that case we create a record here.
+            $localPayment = Payment::findByMolliePaymentOrCreate($molliePayment, $this->owner);
             $localPayment->update([
                 'mollie_payment_status' => 'paid',
             ]);

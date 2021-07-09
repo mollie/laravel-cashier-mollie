@@ -104,7 +104,7 @@ class Payment extends Model
     }
 
     /**
-     * Retrieve an Order by the Mollie Payment id or throw an Exception if not found.
+     * Retrieve a Payment by the Mollie Payment id or throw an Exception if not found.
      *
      * @param $id
      * @return self
@@ -113,6 +113,25 @@ class Payment extends Model
     public static function findByPaymentIdOrFail($id): self
     {
         return self::where('mollie_payment_id', $id)->firstOrFail();
+    }
+
+    /**
+     * Find a Payment by the Mollie payment id, or create a new Payment record from a Mollie payment if not found.
+     *
+     * @param \Mollie\Api\Resources\Payment $molliePayment
+     * @param \Illuminate\Database\Eloquent\Model $owner
+     * @param array $actions
+     * @return static
+     */
+    public static function findByMolliePaymentOrCreate(MolliePayment $molliePayment, Model $owner, array $actions = []): self
+    {
+        $payment = self::findByPaymentId($molliePayment->id);
+
+        if ($payment) {
+            return $payment;
+        }
+
+        return self::createFromMolliePayment($molliePayment, $owner, $actions);
     }
 
     /**
