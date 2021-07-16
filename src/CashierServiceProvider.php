@@ -32,6 +32,7 @@ class CashierServiceProvider extends ServiceProvider
         }
 
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'cashier');
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'cashier');
 
         mollie()->addVersionString('MollieLaravelCashier/' . self::PACKAGE_VERSION);
 
@@ -39,6 +40,7 @@ class CashierServiceProvider extends ServiceProvider
             $this->publishMigrations('cashier-migrations');
             $this->publishConfig('cashier-configs');
             $this->publishViews('cashier-views');
+            $this->publishTranslations('cashier-translations');
             $this->publishUpdate('cashier-update');
         }
 
@@ -114,6 +116,13 @@ class CashierServiceProvider extends ServiceProvider
             __DIR__.'/../config/cashier.php' => config_path('cashier.php'),
             __DIR__.'/../config/cashier_coupons.php' => config_path('cashier_coupons.php'),
             __DIR__.'/../config/cashier_plans.php' => config_path('cashier_plans.php'),
+        ], $tag);
+    }
+
+    protected function publishTranslations(string $tag)
+    {
+        $this->publishes([
+            __DIR__.'/../resources/lang' => $this->app->basePath('resources/lang/vendor/cashier'),
         ], $tag);
     }
 
