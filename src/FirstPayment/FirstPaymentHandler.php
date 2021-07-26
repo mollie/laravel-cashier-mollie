@@ -52,8 +52,15 @@ class FirstPaymentHandler
                 'mollie_payment_status' => $this->molliePayment->status,
             ]);
 
-            $payment = LocalPayment::findByPaymentIdOrFail($this->molliePayment->id);
-            $payment->update([
+            // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
+            // In that case we create a record here.
+            $localPayment = LocalPayment::findByMolliePaymentOrCreate(
+                $this->molliePayment,
+                $this->owner,
+                $this->actions->all()
+            );
+
+            $localPayment->update([
                 'order_id' => $order->id,
                 'mollie_payment_status' => $this->molliePayment->status,
                 'mollie_mandate_id' => $this->molliePayment->mandateId,
