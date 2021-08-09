@@ -4,10 +4,12 @@ namespace Laravel\Cashier;
 
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
+use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Order\ConvertsToMoney;
 use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Traits\HasOwner;
 use Mollie\Api\Resources\Payment as MolliePayment;
+use Mollie\Api\Types\PaymentStatus;
 use Money\Money;
 
 /**
@@ -104,7 +106,7 @@ class Payment extends Model
     }
 
     /**
-     * Retrieve an Order by the Mollie Payment id or throw an Exception if not found.
+     * Retrieve a Payment by the Mollie Payment id or throw an Exception if not found.
      *
      * @param $id
      * @return self
@@ -113,6 +115,35 @@ class Payment extends Model
     public static function findByPaymentIdOrFail($id): self
     {
         return self::where('mollie_payment_id', $id)->firstOrFail();
+    }
+
+    /**
+     * Find a Payment by the Mollie payment id, or create a new Payment record from a Mollie payment if not found.
+     *
+     * @param \Mollie\Api\Resources\Payment $molliePayment
+     * @param \Illuminate\Database\Eloquent\Model $owner
+     * @param array $actions
+     * @return static
+     */
+    public static function findByMolliePaymentOrCreate(MolliePayment $molliePayment, Model $owner, array $actions = []): self
+    {
+        $payment = self::findByPaymentId($molliePayment->id);
+
+        if ($payment) {
+            return $payment;
+        }
+
+        $newPayment = self::createFromMolliePayment($molliePayment, $owner, $actions);
+
+        if ($newPayment->mollie_payment_status === PaymentStatus::STATUS_PAID) {
+            $molliePayment->webhookUrl = route('webhooks.mollie.aftercare');
+
+            /** @var UpdateMolliePayment $updateMolliePayment */
+            $updateMolliePayment = app()->make(UpdateMolliePayment::class);
+            $updateMolliePayment->execute($molliePayment);
+        }
+
+        return $newPayment;
     }
 
     /**

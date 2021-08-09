@@ -479,7 +479,10 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
             $subscription->save();
 
             $item->description_extra_lines = [
-                'From ' . $subscription->cycle_started_at->format('Y-m-d') . ' to ' . $subscription->cycle_ends_at->format('Y-m-d'),
+                trans('cashier::order_item.cycle', [
+                    'from' => $subscription->cycle_started_at->format('Y-m-d'),
+                    'to' => $subscription->cycle_ends_at->format('Y-m-d'),
+                ]),
             ];
 
             return $item;
