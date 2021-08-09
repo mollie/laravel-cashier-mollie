@@ -55,3 +55,6 @@ The subscription plan was swapped.
 
 ### `SubscriptionQuantityUpdated` event
 The subscription quantity was updated.
+
+### `ChargebackReceived` event
+Chargeback was received

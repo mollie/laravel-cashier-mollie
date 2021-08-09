@@ -23,22 +23,22 @@ class AftercareWebhookController extends BaseWebhookController
      */
     public function handleWebhook(Request $request)
     {
-        $payment = $this->getMolliePaymentById($request->get('id'));
+        $molliePayment = $this->getMolliePaymentById($request->get('id'));
 
-        if ($payment && $payment->hasRefunds()) {
-            $order = Order::findByMolliePaymentId($payment->id);
+        if ($molliePayment && $molliePayment->hasRefunds()) {
+            $order = Order::findByMolliePaymentId($molliePayment->id);
 
-            $this->handleRefunds($order, $payment);
+            $this->handleRefunds($order, $molliePayment);
         }
 
-        if ($payment && $payment->hasChargebacks()) {
-            $localPayment = Payment::findByPaymentId($payment->id);
+        if ($molliePayment && $molliePayment->hasChargebacks()) {
+            $localPayment = Payment::findByPaymentId($molliePayment->id);
 
-            if ($localPayment->amount_charged_back < mollie_object_to_money($payment->amountChargedBack)) {
-                $localPayment->amount_charged_back = mollie_object_to_money($payment->amountChargedBack);
+            if ($localPayment->amount_charged_back < mollie_object_to_money($molliePayment->amountChargedBack)) {
+                $localPayment->amount_charged_back = mollie_object_to_money($molliePayment->amountChargedBack);
                 $localPayment->save();
 
-                Event::dispatch(new ChargebackReceived($localPayment));
+                Event::dispatch(new ChargebackReceived($localPayment, $molliePayment->amountChargedBack - $localPayment->amount_charged_back));
             }
         }
 
