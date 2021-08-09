@@ -18,7 +18,7 @@ class CashierServiceProvider extends ServiceProvider
 {
     use RegistersMollieInteractions;
 
-    const PACKAGE_VERSION = '0.2.2';
+    const PACKAGE_VERSION = '0.2.4';
 
     /**
      * Bootstrap the application services.
