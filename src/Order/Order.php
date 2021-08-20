@@ -679,4 +679,20 @@ class Order extends Model
     {
         return $this->hasMany(Payment::class)->orderByDesc('updated_at');
     }
+
+    /**
+     * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
+     */
+    public function retryNow()
+    {
+        if (! $this->owner->validMollieMandate()) {
+            throw new InvalidMandateException();
+        }
+        $this->processed_at = null;
+        $this->mollie_payment_id = null;
+        $this->mollie_payment_status = null;
+        $this->save();
+
+        $this->processPayment();
+    }
 }
