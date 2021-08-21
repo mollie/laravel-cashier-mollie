@@ -424,7 +424,7 @@ class OrderTest extends BaseTestCase
     }
 
     /** @test */
-    public function canRetryAnFailedOrder()
+    public function canRetryAFailedOrderNow()
     {
         $this->mock(GetMollieMandate::class, function ($mock) {
             $mandate = new Mandate(new MollieApiClient);
@@ -477,8 +477,8 @@ class OrderTest extends BaseTestCase
 
         $order = $user->orders()->save(factory(Order::class)->make([
             'processed_at' => now()->subMinutes(5),
-            'total' => 1025,
-            'total_due' => 1025,
+            'total' => 10.25,
+            'total_due' => 10.25,
             'currency' => 'EUR',
             'mollie_payment_status' => 'failed',
             'mollie_payment_id' => 'tr_1234',
@@ -492,7 +492,7 @@ class OrderTest extends BaseTestCase
         $this->assertCarbon(now(), $order->processed_at);
         $this->assertTrue($order->isProcessed());
         $this->assertSame($order->mollie_payment_id, 'tr_unique_payment_id');
-//        $this->assertNotNull($order->mollie_payment_id);
+        $this->assertSame('open', $order->mollie_payment_status);
     }
 
     /** @test */
