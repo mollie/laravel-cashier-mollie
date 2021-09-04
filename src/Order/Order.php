@@ -502,6 +502,7 @@ class Order extends Model
             $localPayment = Payment::findByMolliePaymentOrCreate($molliePayment, $this->owner);
             $localPayment->update([
                 'mollie_payment_status' => 'paid',
+                'order_id' => $this->id,
             ]);
 
             Event::dispatch(new OrderPaymentPaid($this));
@@ -695,13 +696,27 @@ class Order extends Model
             throw new InvalidMandateException();
         }
 
-        return DB::transaction(function () {
-            $this->processed_at = null;
-            $this->mollie_payment_id = null;
-            $this->mollie_payment_status = null;
-            $this->save();
+        $newOrder = $this->duplicate($this);
+        $this->refresh();
+        $newOrder->processPayment();
+    }
 
-            $this->processPayment();
-        });
+    protected function duplicate(Order $order): Order
+    {
+        $clone = $order->replicate()->fill([
+            'number' => static::numberGenerator()->generate(),
+            'processed_at' => null,
+            'mollie_payment_id' => null,
+            'mollie_payment_status' => null,
+        ]);
+
+        $clone->save();
+        $clone->refresh();
+        if ($order->items) {
+            $cloned_relation = $order->items->replicate($clone->id);
+            $cloned_relation->save();
+        }
+
+        return $clone;
     }
 }

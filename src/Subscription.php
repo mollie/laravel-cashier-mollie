@@ -565,7 +565,16 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public static function handlePaymentPaid(OrderItem $item)
     {
-        // Subscriptions are prolonged optimistically (so before payment is being completely processed).
+        $subscription = $item->orderable;
+
+
+        return DB::transaction(function () use ($subscription) {
+            $subscription->update([
+                'ends_at' => null,
+            ]);
+
+            return $subscription;
+        });
     }
 
     public static function handlePaymentRefunded(RefundItem $refundItem)
