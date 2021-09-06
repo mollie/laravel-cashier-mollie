@@ -490,16 +490,15 @@ class OrderTest extends BaseTestCase
         $this->assertSame($order->mollie_payment_id, 'tr_1234');
 
         $order->retryNow();
-        $this->assertDatabaseCount('orders', 2);
-        $retriedOrder = $user->orders()->find(2);
+        $order->refresh();
+        $this->assertDatabaseCount('orders', 1);
 
-        $this->assertTrue($retriedOrder->isProcessed());
-        $this->assertSame($retriedOrder->mollie_payment_id, 'tr_new_payment_id');
-        $this->assertSame('open', $retriedOrder->mollie_payment_status);
+        $this->assertTrue($order->isProcessed());
+        $this->assertSame($order->mollie_payment_id, 'tr_new_payment_id');
+        $this->assertSame('open', $order->mollie_payment_status);
 
         $this->assertDatabaseCount('payments', 1);
         $this->assertDatabaseHas('payments', ['mollie_payment_id' => 'tr_new_payment_id']);
-
     }
 
     /** @test */

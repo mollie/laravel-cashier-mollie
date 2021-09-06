@@ -5,7 +5,7 @@ namespace Laravel\Cashier\Exceptions;
 use Exception;
 use Throwable;
 
-class RetryingRequiresOrderStatusFailedException extends Exception
+class OrderRetryRequiresStatusFailedException extends Exception
 {
     /**
      * RetryingRequiresOrderStatusFailedException constructor.

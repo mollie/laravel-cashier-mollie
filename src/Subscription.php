@@ -567,14 +567,15 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     {
         $subscription = $item->orderable;
 
+        if ($subscription->ends_at !== null) {
+            return DB::transaction(function () use ($subscription) {
+                $subscription->update([
+                    'ends_at' => null,
+                ]);
 
-        return DB::transaction(function () use ($subscription) {
-            $subscription->update([
-                'ends_at' => null,
-            ]);
-
-            return $subscription;
-        });
+                return $subscription;
+            });
+        }
     }
 
     public static function handlePaymentRefunded(RefundItem $refundItem)

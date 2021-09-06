@@ -16,7 +16,7 @@ use Laravel\Cashier\Events\OrderPaymentFailedDueToInvalidMandate;
 use Laravel\Cashier\Events\OrderPaymentPaid;
 use Laravel\Cashier\Events\OrderProcessed;
 use Laravel\Cashier\Exceptions\InvalidMandateException;
-use Laravel\Cashier\Exceptions\RetryingRequiresOrderStatusFailedException;
+use Laravel\Cashier\Exceptions\OrderRetryRequiresStatusFailedException;
 use Laravel\Cashier\MandatedPayment\MandatedPaymentBuilder;
 use Laravel\Cashier\Order\Contracts\MinimumPayment;
 use Laravel\Cashier\Payment;
@@ -684,39 +684,25 @@ class Order extends Model
 
     /**
      * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
-     * @throws \Laravel\Cashier\Exceptions\RetryingRequiresOrderStatusFailedException
+     * @throws \Laravel\Cashier\Exceptions\OrderRetryRequiresStatusFailedException
      */
     public function retryNow()
     {
         if ($this->mollie_payment_status != 'failed') {
-            throw new RetryingRequiresOrderStatusFailedException();
+            throw new OrderRetryRequiresStatusFailedException();
         }
 
         if (! $this->owner->validMollieMandate()) {
             throw new InvalidMandateException();
         }
 
-        $newOrder = $this->duplicate($this);
-        $this->refresh();
-        $newOrder->processPayment();
-    }
+        return DB::transaction(function () {
+            $this->processed_at = null;
+            $this->mollie_payment_id = null;
+            $this->mollie_payment_status = null;
+            $this->save();
 
-    protected function duplicate(Order $order): Order
-    {
-        $clone = $order->replicate()->fill([
-            'number' => static::numberGenerator()->generate(),
-            'processed_at' => null,
-            'mollie_payment_id' => null,
-            'mollie_payment_status' => null,
-        ]);
-
-        $clone->save();
-        $clone->refresh();
-        if ($order->items) {
-            $cloned_relation = $order->items->replicate($clone->id);
-            $cloned_relation->save();
-        }
-
-        return $clone;
+            $this->processPayment();
+        });
     }
 }

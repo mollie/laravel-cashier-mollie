@@ -144,17 +144,6 @@ class OrderItemCollection extends Collection
         });
     }
 
-    public function replicate(int $newOrderId)
-    {
-        return $this->map(function (OrderItem $item) use ($newOrderId) {
-            $cloneItem = $item->replicate();
-            $cloneItem->order_id = $newOrderId;
-            $cloneItem->save();
-
-            return $cloneItem;
-        });
-    }
-
     /**
      * Get a collection of distinct tax percentages in this collection.
      * @return \Illuminate\Support\Collection
