@@ -488,6 +488,7 @@ class OrderTest extends BaseTestCase
         $this->assertDatabaseCount('orders', 1);
         $this->assertEquals('failed', $order->mollie_payment_status);
         $this->assertSame($order->mollie_payment_id, 'tr_1234');
+        $this->assertDatabaseCount('payments', 0);
 
         $order->retryNow();
         $order->refresh();
