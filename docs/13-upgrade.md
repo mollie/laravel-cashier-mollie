@@ -1,8 +1,27 @@
 # Upgrade Guide
 ##Upgrading To 2.0 From 1.x
 
+First, make sure to add the Mollie key to your `.env` file. You can obtain an API key from the [Mollie dashboard](https://www.mollie.com/dashboard/developers/api-keys):
+
+```dotenv
+MOLLIE_KEY="test_xxxxxxxxxxx"
+```
+
+Next, add the repository to your `composer.json`:
+
+```json
+"repositories": [
+    {
+      "type": "vcs",
+      "url":  "git@github.com:sandorianHQ/laravel-cashier-mollie.git"
+    }
+]
+```
+
+Now pull the package in using composer:
+
 ```bash
-composer require laravel/cashier-mollie "^2.0"
+composer require mollie/laravel-cashier-mollie "^0.2.0"
 ```
 
 Once you have pulled in the package:

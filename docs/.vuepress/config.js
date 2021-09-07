@@ -36,6 +36,7 @@ module.exports = {
         sidebar: [
             ['/', 'Introduction'],
             '/00-installation',
+            '/13-upgrade',
             //'/01-installation',
             '/02-subscriptions',
             '/03-trials',
