@@ -45,7 +45,7 @@ module.exports = {
             '/06-customer',
             '/07-invoices',
             '/08-refunds',
-            '/13-retry',
+            '/14-retry',
             '/09-events',
             '/10-webhook',
             '/11-testing',
