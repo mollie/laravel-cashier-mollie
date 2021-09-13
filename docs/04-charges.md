@@ -29,9 +29,11 @@ $chargeItem2 = $item2->make();
 $result = $user->newCharge()
     ->addItem($chargeItem)
     ->addItem($chargeItem2)
-    ->make();
+    ->create();
 
 if(is_a($result, \Laravel\Cashier\Http\RedirectToCheckoutResponse::class)) {
-    return redirect($result);
+    return $result;
 }
+
+return back()->with('status', 'Thank you.';
 ```
