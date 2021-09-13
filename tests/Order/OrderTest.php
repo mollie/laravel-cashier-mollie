@@ -424,6 +424,85 @@ class OrderTest extends BaseTestCase
     }
 
     /** @test */
+    public function canRetryAFailedOrderNow()
+    {
+        $this->mock(GetMollieMandate::class, function ($mock) {
+            $mandate = new Mandate(new MollieApiClient);
+            $mandate->id = 'mdt_unique_mandate_id';
+            $mandate->status = 'valid';
+            $mandate->method = 'directdebit';
+
+            return $mock->shouldReceive('execute')
+                ->with('cst_unique_customer_id', 'mdt_unique_mandate_id')
+                ->twice()
+                ->andReturn($mandate);
+        });
+
+        $this->mock(GetMollieCustomer::class, function ($mock) {
+            $customer = new Customer(new MollieApiClient);
+            $customer->id = 'cst_unique_customer_id';
+
+            return $mock->shouldReceive('execute')
+                ->with('cst_unique_customer_id')
+                ->twice()
+                ->andReturn($customer);
+        });
+
+        $this->mock(GetMollieMethodMinimumAmount::class, function ($mock) {
+            return $mock->shouldReceive('execute')
+                ->with('directdebit', 'EUR')
+                ->once()
+                ->andReturn(money(10, 'EUR'));
+        });
+
+        $this->mock(CreateMolliePayment::class, function ($mock) {
+            $payment = new Payment(new MollieApiClient);
+            $payment->id = 'tr_new_payment_id';
+            $payment->amount = (object) [
+                'currency' => 'EUR',
+                'value' => '10.25',
+            ];
+            $payment->mandateId = 'mdt_dummy_mandate_id';
+
+            return $mock->shouldReceive('execute')
+                ->once()
+                ->andReturn($payment);
+        });
+
+        $user = $this->getMandatedUser(true, [
+            'id' => 2,
+            'mollie_mandate_id' => 'mdt_unique_mandate_id',
+            'mollie_customer_id' => 'cst_unique_customer_id',
+        ]);
+
+        $order = $user->orders()->save(factory(Order::class)->make([
+            'processed_at' => now()->subMinutes(5),
+            'total' => 10.25,
+            'total_due' => 10.25,
+            'currency' => 'EUR',
+            'mollie_payment_status' => 'failed',
+            'mollie_payment_id' => 'tr_1234',
+        ]));
+
+        $this->assertTrue($order->isProcessed());
+        $this->assertDatabaseCount('orders', 1);
+        $this->assertEquals('failed', $order->mollie_payment_status);
+        $this->assertSame($order->mollie_payment_id, 'tr_1234');
+        $this->assertDatabaseCount('payments', 0);
+
+        $order->retryNow();
+        $order->refresh();
+        $this->assertDatabaseCount('orders', 1);
+
+        $this->assertTrue($order->isProcessed());
+        $this->assertSame($order->mollie_payment_id, 'tr_new_payment_id');
+        $this->assertSame('open', $order->mollie_payment_status);
+
+        $this->assertDatabaseCount('payments', 1);
+        $this->assertDatabaseHas('payments', ['mollie_payment_id' => 'tr_new_payment_id']);
+    }
+
+    /** @test */
     public function storesOwnerCreditIfTotalIsPositiveAndSmallerThanMolliesMinimum()
     {
         Event::fake();

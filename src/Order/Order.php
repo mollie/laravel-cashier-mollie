@@ -16,6 +16,7 @@ use Laravel\Cashier\Events\OrderPaymentFailedDueToInvalidMandate;
 use Laravel\Cashier\Events\OrderPaymentPaid;
 use Laravel\Cashier\Events\OrderProcessed;
 use Laravel\Cashier\Exceptions\InvalidMandateException;
+use Laravel\Cashier\Exceptions\OrderRetryRequiresStatusFailedException;
 use Laravel\Cashier\MandatedPayment\MandatedPaymentBuilder;
 use Laravel\Cashier\Order\Contracts\MinimumPayment;
 use Laravel\Cashier\Payment;
@@ -501,6 +502,7 @@ class Order extends Model
             $localPayment = Payment::findByMolliePaymentOrCreate($molliePayment, $this->owner);
             $localPayment->update([
                 'mollie_payment_status' => 'paid',
+                'order_id' => $this->id,
             ]);
 
             Event::dispatch(new OrderPaymentPaid($this));
@@ -678,5 +680,29 @@ class Order extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class)->orderByDesc('updated_at');
+    }
+
+    /**
+     * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
+     * @throws \Laravel\Cashier\Exceptions\OrderRetryRequiresStatusFailedException
+     */
+    public function retryNow()
+    {
+        if ($this->mollie_payment_status != 'failed') {
+            throw new OrderRetryRequiresStatusFailedException();
+        }
+
+        if (! $this->owner->validMollieMandate()) {
+            throw new InvalidMandateException();
+        }
+
+        return DB::transaction(function () {
+            $this->processed_at = null;
+            $this->mollie_payment_id = null;
+            $this->mollie_payment_status = null;
+            $this->save();
+
+            $this->processPayment();
+        });
     }
 }
