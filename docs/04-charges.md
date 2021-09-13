@@ -32,6 +32,8 @@ $result = $user->newCharge()
     ->create();
 
 if(is_a($result, \Laravel\Cashier\Http\RedirectToCheckoutResponse::class)) {
-    return redirect($result);
+    return $result;
 }
+
+return back()->with('status', 'Thank you.';
 ```
