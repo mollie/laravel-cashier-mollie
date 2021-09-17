@@ -9,11 +9,11 @@ The amount, redirect url and description for the update payment method can be co
 ```php
 use App\Models\User;
 
-$user = App\User::find(1);
+$user = User::find(1);
 
 $response = $user->updatePaymentMethod()->create();
 
-return redirect($response);
+return $response;
 ```
 
 By default, the amount paid will be added to the customer's balance. If you want to prevent this, apply `skipBalance`:
@@ -23,7 +23,7 @@ $response = $user->updatePaymentMethod()
     ->skipBalance()
     ->create();
     
-return redirect($response); 
+return $response; 
 ```
 
 ## Customer balance
