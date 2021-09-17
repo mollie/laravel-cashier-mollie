@@ -6,7 +6,7 @@ namespace Laravel\Cashier\Refunds;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Laravel\Cashier\Events\RefundFailed;
 use Laravel\Cashier\Events\RefundProcessed;
