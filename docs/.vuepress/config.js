@@ -13,7 +13,7 @@ module.exports = {
     ],
     themeConfig: {
         logo: '/assets/img/cashier-mollie.svg',
-        repo: 'sandorianHQ/laravel-cashier-mollie',
+        repo: 'mollie/laravel-cashier-mollie',
         authors: [
             {
                 'name': 'Mollie.com',
