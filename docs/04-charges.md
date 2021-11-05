@@ -35,5 +35,5 @@ if(is_a($result, \Laravel\Cashier\Http\RedirectToCheckoutResponse::class)) {
     return $result;
 }
 
-return back()->with('status', 'Thank you.';
+return back()->with('status', 'Thank you.');
 ```
