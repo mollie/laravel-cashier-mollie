@@ -53,7 +53,7 @@ module.exports = {
             //'/13-upgrade',
         ]
     },
-    base: '/laravel-cashier-mollie/',
+    base: '/',
     plugins: [
         ['seo', {
             siteTitle: (_, $site) => $site.title,
