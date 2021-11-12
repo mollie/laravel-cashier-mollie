@@ -54,7 +54,7 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ### Security
 
-If you discover any security related issues, please email support@mollie.com instead of using the issue tracker.
+If you discover any security related issues, please email security@mollie.com instead of using the issue tracker.
 
 ## Credits
 
