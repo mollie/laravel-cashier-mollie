@@ -12,7 +12,7 @@ Then add this custom repository:
 "repositories": [
     {
       "type": "vcs",
-      "url":  "git@github.com:sandorianHQ/laravel-cashier-mollie.git"
+      "url":  "git@github.com:mollie/laravel-cashier-mollie.git"
     }
 ]
 ```

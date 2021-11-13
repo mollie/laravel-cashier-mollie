@@ -23,7 +23,7 @@ Next, add the repository to your `composer.json`:
 "repositories": [
     {
       "type": "vcs",
-      "url":  "git@github.com:sandorianHQ/laravel-cashier-mollie.git"
+      "url":  "git@github.com:mollie/laravel-cashier-mollie.git"
     }
 ]
 ```
