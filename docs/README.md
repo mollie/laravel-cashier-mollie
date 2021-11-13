@@ -25,4 +25,4 @@ If you discover any security related issues, please email **support@mollie.com**
 
 ### License
 
-The MIT License (MIT). Please see [License File](https://github.com/mollie/laravel-cashier-mollie/blob/develop/LICENSE.md) for more information.
+The MIT License (MIT). Please see [License File](https://github.com/mollie/laravel-cashier-mollie/blob/main/LICENSE.md) for more information.
