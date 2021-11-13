@@ -35,9 +35,8 @@ module.exports = {
         displayAllHeaders: true,
         sidebar: [
             ['/', 'Introduction'],
-            '/00-installation',
+            '/01-installation',
             '/13-upgrade',
-            //'/01-installation',
             '/02-subscriptions',
             '/03-trials',
             '/04-charges',
