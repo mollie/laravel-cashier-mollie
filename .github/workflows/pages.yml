@@ -2,6 +2,8 @@ name: Build and Deploy GitHub Page
 on:
     push:
         branches: [main]
+        paths:
+            - 'docs/**'
 jobs:
     build-and-deploy:
         runs-on: ubuntu-latest
