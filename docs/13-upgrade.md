@@ -6,21 +6,10 @@
 
 Remove the `laravel/cashier-mollie` dependency from your `composer.json`.
 
-Then add this custom repository:
-
-```json
-"repositories": [
-    {
-      "type": "vcs",
-      "url":  "git@github.com:mollie/laravel-cashier-mollie.git"
-    }
-]
-```
-
-Now pull the alpha testing package in using composer:
+Once you have removed  the `laravel/cashier-mollie`, you may install Laravel Cashier Mollie using Composer:
 
 ```bash
-composer require mollie/laravel-cashier-mollie "^0.2.0"
+composer require mollie/laravel-cashier-mollie "^2.0"
 ```
 
 Once you have pulled in the package:
