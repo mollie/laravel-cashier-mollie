@@ -20,7 +20,7 @@ If you discover any security related issues, please email **support@mollie.com**
 ### Credits
 
 - [Mollie.com](https://www.mollie.com)
-- [Sander van Hooft](https://github.com/sandervanhooft)
+- [Sandorian.com](https://www.sandorian.com)
 - [All Contributors](https://github.com/mollie/laravel-cashier-mollie/contributors)
 
 ### License
