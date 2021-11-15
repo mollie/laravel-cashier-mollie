@@ -5,13 +5,13 @@
 </p>
 <img src="https://info.mollie.com/hubfs/github/laravel-cashier/editorLaravel.jpg"  title="Laravel Cashier Mollie Example"/>
 
-[![Github Actions](https://github.com/sandorianHQ/laravel-cashier-mollie/workflows/tests/badge.svg)](https://github.com/sandorianHQ/laravel-cashier-mollie/actions)
+[![Github Actions](https://github.com/mollie/laravel-cashier-mollie/workflows/tests/badge.svg)](https://github.com/mollie/laravel-cashier-mollie/actions)
 
 Laravel Cashier provides an expressive, fluent interface to subscriptions using [Mollie](https://www.mollie.com)'s billing services.
 
 ### Contributing
 
-Please see [CONTRIBUTING](https://github.com/sandorianHQ/laravel-cashier-mollie/blob/master/CONTRIBUTING.md) for details.
+Please see [CONTRIBUTING](https://github.com/mollie/laravel-cashier-mollie/blob/master/CONTRIBUTING.md) for details.
 
 #### Security
 
@@ -21,8 +21,8 @@ If you discover any security related issues, please email **support@mollie.com**
 
 - [Mollie.com](https://www.mollie.com)
 - [Sander van Hooft](https://github.com/sandervanhooft)
-- [All Contributors](https://github.com/sandorianHQ/laravel-cashier-mollie/contributors)
+- [All Contributors](https://github.com/mollie/laravel-cashier-mollie/contributors)
 
 ### License
 
-The MIT License (MIT). Please see [License File](https://github.com/sandorianHQ/laravel-cashier-mollie/blob/develop/LICENSE.md) for more information.
+The MIT License (MIT). Please see [License File](https://github.com/mollie/laravel-cashier-mollie/blob/main/LICENSE.md) for more information.

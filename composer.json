@@ -13,7 +13,7 @@
         "debit card",
         "Europe"
     ],
-    "homepage": "https://github.com/sandorianHQ/laravel-cashier-mollie",
+    "homepage": "https://github.com/mollie/laravel-cashier-mollie",
     "license": "MIT",
     "authors": [
         {

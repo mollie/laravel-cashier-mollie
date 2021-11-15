@@ -56,6 +56,22 @@ class Order extends Model
     use ConvertsToMoney;
 
     /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'amount_refunded' => 'int',
+        'amount_charged_back' => 'int',
+        'tax' => 'int',
+        'owner_id' => 'int',
+        'subtotal' => 'int',
+        'total' => 'int',
+        'balance_before' => 'int',
+        'credit_used' => 'int',
+        'total_due' => 'int',
+    ];
+    /**
      * The attributes that should be mutated to dates.
      *
      * @var array

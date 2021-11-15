@@ -1,13 +1,13 @@
 <h1 align="center">Subscription billing with Laravel Cashier for Mollie</h1>
 <p align="center">
-  <img src="https://sandorianhq.github.io/laravel-cashier-mollie/assets/img/laravelcashiermollie.a7bde0e4.jpg"/>
+  <img src="https://www.cashiermollie.com/assets/img/laravelcashiermollie.a7bde0e4.jpg"/>
 </p>
 
 
 <img src="https://info.mollie.com/hubfs/github/laravel-cashier/editorLaravel.jpg" />
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/sandorianHQ/laravel-cashier-mollie.svg?style=flat-square)](https://packagist.org/packages/sandorianHQ/laravel-cashier-mollie)
-[![Github Actions](https://github.com/sandorianHQ/laravel-cashier-mollie/workflows/tests/badge.svg)](https://github.com/sandorianHQ/laravel-cashier-mollie/actions)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/mollie/laravel-cashier-mollie.svg?style=flat-square)](https://packagist.org/packages/mollie/laravel-cashier-mollie)
+[![Github Actions](https://github.com/mollie/laravel-cashier-mollie/workflows/tests/badge.svg)](https://github.com/mollie/laravel-cashier-mollie/actions)
 
 Laravel Cashier provides an expressive, fluent interface to subscriptions using [Mollie](https://www.mollie.com)'s billing services.
 
@@ -28,25 +28,14 @@ First, make sure to add the Mollie key to your `.env` file. You can obtain an AP
 MOLLIE_KEY="test_xxxxxxxxxxx"
 ```
 
-Next, add the repository to your `composer.json`:
-
-```json
-"repositories": [
-    {
-        "type": "vcs",
-        "url":  "git@github.com:sandorianHQ/laravel-cashier-mollie.git"
-    }
-]
-```
-
-Now pull the package in using composer:
+Once you have added the `MOLLIE_KEY`, you may install Laravel Cashier Mollie using Composer:
 
 ```bash
-composer require mollie/laravel-cashier-mollie "^0.2.0"
+composer require mollie/laravel-cashier-mollie "^2.0"
 ```
 
 ## Official Documentation
-Documentation can be found on the [Laravel Cashier Mollie website](https://sandorianhq.github.io/laravel-cashier-mollie/).
+Documentation can be found on the [Laravel Cashier Mollie website](https://www.cashiermollie.com/).
 
 ## Contributing
 

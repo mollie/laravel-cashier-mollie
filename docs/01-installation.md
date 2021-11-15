@@ -1,5 +1,17 @@
 # Installation
 
+First, make sure to add the Mollie key to your `.env` file. You can obtain an API key from the [Mollie dashboard](https://www.mollie.com/dashboard/developers/api-keys):
+
+```dotenv
+MOLLIE_KEY="test_xxxxxxxxxxx"
+```
+
+Now pull the package in using composer:
+
+```bash
+composer require mollie/laravel-cashier-mollie "^2.0"
+```
+
 ## Setup
 
 Once you have pulled in the package:
@@ -18,13 +30,7 @@ Once you have pulled in the package:
 
 3. Run the migrations: `php artisan migrate`
 
-4. Ensure you have properly configured the `MOLLIE_KEY` in your .env file. You can obtain an API key from the [Mollie dashboard](https://www.mollie.com/dashboard/developers/api-keys):
-
-    ```dotenv
-   MOLLIE_KEY="test_xxxxxxxxxxxxxxxxxxxxxx"
-    ```
-
-5. Prepare the configuration files:
+4. Prepare the configuration files:
 
     - configure at least one subscription plan in `config/cashier_plans.php`.
 
@@ -34,7 +40,7 @@ Once you have pulled in the package:
     - the base configuration is in `config/cashier`. Be careful while modifying this, in most cases you will not need
       to.
 
-6. Prepare the billable model (typically the default Laravel User model):
+5. Prepare the billable model (typically the default Laravel User model):
 
     - Add the `Laravel\Cashier\Billable` trait.
 
@@ -52,41 +58,39 @@ Once you have pulled in the package:
    Learn more about storing data on the Mollie Customer [here](https://docs.mollie.com/reference/v2/customers-api/create-customer#parameters).
 
     - Implement
-    
     ```php
     Laravel\Cashier\Order\Contracts\ProvidesInvoiceInformation
     ```
-    
-    interface. For example:
+   interface. For example:
 
     ```php
-   /**
-    * Get the receiver information for the invoice.
-    * Typically includes the name and some sort of (E-mail/physical) address.
-    *
-    * @return array An array of strings
-    */
-   public function getInvoiceInformation()
-   {
-       return [$this->name, $this->email];
-   }
-
-   /**
-    * Get additional information to be displayed on the invoice. Typically a note provided by the customer.
-    *
-    * @return string|null
-    */
-   public function getExtraBillingInformation()
-   {
-       return null;
-   }
+        /**
+        * Get the receiver information for the invoice.
+        * Typically includes the name and some sort of (E-mail/physical) address.
+        *
+        * @return array An array of strings
+        */
+        public function getInvoiceInformation()
+        {
+            return [$this->name, $this->email];
+        }
+        
+        /**
+        * Get additional information to be displayed on the invoice. Typically a note provided by the customer.
+        *
+        * @return string|null
+        */
+        public function getExtraBillingInformation()
+        {
+            return null;
+        }
     ```
 
-7. Schedule a periodic job to execute `Cashier::run()`.
+6. Schedule a periodic job to execute `Cashier::run()`.
 
     ```php
     $schedule->command('cashier:run')
-        ->daily() // run as often as you like (Daily, monthly, every minute, ...)
+        ->daily() // run as often as you like (daily, monthly, every minute, ...)
         ->withoutOverlapping(); // make sure to include this
     ```
 
