@@ -29,6 +29,7 @@ module.exports = {
             }
         ],
         docsDir: 'docs',
+        docsBranch: 'main',
         editLinks: true,
         editLinkText: 'Improve this page (submit a PR)',
         domain: 'https://www.cashiermollie.com',
