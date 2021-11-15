@@ -25,7 +25,7 @@ If you discover any security related issues, please email security@mollie.com in
 ## Credits
 
 - [Mollie.com](https://www.mollie.com)
-- [Sander van Hooft](https://github.com/sandervanhooft)
+- [Sandorian.com](https://www.sandorian.com)
 - [All Contributors](../../contributors)
 
 ## License
