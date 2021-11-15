@@ -15,7 +15,7 @@ Please see [CONTRIBUTING](https://github.com/mollie/laravel-cashier-mollie/blob/
 
 #### Security
 
-If you discover any security related issues, please email **support@mollie.com** instead of using the issue tracker.
+If you discover any security related issues, please email **security@mollie.com** instead of using the issue tracker.
 
 ### Credits
 
