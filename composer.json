@@ -13,7 +13,7 @@
         "debit card",
         "Europe"
     ],
-    "homepage": "https://github.com/sandorianHQ/laravel-cashier-mollie",
+    "homepage": "https://github.com/mollie/laravel-cashier-mollie",
     "license": "MIT",
     "authors": [
         {
@@ -24,7 +24,7 @@
         },
         {
             "name": "Sander van Hooft",
-            "email": "info@sandervanhooft.com",
+            "email": "sander@sandorian.com",
             "homepage": "https://www.sandorian.com",
             "role": "Developer"
         }
