@@ -160,12 +160,12 @@ class OrderTest extends BaseTestCase
         $this->assertCarbon(now()->addMonth(), $subscription->cycle_ends_at);
         $this->assertCarbon(now()->addMonth(), $scheduled_item->process_at);
 
-        $this->assertSame('2', $scheduled_item->owner_id);
+        $this->assertSame(2, $scheduled_item->owner_id);
         $this->assertSame(User::class, $scheduled_item->owner_type);
         $this->assertSame('EUR', $scheduled_item->currency);
-        $this->assertSame('1', $scheduled_item->quantity);
-        $this->assertSame('1000', $scheduled_item->unit_price);
-        $this->assertSame('0', $scheduled_item->tax_percentage);
+        $this->assertSame(1, $scheduled_item->quantity);
+        $this->assertSame(1000, $scheduled_item->unit_price);
+        $this->assertSame(0.0, $scheduled_item->tax_percentage);
     }
 
     /** @test */
@@ -199,15 +199,15 @@ class OrderTest extends BaseTestCase
 
         $order = Order::createFromItems(new OrderItemCollection([$scheduled_item]))->fresh();
 
-        $this->assertSame("2", $order->owner_id);
+        $this->assertSame(2, $order->owner_id);
         $this->assertSame(User::class, $order->owner_type);
         $this->assertSame("EUR", $order->currency);
-        $this->assertSame("0", $order->tax);
-        $this->assertSame("1000", $order->subtotal);
-        $this->assertSame("1000", $order->total);
-        $this->assertSame("1000", $order->total_due);
-        $this->assertSame("0", $order->credit_used);
-        $this->assertSame("0", $order->balance_before);
+        $this->assertSame(0, $order->tax);
+        $this->assertSame(1000, $order->subtotal);
+        $this->assertSame(1000, $order->total);
+        $this->assertSame(1000, $order->total_due);
+        $this->assertSame(0, $order->credit_used);
+        $this->assertSame(0, $order->balance_before);
 
 
         $this->assertEquals(0, $order->balance_after);
@@ -234,15 +234,15 @@ class OrderTest extends BaseTestCase
         $this->assertMoneyEURCents(500, $user->credit('EUR')->money());
 
 
-        $this->assertSame("2", $order->owner_id);
+        $this->assertSame(2, $order->owner_id);
         $this->assertSame(User::class, $order->owner_type);
         $this->assertSame("EUR", $order->currency);
-        $this->assertSame("0", $order->tax);
-        $this->assertSame("1000", $order->subtotal);
-        $this->assertSame("1000", $order->total);
-        $this->assertSame("0", $order->total_due);
+        $this->assertSame(0, $order->tax);
+        $this->assertSame(1000, $order->subtotal);
+        $this->assertSame(1000, $order->total);
+        $this->assertSame(0, $order->total_due);
         $this->assertSame(1000, $order->credit_used);
-        $this->assertSame("1500", $order->balance_before);
+        $this->assertSame(1500, $order->balance_before);
     }
 
     /** @test */

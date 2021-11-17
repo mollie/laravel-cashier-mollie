@@ -29,15 +29,15 @@ module.exports = {
             }
         ],
         docsDir: 'docs',
+        docsBranch: 'main',
         editLinks: true,
         editLinkText: 'Improve this page (submit a PR)',
         domain: 'https://www.cashiermollie.com',
         displayAllHeaders: true,
         sidebar: [
             ['/', 'Introduction'],
-            '/00-installation',
+            '/01-installation',
             '/13-upgrade',
-            //'/01-installation',
             '/02-subscriptions',
             '/03-trials',
             '/04-charges',
@@ -53,7 +53,7 @@ module.exports = {
             //'/13-upgrade',
         ]
     },
-    base: '/laravel-cashier-mollie/',
+    base: '/',
     plugins: [
         ['seo', {
             siteTitle: (_, $site) => $site.title,
@@ -64,7 +64,7 @@ module.exports = {
             twitterCard: _ => 'summary_large_image',
             type: $page => 'website',
             url: (_, $site, path) => ($site.themeConfig.domain || '') + path,
-            image: ($page, $site) => "https://sandorianhq.github.io/laravel-cashier-mollie/assets/pages/laravelcashiermollie.jpg",
+            image: ($page, $site) => "https://www.cashiermollie.com/assets/pages/laravelcashiermollie.jpg",
             publishedAt: $page => $page.frontmatter.date && new Date($page.frontmatter.date),
             modifiedAt: $page => $page.lastUpdated && new Date($page.lastUpdated),
         }],
