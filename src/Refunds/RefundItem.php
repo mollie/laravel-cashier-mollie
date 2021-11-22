@@ -37,6 +37,11 @@ class RefundItem extends Model
      */
     protected $casts = [
         'description_extra_lines' => 'array',
+        'tax_percentage' => 'float',
+        'unit_price' => 'int',
+        'subtotal' => 'int',
+        'tax' => 'int',
+        'total' => 'int',
     ];
 
     /**
