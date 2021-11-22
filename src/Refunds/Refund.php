@@ -33,6 +33,9 @@ class Refund extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'total' => 'int',
+    ];
     /**
      * Create a new Refund Collection instance.
      *
