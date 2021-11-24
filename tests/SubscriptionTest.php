@@ -168,7 +168,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertSame("Laravel\Cashier\Subscription", $item_1->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_1->owner_type);
         $this->assertSame(1, $item_1->orderable_id);
-        $this->assertSame(1, $item_1->owner_id);
+        $this->assertEquals(1, $item_1->owner_id);
         $this->assertSame("Monthly payment", $item_1->description);
         $this->assertSame(null, $item_1->description_extra_lines);
         $this->assertSame("EUR", $item_1->currency);
@@ -193,7 +193,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertSame("Laravel\Cashier\Subscription", $item_2->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_2->owner_type);
         $this->assertSame(1, $item_2->orderable_id);
-        $this->assertSame(1, $item_2->owner_id);
+        $this->assertEquals(1, $item_2->owner_id);
         $this->assertSame("Monthly payment", $item_2->description);
         $this->assertSame(null, $item_2->description_extra_lines);
         $this->assertSame("EUR", $item_2->currency);
@@ -219,7 +219,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertSame("Laravel\Cashier\Subscription", $item_3->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_3->owner_type);
         $this->assertSame(1, $item_3->orderable_id);
-        $this->assertSame(1, $item_3->owner_id);
+        $this->assertEquals(1, $item_3->owner_id);
         $this->assertSame("Monthly payment", $item_3->description);
         $this->assertSame(null, $item_3->description_extra_lines);
         $this->assertSame("EUR", $item_3->currency);
@@ -252,7 +252,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertSame("Laravel\Cashier\Subscription", $item_1->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_1->owner_type);
         $this->assertSame(1, $item_1->orderable_id);
-        $this->assertSame(1, $item_1->owner_id);
+        $this->assertEquals(1, $item_1->owner_id);
         $this->assertSame("Monthly payment", $item_1->description);
         $this->assertSame(null, $item_1->description_extra_lines);
         $this->assertSame("EUR", $item_1->currency);
@@ -277,7 +277,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertSame("Laravel\Cashier\Subscription", $item_2->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_2->owner_type);
         $this->assertSame(1, $item_2->orderable_id);
-        $this->assertSame(1, $item_2->owner_id);
+        $this->assertEquals(1, $item_2->owner_id);
         $this->assertSame("Monthly payment", $item_2->description);
         $this->assertSame(null, $item_2->description_extra_lines);
         $this->assertSame("EUR", $item_2->currency);
@@ -303,7 +303,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertSame("Laravel\Cashier\Subscription", $item_3->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_3->owner_type);
         $this->assertSame(1, $item_3->orderable_id);
-        $this->assertSame(1, $item_3->owner_id);
+        $this->assertEquals(1, $item_3->owner_id);
         $this->assertSame("Monthly payment", $item_3->description);
         $this->assertSame(null, $item_3->description_extra_lines);
         $this->assertSame("EUR", $item_3->currency);
@@ -336,7 +336,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertSame("Laravel\Cashier\Subscription", $item_1->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_1->owner_type);
         $this->assertSame(1, $item_1->orderable_id);
-        $this->assertSame(1, $item_1->owner_id);
+        $this->assertEquals(1, $item_1->owner_id);
         $this->assertSame("Monthly payment", $item_1->description);
         $this->assertSame(null, $item_1->description_extra_lines);
         $this->assertSame("EUR", $item_1->currency);
@@ -361,7 +361,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertSame("Laravel\Cashier\Subscription", $item_2->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_2->owner_type);
         $this->assertSame(1, $item_2->orderable_id);
-        $this->assertSame(1, $item_2->owner_id);
+        $this->assertEquals(1, $item_2->owner_id);
         $this->assertSame("Monthly payment", $item_2->description);
         $this->assertSame(null, $item_2->description_extra_lines);
         $this->assertSame("EUR", $item_2->currency);
@@ -387,7 +387,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertSame("Laravel\Cashier\Subscription", $item_3->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_3->owner_type);
         $this->assertSame(1, $item_3->orderable_id);
-        $this->assertSame(1, $item_3->owner_id);
+        $this->assertEquals(1, $item_3->owner_id);
         $this->assertSame("Monthly payment", $item_3->description);
         $this->assertSame(null, $item_3->description_extra_lines);
         $this->assertSame("EUR", $item_3->currency);
@@ -412,7 +412,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertSame("Laravel\Cashier\Subscription", $item_4->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_4->owner_type);
         $this->assertSame(1, $item_4->orderable_id);
-        $this->assertSame(1, $item_4->owner_id);
+        $this->assertEquals(1, $item_4->owner_id);
         $this->assertSame("Monthly payment", $item_4->description);
         $this->assertSame(null, $item_4->description_extra_lines);
         $this->assertSame("EUR", $item_4->currency);
