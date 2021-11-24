@@ -113,7 +113,7 @@ class FirstPaymentBuilder
             'redirectUrl' => $this->redirectUrl,
             'metadata' => [
                 'owner' => [
-                    'type' => get_class($this->owner),
+                    'type' => $this->owner->getMorphClass(),
                     'id' => $this->owner->getKey(),
                 ],
             ],
