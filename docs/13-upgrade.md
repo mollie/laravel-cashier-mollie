@@ -1,5 +1,9 @@
 # Upgrade Guide
 
+## Preparations
+
+If you're using `receipt_old.blade.php`, make sure to either publish it to your views directory before upgrading, or switch to the default `receipt.blade.php`.
+
 ## Upgrading To 2.0 From 1.x
 
 Remove the `laravel/cashier-mollie` dependency from your `composer.json`.
@@ -24,5 +28,5 @@ public function __construct(Model $owner, Money $unitPrice, int $quantity, strin
 ```php
 public function __construct(Model $owner, Money $subtotal, int $quantity, string $description) {...}
 ```
+
 3. Once you have asserted everything went ok, you can remove the `cashier_backup_orders` table.
-4. If you use `receipt_old.blade.php`, publish it to views because is removed from package views folder
