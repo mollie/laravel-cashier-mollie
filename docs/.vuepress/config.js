@@ -72,6 +72,12 @@ module.exports = {
         ['@vuepress/pwa', {
             serviceWorker: true,
             updatePopup: true
-        }]
+        }],
+        [
+            "@mr-hope/sitemap",
+            {
+                hostname: "https://www.cashiermollie.com"
+            },
+        ],
     ]
 }
