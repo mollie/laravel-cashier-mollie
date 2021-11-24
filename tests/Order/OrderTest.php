@@ -160,7 +160,7 @@ class OrderTest extends BaseTestCase
         $this->assertCarbon(now()->addMonth(), $subscription->cycle_ends_at);
         $this->assertCarbon(now()->addMonth(), $scheduled_item->process_at);
 
-        $this->assertSame(2, $scheduled_item->owner_id);
+        $this->assertEquals(2, $scheduled_item->owner_id);
         $this->assertSame(User::class, $scheduled_item->owner_type);
         $this->assertSame('EUR', $scheduled_item->currency);
         $this->assertSame(1, $scheduled_item->quantity);
@@ -199,7 +199,7 @@ class OrderTest extends BaseTestCase
 
         $order = Order::createFromItems(new OrderItemCollection([$scheduled_item]))->fresh();
 
-        $this->assertSame(2, $order->owner_id);
+        $this->assertEquals(2, $order->owner_id);
         $this->assertSame(User::class, $order->owner_type);
         $this->assertSame("EUR", $order->currency);
         $this->assertSame(0, $order->tax);
@@ -234,7 +234,7 @@ class OrderTest extends BaseTestCase
         $this->assertMoneyEURCents(500, $user->credit('EUR')->money());
 
 
-        $this->assertSame(2, $order->owner_id);
+        $this->assertEquals(2, $order->owner_id);
         $this->assertSame(User::class, $order->owner_type);
         $this->assertSame("EUR", $order->currency);
         $this->assertSame(0, $order->tax);

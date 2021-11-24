@@ -64,7 +64,6 @@ class Order extends Model
         'amount_refunded' => 'int',
         'amount_charged_back' => 'int',
         'tax' => 'int',
-        'owner_id' => 'int',
         'subtotal' => 'int',
         'total' => 'int',
         'balance_before' => 'int',

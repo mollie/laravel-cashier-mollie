@@ -33,7 +33,10 @@ $table->unsignedInteger('owner_id');
 // By this:
 $table->uuid('owner_id');  
 ```
-
+And in your `Billable` model add
+```php
+protected $keyType = 'string';
+```
 ## How is prorating handled?
 
 Cashier Mollie applies prorating by default. With prorating, customers are billed at the start of each billing cycle.

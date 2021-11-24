@@ -39,7 +39,6 @@ class OrderItem extends Model implements InvoicableItem
         'unit_price' => 'int',
         'tax_percentage' => 'float',
         'orderable_id' => 'int',
-        'owner_id' => 'int',
     ];
 
     /**
