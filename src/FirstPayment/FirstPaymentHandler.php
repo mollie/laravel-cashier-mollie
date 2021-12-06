@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\FirstPayment;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Laravel\Cashier\Events\MandateUpdated;
@@ -84,7 +85,9 @@ class FirstPaymentHandler
         $ownerType = $this->molliePayment->metadata->owner->type;
         $ownerID = $this->molliePayment->metadata->owner->id;
 
-        return $ownerType::findOrFail($ownerID);
+        $ownerClass = Relation::getMorphedModel($ownerType) ?? $ownerType;
+
+        return $ownerClass::findOrFail($ownerID);
     }
 
     /**
