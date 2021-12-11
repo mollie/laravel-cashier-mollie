@@ -47,6 +47,7 @@ module.exports = {
             '/08-refunds',
             '/14-retry',
             '/09-events',
+            '/15-localization',
             '/10-webhook',
             '/11-testing',
             '/12-faq',
