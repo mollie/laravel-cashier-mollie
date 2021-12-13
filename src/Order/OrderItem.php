@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Order;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder;
 use Laravel\Cashier\Order\Contracts\InteractsWithOrderItems;
 use Laravel\Cashier\Order\Contracts\InvoicableItem;
@@ -297,7 +298,7 @@ class OrderItem extends Model implements InvoicableItem
     public function handlePaymentFailed()
     {
         if ($this->orderableIsSet()) {
-            $this->orderable_type::handlePaymentFailed($this);
+            $this->getOrderableClass()::handlePaymentFailed($this);
         }
 
         return $this;
@@ -312,7 +313,7 @@ class OrderItem extends Model implements InvoicableItem
     public function handlePaymentPaid()
     {
         if ($this->orderableIsSet()) {
-            $this->orderable_type::handlePaymentPaid($this);
+            $this->getOrderableClass()::handlePaymentPaid($this);
         }
 
         return $this;
@@ -328,7 +329,7 @@ class OrderItem extends Model implements InvoicableItem
     public function handlePaymentRefunded(RefundItem $refundItem)
     {
         if ($this->orderableIsSet()) {
-            $this->orderable_type::handlePaymentRefunded($refundItem);
+            $this->getOrderableClass()::handlePaymentRefunded($refundItem);
         }
 
         return $this;
@@ -344,7 +345,7 @@ class OrderItem extends Model implements InvoicableItem
     public function handlePaymentRefundFailed(RefundItem $refundItem)
     {
         if ($this->orderableIsSet()) {
-            $this->orderable_type::handlePaymentRefundFailed($refundItem);
+            $this->getOrderableClass()::handlePaymentRefundFailed($refundItem);
         }
 
         return $this;
@@ -353,5 +354,15 @@ class OrderItem extends Model implements InvoicableItem
     public function getCurrency()
     {
         return $this->currency;
+    }
+
+    /**
+     * Get the class of orderable_type.
+     *
+     * @return string
+     */
+    protected function getOrderableClass()
+    {
+        return Relation::getMorphedModel($this->orderable_type) ?? $this->orderable_type;
     }
 }
