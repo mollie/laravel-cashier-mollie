@@ -29,4 +29,4 @@ public function __construct(Model $owner, Money $unitPrice, int $quantity, strin
 public function __construct(Model $owner, Money $subtotal, int $quantity, string $description) {...}
 ```
 
-3. Once you have asserted everything went ok, you can remove the `cashier_backup_orders` table.
+3. Run the migrations `php artisan migrate`.
