@@ -18,7 +18,7 @@ Once you have pulled in the package:
 
 1. Run `php artisan cashier:install`.
 
-2. Add these fields to your billable model's migration (typically the default "create_user_table" migration):
+2. Add these fields to your billable model's migration (typically the default "create_users_table" migration):
 
     ```php
     $table->string('mollie_customer_id')->nullable();
