@@ -34,8 +34,8 @@ class AftercareWebhookController extends BaseWebhookController
         if ($molliePayment && $molliePayment->hasChargebacks()) {
             $localPayment = Payment::findByPaymentId($molliePayment->id);
 
-            if ($localPayment->amount_charged_back < mollie_object_to_money($molliePayment->amountChargedBack)) {
-                $localPayment->amount_charged_back = mollie_object_to_money($molliePayment->amountChargedBack);
+            if ($localPayment->amount_charged_back < mollie_object_to_money($molliePayment->amountChargedBack)->getAmount()) {
+                $localPayment->amount_charged_back = mollie_object_to_money($molliePayment->amountChargedBack)->getAmount();
                 $localPayment->save();
 
                 Event::dispatch(new ChargebackReceived($localPayment, $molliePayment->amountChargedBack - $localPayment->amount_charged_back));
