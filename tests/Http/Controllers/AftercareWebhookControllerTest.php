@@ -45,7 +45,6 @@ class AftercareWebhookControllerTest extends BaseTestCase
         ];
 
         $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($molliePaymentId, $molliePayment) {
-
             return $mock->shouldReceive('execute')
                 ->with($molliePaymentId, [])
                 ->once()
@@ -60,10 +59,8 @@ class AftercareWebhookControllerTest extends BaseTestCase
         );
 
         $localPayment->refresh();
-        $this->assertMoney(1000,'EUR', $localPayment->getAmountChargedBack());
+        $this->assertMoney(1000, 'EUR', $localPayment->getAmountChargedBack());
 
         Event::assertDispatched(ChargebackReceived::class);
     }
-
-
 }
