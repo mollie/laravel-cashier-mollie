@@ -34,10 +34,10 @@ Once you have pulled in the package:
 
     - configure at least one subscription plan in `config/cashier_plans.php`.
 
-    - in `config/cashier_coupons.php` you can manage any coupons. By default an example coupon is enabled. Consider
+    - in `config/cashier_coupons.php` you can manage your subscription coupons. By default an example coupon is enabled. Consider
       disabling it before deploying to production.
 
-    - the base configuration is in `config/cashier`. Be careful while modifying this, in most cases you will not need
+    - the base configuration is in `config/cashier.php`. Be careful while modifying this, in most cases you will not need
       to.
 
 5. Prepare the billable model (typically the default Laravel User model):
@@ -57,11 +57,7 @@ Once you have pulled in the package:
     ```
    Learn more about storing data on the Mollie Customer [here](https://docs.mollie.com/reference/v2/customers-api/create-customer#parameters).
 
-    - Implement
-    ```php
-    Laravel\Cashier\Order\Contracts\ProvidesInvoiceInformation
-    ```
-   interface. For example:
+    - Implement the `Laravel\Cashier\Order\Contracts\ProvidesInvoiceInformation` interface on your billable model. For example:
 
     ```php
         /**
@@ -86,14 +82,14 @@ Once you have pulled in the package:
         }
     ```
 
-6. Schedule a periodic job to execute `Cashier::run()`.
+6. Schedule a periodic job to execute the `cashier:run` command. When processing lots of orders, consider increasing the job frequency to prevent hitting Mollie's rate limiter.
 
     ```php
     $schedule->command('cashier:run')
-        ->daily() // run as often as you like (daily, monthly, every minute, ...)
+        ->hourly() // run as often as you like (daily, monthly, every minute, ...)
         ->withoutOverlapping(); // make sure to include this
     ```
 
-You can find more about scheduling jobs using Laravel [here](https://laravel.com/docs/scheduling).
+    You can find more about scheduling jobs using Laravel [here](https://laravel.com/docs/scheduling).
 
 🎉 You're now good to go :).
