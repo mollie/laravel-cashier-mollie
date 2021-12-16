@@ -44,10 +44,10 @@ class AftercareWebhookController extends BaseWebhookController
                 $amountChargedBackNow = $molliePaymentAmountChargedBackTotal->subtract(
                     $locallyKnownAmountChargedBack
                 );
-                Event::dispatch(new ChargebackReceived(
-                    $localPayment,
-                    $amountChargedBackNow,
-                ));
+
+                Event::dispatch(
+                    new ChargebackReceived($localPayment, $amountChargedBackNow)
+                );
             }
         }
 
