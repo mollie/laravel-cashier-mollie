@@ -47,6 +47,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
         $subscription = $subscription->swap('weekly-20-1')->fresh();
 
         $this->assertEquals('weekly-20-1', $subscription->plan);
+        $this->assertEquals('weekly-20-1', $subscription->name);
 
         $this->assertCarbon($now->copy(), $subscription->cycle_started_at);
         $this->assertCarbon($now->copy()->addWeek(), $subscription->cycle_ends_at);
@@ -110,6 +111,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
             factory(Subscription::class)->make([
                 'ends_at' => now()->addWeek(),
                 'plan' => 'monthly-20-1',
+                'name' => 'monthly-20-1',
             ])
         );
         $subscription->cancel();
@@ -134,6 +136,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
         $subscription = $subscription->swapNextCycle('weekly-20-1')->fresh();
 
         $this->assertEquals('monthly-10-1', $subscription->plan);
+        $this->assertEquals('monthly-10-1', $subscription->name);
         $this->assertEquals('weekly-20-1', $subscription->next_plan);
 
         // Check that the billing cycle remains intact
@@ -157,6 +160,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
         Event::assertNotDispatched(SubscriptionPlanSwapped::class);
 
         $this->assertEquals('monthly-10-1', $subscription->plan);
+        $this->assertEquals('monthly-10-1', $subscription->name);
         $this->assertEquals('weekly-20-1', $subscription->next_plan);
 
         Subscription::processOrderItem($new_order_item);
@@ -165,6 +169,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
 
         $this->assertNull($subscription->next_plan);
         $this->assertEquals('weekly-20-1', $subscription->plan);
+        $this->assertEquals('weekly-20-1', $subscription->name);
 
         // Assert that the subscription cycle reflects the new plan
         $cycle_should_have_started_at = $cycle_should_end_at->copy();
@@ -196,7 +201,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     protected function getSubscriptionForUser($user)
     {
         return $user->subscriptions()->save(factory(Subscription::class)->make([
-            "name" => "dummy name",
+            "name" => "monthly-10-1",
             "plan" => "monthly-10-1",
             "cycle_started_at" => now()->subWeeks(2),
             "cycle_ends_at" => now()->subWeeks(2)->addMonth(),
