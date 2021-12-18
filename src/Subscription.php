@@ -37,6 +37,7 @@ use Money\Money;
  * @property string owner_type
  * @property string next_plan
  * @property string plan
+ * @property string name
  * @property int quantity
  * @property mixed scheduled_order_item_id
  * @property OrderItem scheduledOrderItem
@@ -211,6 +212,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
 
         $applyNewSettings = function () use ($newPlan) {
             $this->plan = $newPlan->name();
+            $this->name = $newPlan->name();
         };
 
         $this->restartCycleWithModifications($applyNewSettings, now(), $invoiceNow);
