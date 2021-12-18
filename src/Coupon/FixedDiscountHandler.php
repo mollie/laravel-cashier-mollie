@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Coupon;
 
+use Laravel\Cashier\Exceptions\CurrencyMismatchException;
 use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Money\Money;
@@ -21,7 +22,12 @@ class FixedDiscountHandler extends BaseCouponHandler
         /** @var OrderItem $firstItem */
         $firstItem = $items->first();
 
+
         $unitPrice = $this->unitPrice($firstItem->getTotal());
+
+        if (! $unitPrice->isSameCurrency($firstItem->getTotal())) {
+            throw new CurrencyMismatchException('All actions must be in the same currency');
+        }
 
         return $this->makeOrderItem([
             'process_at' => now(),
