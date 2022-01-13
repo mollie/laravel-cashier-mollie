@@ -4,13 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Subscription Trials | Laravel Cashier Mollie v2</title>
-    <meta name="generator" content="VuePress 1.8.2">
+    <meta name="generator" content="VuePress 1.9.5">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/manifest.json">
     <script src="https://cdn.usefathom.com/script.js" spa="auto" site="ANMLOYPH" defer="true"></script>
-    <meta name="description" content="Laravel Cashier provides an expressive, fluent interface to subscriptions using Mollie's billing services.">
+    <meta name="description" content="Laravel Cashier provides an expressive, fluent interface to subscriptions using Mollie&#39;s billing services.">
     <meta property="og:site_name" content="Laravel Cashier Mollie v2">
     <meta property="og:title" content="Subscription Trials">
     <meta property="og:type" content="website">
@@ -25,7 +25,7 @@
     <meta name="theme-color" content="#ffffff">
     <meta name="viewport" content="width=device-width">
     
-    <link rel="preload" href="/assets/css/0.styles.8d363c57.css" as="style"><link rel="preload" href="/assets/js/app.34a3b78a.js" as="script"><link rel="preload" href="/assets/js/2.ca9cb91f.js" as="script"><link rel="preload" href="/assets/js/11.06d48f1a.js" as="script"><link rel="preload" href="/assets/js/3.ef87c80f.js" as="script"><link rel="prefetch" href="/assets/js/10.10907cbf.js"><link rel="prefetch" href="/assets/js/12.b1b4f26a.js"><link rel="prefetch" href="/assets/js/13.a368191a.js"><link rel="prefetch" href="/assets/js/14.cc8e3b38.js"><link rel="prefetch" href="/assets/js/15.e5b7484e.js"><link rel="prefetch" href="/assets/js/16.1699dcd5.js"><link rel="prefetch" href="/assets/js/17.0203c377.js"><link rel="prefetch" href="/assets/js/18.fca08ff7.js"><link rel="prefetch" href="/assets/js/19.b40fc194.js"><link rel="prefetch" href="/assets/js/20.21920152.js"><link rel="prefetch" href="/assets/js/21.852c7e44.js"><link rel="prefetch" href="/assets/js/22.1cd496ae.js"><link rel="prefetch" href="/assets/js/23.9033ca21.js"><link rel="prefetch" href="/assets/js/24.e4940cdf.js"><link rel="prefetch" href="/assets/js/4.c942773d.js"><link rel="prefetch" href="/assets/js/5.d52db440.js"><link rel="prefetch" href="/assets/js/6.1c3bb5fe.js"><link rel="prefetch" href="/assets/js/7.ed75cf2c.js"><link rel="prefetch" href="/assets/js/8.3bbd489b.js"><link rel="prefetch" href="/assets/js/9.4dbd18aa.js">
+    <link rel="preload" href="/assets/css/0.styles.8d363c57.css" as="style"><link rel="preload" href="/assets/js/app.f9548df0.js" as="script"><link rel="preload" href="/assets/js/2.732317f1.js" as="script"><link rel="preload" href="/assets/js/11.69edff1d.js" as="script"><link rel="preload" href="/assets/js/3.42d67b2b.js" as="script"><link rel="prefetch" href="/assets/js/10.4bb8aa94.js"><link rel="prefetch" href="/assets/js/12.aa8b36ea.js"><link rel="prefetch" href="/assets/js/13.2ebac815.js"><link rel="prefetch" href="/assets/js/14.8ab8bad3.js"><link rel="prefetch" href="/assets/js/15.634217ba.js"><link rel="prefetch" href="/assets/js/16.4887b3f2.js"><link rel="prefetch" href="/assets/js/17.601908f7.js"><link rel="prefetch" href="/assets/js/18.fafa4fc6.js"><link rel="prefetch" href="/assets/js/19.3dcbe86f.js"><link rel="prefetch" href="/assets/js/20.c26766c0.js"><link rel="prefetch" href="/assets/js/21.30502fce.js"><link rel="prefetch" href="/assets/js/22.2410b9dc.js"><link rel="prefetch" href="/assets/js/23.d16235d8.js"><link rel="prefetch" href="/assets/js/24.2e1c18ef.js"><link rel="prefetch" href="/assets/js/4.b1b7a693.js"><link rel="prefetch" href="/assets/js/5.75ae48a5.js"><link rel="prefetch" href="/assets/js/6.bb2a77e9.js"><link rel="prefetch" href="/assets/js/7.dc5e05ae.js"><link rel="prefetch" href="/assets/js/8.bc1d50a5.js"><link rel="prefetch" href="/assets/js/9.ca3df7ed.js">
     <link rel="stylesheet" href="/assets/css/0.styles.8d363c57.css">
   </head>
   <body>
@@ -71,7 +71,7 @@ trial period and has not created an actual subscription yet:</p> <div class="lan
 </code></pre></div><p>Once you are ready to create an actual subscription for the user, you may use the <code>newSubscription</code> method as usual:</p> <div class="language-php extra-class"><pre class="language-php"><code><span class="token variable">$user</span> <span class="token operator">=</span> <span class="token class-name static-context">User</span><span class="token operator">::</span><span class="token function">find</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 <span class="token variable">$user</span><span class="token operator">-&gt;</span><span class="token function">newSubscription</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'main'</span><span class="token punctuation">,</span> <span class="token string single-quoted-string">'monthly'</span><span class="token punctuation">)</span><span class="token operator">-&gt;</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-</code></pre></div></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/mollie/laravel-cashier-mollie/edit/main/docs/03-trials.md" target="_blank" rel="noopener noreferrer">Improve this page (submit a PR)</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <div class="last-updated"><span class="prefix">Last Updated:</span> <span class="time">12/15/2021, 12:01:40 PM</span></div></footer> <div class="page-nav"><p class="inner"><span class="prev">
+</code></pre></div></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/mollie/laravel-cashier-mollie/edit/main/docs/03-trials.md" target="_blank" rel="noopener noreferrer">Improve this page (submit a PR)</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <div class="last-updated"><span class="prefix">Last Updated:</span> <span class="time">12/16/2021, 8:23:29 PM</span></div></footer> <div class="page-nav"><p class="inner"><span class="prev">
       ←
       <a href="/02-subscriptions.html" class="prev">
         Subscriptions
@@ -80,6 +80,6 @@ trial period and has not created an actual subscription yet:</p> <div class="lan
       </a>
       →
     </span></p></div> </main></div><div class="global-ui"><!----></div></div>
-    <script src="/assets/js/app.34a3b78a.js" defer></script><script src="/assets/js/2.ca9cb91f.js" defer></script><script src="/assets/js/11.06d48f1a.js" defer></script><script src="/assets/js/3.ef87c80f.js" defer></script>
+    <script src="/assets/js/app.f9548df0.js" defer></script><script src="/assets/js/2.732317f1.js" defer></script><script src="/assets/js/11.69edff1d.js" defer></script><script src="/assets/js/3.42d67b2b.js" defer></script>
   </body>
 </html>
