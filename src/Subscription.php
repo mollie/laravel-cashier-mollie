@@ -466,7 +466,6 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
             $plan_swapped = true;
             $previousPlan = $subscription->plan;
             $subscription->plan = $subscription->next_plan;
-            $subscription->name = $subscription->next_plan;
             $subscription->next_plan = null;
         }
 
