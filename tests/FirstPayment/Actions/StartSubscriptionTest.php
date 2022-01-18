@@ -516,6 +516,45 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
+    public function canStartSubscriptionUsingNextPaymentAt()
+    {
+        $this->withMockedGetMollieCustomer();
+        $this->withMockedGetMollieMandate();
+        $user = $this->getMandatedUser();
+
+        $this->assertFalse($user->subscribed('default'));
+
+        $action = new StartSubscription(
+            $user,
+            'default',
+            'monthly-10-1'
+        );
+
+        $action->nextPaymentAt(now()->addWeeks(2));
+
+        // Returns the OrderItem ready for processing right away.
+        // Behind the scenes another OrderItem is scheduled for the next billing cycle.
+        $items = $action->execute();
+        $item = $items->first();
+        $user = $user->fresh();
+
+        $this->assertTrue($user->subscribed('default'));
+        $this->assertInstanceOf(OrderItemCollection::class, $items);
+        $this->assertCount(1, $items);
+        $this->assertInstanceOf(OrderItem::class, $item);
+        $this->assertFalse($item->isProcessed());
+        $this->assertCarbon(now(), $item->process_at);
+
+        $subscription = $user->subscription('default');
+        $this->assertEquals(2, $subscription->orderItems()->count());
+        $this->assertCarbon(now(), $subscription->cycle_started_at);
+        $this->assertCarbon(now()->addWeeks(2), $subscription->cycle_ends_at);
+
+        $scheduledItem = $subscription->orderItems()->orderByDesc('process_at')->first();
+        $this->assertCarbon(now()->addWeeks(2), $scheduledItem->process_at);
+    }
+
+    /** @test */
     public function canStartSubscriptionWithCouponNoTrial()
     {
         $this->withMockedCouponRepository();
