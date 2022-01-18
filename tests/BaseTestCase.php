@@ -420,6 +420,41 @@ abstract class BaseTestCase extends TestCase
     }
 
     /**
+     * @param \Laravel\Cashier\Coupon\Coupon $coupon
+     * @param null $couponHandler
+     * @param null $context
+     * @return CouponRepository The mocked coupon repository
+     */
+    protected function withMockedUsdCouponRepository(Coupon $coupon = null, $couponHandler = null, $context = null)
+    {
+        if (is_null($couponHandler)) {
+            $couponHandler = new FixedDiscountHandler;
+        }
+
+        if (is_null($context)) {
+            $context = [
+                'description' => 'Test USD coupon',
+                'discount' => [
+                    'value' => '5.00',
+                    'currency' => 'USD',
+                ],
+            ];
+        }
+
+        if (is_null($coupon)) {
+            $coupon = new Coupon(
+                'usddiscount',
+                $couponHandler,
+                $context
+            );
+        }
+
+        return $this->mock(CouponRepository::class, function ($mock) use ($coupon) {
+            return $mock->shouldReceive('findOrFail')->with($coupon->name())->andReturn($coupon);
+        });
+    }
+
+    /**
      * Register an instance of an object in the container.
      * Included for Laravel 5.5 / 5.6 compatibility.
      *
