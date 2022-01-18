@@ -88,6 +88,10 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
             $action->trialUntil(Carbon::parse($payload['trialUntil']));
         }
 
+        if (isset($payload['nextPaymentAt'])) {
+            $action->nextPaymentAt(Carbon::parse($payload['nextPaymentAt']));
+        }
+
         if (isset($payload['trialDays'])) {
             $action->trialDays($payload['trialDays']);
         }
@@ -287,6 +291,7 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     public function nextPaymentAt(Carbon $nextPaymentAt)
     {
         $this->nextPaymentAt = $nextPaymentAt;
+        $this->builder()->nextPaymentAt($nextPaymentAt);
 
         return $this;
     }
