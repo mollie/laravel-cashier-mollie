@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Charge;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\FirstPayment\Actions\AddGenericOrderItem;
 use Laravel\Cashier\FirstPayment\Actions\BaseAction as FirstPaymentAction;
 use Laravel\Cashier\Order\OrderItem;
@@ -56,7 +57,7 @@ class ChargeItem
 
     public function toOrderItem(array $overrides = []): OrderItem
     {
-        return OrderItem::make(array_merge([
+        return Cashier::$orderItemModel::make(array_merge([
             'owner_type' => $this->owner->getMorphClass(),
             'owner_id' => $this->owner->getKey(),
             'description' => $this->description,

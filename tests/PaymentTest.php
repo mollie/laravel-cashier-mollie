@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Tests;
 
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Payment;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
@@ -25,7 +26,7 @@ class PaymentTest extends BaseTestCase
         $molliePayment->mandateId = 'mdt_dummy_mandate_id';
         $user = $this->getMandatedUser();
 
-        $localPayment = Payment::createFromMolliePayment($molliePayment, $user);
+        $localPayment = Cashier::$paymentModel::createFromMolliePayment($molliePayment, $user);
 
         $this->assertEquals('tr_dummy_payment_id', $localPayment->mollie_payment_id);
         $this->assertEquals('dummy_status', $localPayment->mollie_payment_status);
@@ -60,7 +61,7 @@ class PaymentTest extends BaseTestCase
         $molliePayment->mandateId = 'mdt_dummy_mandate_id';
         $user = $this->getMandatedUser();
 
-        $localPayment = Payment::createFromMolliePayment($molliePayment, $user);
+        $localPayment = Cashier::$paymentModel::createFromMolliePayment($molliePayment, $user);
 
         $this->assertEquals('tr_dummy_payment_id', $localPayment->mollie_payment_id);
         $this->assertEquals('dummy_status', $localPayment->mollie_payment_status);

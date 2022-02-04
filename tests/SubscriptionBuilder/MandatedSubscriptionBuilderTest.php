@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Tests\SubscriptionBuilder;
 
 use Carbon\Carbon;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\AppliedCoupon;
 use Laravel\Cashier\Coupon\RedeemedCoupon;
 use Laravel\Cashier\Exceptions\CouponException;
@@ -39,8 +40,8 @@ class MandatedSubscriptionBuilderTest extends BaseTestCase
         $now = Carbon::parse('2019-01-01');
         $this->withTestNow($now);
 
-        $this->assertEquals(0, RedeemedCoupon::count());
-        $this->assertEquals(0, AppliedCoupon::count());
+        $this->assertEquals(0, Cashier::$redeemedCouponModel::count());
+        $this->assertEquals(0, Cashier::$appliedCouponModel::count());
 
         $builder = $this->getBuilder();
 
@@ -66,8 +67,8 @@ class MandatedSubscriptionBuilderTest extends BaseTestCase
         $now = Carbon::parse('2019-01-01');
         $this->withTestNow($now);
 
-        $this->assertEquals(0, RedeemedCoupon::count());
-        $this->assertEquals(0, AppliedCoupon::count());
+        $this->assertEquals(0, Cashier::$redeemedCouponModel::count());
+        $this->assertEquals(0, Cashier::$appliedCouponModel::count());
 
         $builder = $this->getBuilder();
 

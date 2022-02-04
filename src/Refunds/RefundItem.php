@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Laravel\Cashier\Refunds;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\ConvertsToMoney;
 use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Traits\HasOwner;
@@ -56,7 +57,7 @@ class RefundItem extends Model
      * @param array $overrides
      * @return static
      */
-    public static function makeFromOrderItem(OrderItem $orderItem, array $overrides = []): self
+    public static function makeFromOrderItem(OrderItem $orderItem, array $overrides = []): static
     {
         return static::make(array_merge([
             'original_order_item_id' => $orderItem->getKey(),
@@ -72,7 +73,7 @@ class RefundItem extends Model
 
     public function originalOrderItem()
     {
-        return $this->hasOne(OrderItem::class, 'id', 'original_order_item_id');
+        return $this->hasOne(Cashier::$orderItemModel, 'id', 'original_order_item_id');
     }
 
     /**

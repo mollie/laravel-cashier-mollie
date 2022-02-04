@@ -5,6 +5,7 @@ namespace Laravel\Cashier\FirstPayment;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\MandateUpdated;
 use Laravel\Cashier\FirstPayment\Actions\BaseAction;
 use Laravel\Cashier\Order\Order;
@@ -48,14 +49,14 @@ class FirstPaymentHandler
 
             $orderItems = $this->executeActions();
 
-            $order = Order::createProcessedFromItems($orderItems, [
+            $order = Cashier::$orderModel::createProcessedFromItems($orderItems, [
                 'mollie_payment_id' => $this->molliePayment->id,
                 'mollie_payment_status' => $this->molliePayment->status,
             ]);
 
             // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
             // In that case we create a record here.
-            $localPayment = LocalPayment::findByMolliePaymentOrCreate(
+            $localPayment = Cashier::$paymentModel::findByMolliePaymentOrCreate(
                 $this->molliePayment,
                 $this->owner,
                 $this->actions->all()
@@ -97,7 +98,7 @@ class FirstPaymentHandler
      */
     protected function extractActions()
     {
-        $payment = LocalPayment::findByPaymentId($this->molliePayment->id);
+        $payment = Cashier::$paymentModel::findByPaymentId($this->molliePayment->id);
 
         if (isset($payment) && ! is_null($payment->first_payment_actions)) {
             $actions = $payment->first_payment_actions;

@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Tests\Coupon;
 
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\Coupon\Coupon;
 use Laravel\Cashier\Coupon\CouponOrderItemPreprocessor;
@@ -37,8 +38,8 @@ class PercentageCouponTest extends BaseTestCase
         $this->withMockedCouponRepository($coupon, $couponHandler, $context);
 
         /** @var Subscription $subscription */
-        $subscription = factory(Subscription::class)->create();
-        $item = factory(OrderItem::class)->make();
+        $subscription = factory(Cashier::$subscriptionModel)->create();
+        $item = factory(Cashier::$orderItemModel)->make();
         $subscription->orderItems()->save($item);
 
         /** @var \Laravel\Cashier\Coupon\Coupon $coupon */

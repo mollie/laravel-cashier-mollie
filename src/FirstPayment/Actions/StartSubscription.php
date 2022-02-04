@@ -4,6 +4,7 @@ namespace Laravel\Cashier\FirstPayment\Actions;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\Coupon\RedeemedCoupon;
 use Laravel\Cashier\Order\OrderItem;
@@ -140,7 +141,7 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
      */
     public function makeProcessedOrderItems()
     {
-        return OrderItem::make($this->processedOrderItemData())->toCollection();
+        return Cashier::$orderItemModel::make($this->processedOrderItemData())->toCollection();
     }
 
     /**
@@ -185,7 +186,7 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
             ->toCollection();
 
         if ($this->coupon) {
-            $redeemedCoupon = RedeemedCoupon::record($this->coupon, $subscription);
+            $redeemedCoupon = Cashier::$redeemedCouponModel::record($this->coupon, $subscription);
 
             if (! $this->isTrial()) {
                 $processedItems = $this->coupon->applyTo($redeemedCoupon, $processedItems);

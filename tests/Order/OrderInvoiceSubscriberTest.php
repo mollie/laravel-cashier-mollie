@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Tests\Order;
 
 use Illuminate\Support\Facades\Event;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\FirstPaymentPaid;
 use Laravel\Cashier\Events\OrderInvoiceAvailable;
 use Laravel\Cashier\Events\OrderPaymentPaid;
@@ -50,6 +51,6 @@ class OrderInvoiceSubscriberTest extends BaseTestCase
 
     private function order()
     {
-        return factory(Order::class)->make();
+        return factory(Cashier::$orderModel)->make();
     }
 }

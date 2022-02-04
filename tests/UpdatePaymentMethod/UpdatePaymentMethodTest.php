@@ -4,6 +4,7 @@
 namespace Laravel\Cashier\Tests\UpdatePaymentMethod;
 
 use Illuminate\Support\Facades\Event;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\MandateUpdated;
 use Laravel\Cashier\FirstPayment\Actions\AddBalance;
 use Laravel\Cashier\FirstPayment\FirstPaymentHandler;
@@ -26,7 +27,7 @@ class UpdatePaymentMethodTest extends BaseTestCase
         ]);
 
         $newPayment = $this->getNewMandatePaymentStub();
-        LocalPayment::createFromMolliePayment($newPayment, $owner);
+        Cashier::$paymentModel::createFromMolliePayment($newPayment, $owner);
 
         $newHandler = new FirstPaymentHandler($newPayment);
 
@@ -54,7 +55,7 @@ class UpdatePaymentMethodTest extends BaseTestCase
         $this->assertEquals(1, $owner->orderItems()->count());
         $this->assertEquals(1, $owner->orders()->count());
 
-        $this->assertInstanceOf(Order::class, $order);
+        $this->assertInstanceOf(Cashier::$orderModel, $order);
         $this->assertTrue($order->isProcessed());
 
         $this->assertEquals(1, $order->items()->count());

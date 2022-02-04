@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Tests\FirstPayment\Actions;
 
 use Carbon\Carbon;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\AppliedCoupon;
 use Laravel\Cashier\Coupon\RedeemedCoupon;
 use Laravel\Cashier\FirstPayment\Actions\StartSubscription;
@@ -303,7 +304,7 @@ class StartSubscriptionTest extends BaseTestCase
 
         $this->assertInstanceOf(OrderItemCollection::class, $items);
         $this->assertCount(1, $items);
-        $this->assertInstanceOf(OrderItem::class, $item);
+        $this->assertInstanceOf(Cashier::$orderItemModel, $item);
         $this->assertFalse($item->isProcessed());
         $this->assertCarbon(now(), $item->process_at);
         $this->assertEquals(1000, $item->total);
@@ -346,7 +347,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertTrue($user->onTrial());
         $this->assertInstanceOf(OrderItemCollection::class, $items);
         $this->assertCount(1, $items);
-        $this->assertInstanceOf(OrderItem::class, $item);
+        $this->assertInstanceOf(Cashier::$orderItemModel, $item);
         $this->assertFalse($item->isProcessed());
         $this->assertCarbon(now(), $item->process_at);
         $this->assertEquals(0, $item->total);
@@ -397,7 +398,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertTrue($user->onTrial());
         $this->assertInstanceOf(OrderItemCollection::class, $items);
         $this->assertCount(1, $items);
-        $this->assertInstanceOf(OrderItem::class, $item);
+        $this->assertInstanceOf(Cashier::$orderItemModel, $item);
         $this->assertFalse($item->isProcessed());
         $this->assertCarbon(now(), $item->process_at);
         $this->assertEquals(0, $item->total);
@@ -444,7 +445,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertFalse($user->onTrial());
         $this->assertInstanceOf(OrderItemCollection::class, $items);
         $this->assertCount(1, $items);
-        $this->assertInstanceOf(OrderItem::class, $item);
+        $this->assertInstanceOf(Cashier::$orderItemModel, $item);
         $this->assertFalse($item->isProcessed());
         $this->assertCarbon(now(), $item->process_at);
         $this->assertEquals(1000, $item->unit_price);
@@ -492,7 +493,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertTrue($user->onTrial());
         $this->assertInstanceOf(OrderItemCollection::class, $items);
         $this->assertCount(1, $items);
-        $this->assertInstanceOf(OrderItem::class, $item);
+        $this->assertInstanceOf(Cashier::$orderItemModel, $item);
         $this->assertFalse($item->isProcessed());
         $this->assertCarbon(now(), $item->process_at);
         $this->assertEquals(0, $item->total);
@@ -541,7 +542,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertTrue($user->subscribed('default'));
         $this->assertInstanceOf(OrderItemCollection::class, $items);
         $this->assertCount(1, $items);
-        $this->assertInstanceOf(OrderItem::class, $item);
+        $this->assertInstanceOf(Cashier::$orderItemModel, $item);
         $this->assertFalse($item->isProcessed());
         $this->assertCarbon(now(), $item->process_at);
 
@@ -570,8 +571,8 @@ class StartSubscriptionTest extends BaseTestCase
             'coupon' => 'test-coupon',
         ], $user);
 
-        $this->assertEquals(0, RedeemedCoupon::count());
-        $this->assertEquals(0, AppliedCoupon::count());
+        $this->assertEquals(0, Cashier::$redeemedCouponModel::count());
+        $this->assertEquals(0, Cashier::$appliedCouponModel::count());
 
         // Returns the OrderItem ready for processing right away.
         // Behind the scenes another OrderItem is scheduled for the next billing cycle.
@@ -636,7 +637,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertTrue($user->onTrial());
         $this->assertInstanceOf(OrderItemCollection::class, $items);
         $this->assertCount(1, $items);
-        $this->assertInstanceOf(OrderItem::class, $item);
+        $this->assertInstanceOf(Cashier::$orderItemModel, $item);
         $this->assertFalse($item->isProcessed());
         $this->assertCarbon(now(), $item->process_at);
         $this->assertEquals(0, $item->total);

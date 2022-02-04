@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Laravel\Cashier\Tests\Refunds;
 
 use Illuminate\Support\Facades\Event;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\RefundInitiated;
 use Laravel\Cashier\Mollie\Contracts\CreateMollieRefund;
 use Laravel\Cashier\Order\Order;
@@ -45,19 +46,19 @@ class RefundsBuilderTest extends BaseTestCase
         $user = $this->getUser();
 
         $orderItems = $user->orderItems()->createMany([
-            factory(OrderItem::class)->make([
+            factory(Cashier::$orderItemModel)->make([
                 'unit_price' => 1000,
                 'tax_percentage' => 10,
                 'quantity' => 1,
             ])->toArray(),
-            factory(OrderItem::class)->make([
+            factory(Cashier::$orderItemModel)->make([
                 'unit_price' => 500,
                 'tax_percentage' => 10,
                 'quantity' => 2,
             ])->toArray(),
         ]);
 
-        $order = Order::createProcessedFromItems(new OrderItemCollection($orderItems));
+        $order = Cashier::$orderModel::createProcessedFromItems(new OrderItemCollection($orderItems));
         $order->mollie_payment_status = 'paid';
         $order->mollie_payment_id = 'tr_dummy_payment_id';
         $this->assertMoneyEURCents(2200, $order->getTotalDue());
@@ -65,7 +66,7 @@ class RefundsBuilderTest extends BaseTestCase
         $refundBuilder = RefundBuilder::forWholeOrder($order);
         $refund = $refundBuilder->create();
 
-        $this->assertInstanceOf(Refund::class, $refund);
+        $this->assertInstanceOf(Cashier::$refundModel, $refund);
         $this->assertEquals('re_dummy_refund_id', $refund->mollie_refund_id);
         $this->assertEquals(MollieRefundStatus::STATUS_PENDING, $refund->mollie_refund_status);
         $this->assertNull($refund->order_id);

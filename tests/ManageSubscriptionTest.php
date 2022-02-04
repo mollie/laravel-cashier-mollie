@@ -92,7 +92,7 @@ class ManageSubscriptionTest extends BaseTestCase
 
         $scheduled_order_item = $user->subscription('main')->scheduledOrderItem;
         $this->assertNotNull($scheduled_order_item);
-        $this->assertInstanceOf(OrderItem::class, $scheduled_order_item);
+        $this->assertInstanceOf(Cashier::$orderItemModel, $scheduled_order_item);
         $this->assertTrue($scheduled_order_item->is($user->subscription('main')->orderItems()->first()));
         $this->assertEquals('EUR', $scheduled_order_item->currency);
         $this->assertEquals($user->id, $scheduled_order_item->owner_id);
@@ -116,7 +116,7 @@ class ManageSubscriptionTest extends BaseTestCase
         // assert that an order was created properly
         $this->assertEquals(1, $user->orders()->count());
         $order = $user->orders()->first();
-        $this->assertEquals(2, OrderItem::count());
+        $this->assertEquals(2, Cashier::$orderItemModel::count());
         $this->assertEquals(1, $order->items()->count());
         $this->assertTrue($previously_scheduled_order_item->is($order->items()->first()));
         $this->assertNotNull($order->mollie_payment_id);
@@ -272,7 +272,7 @@ class ManageSubscriptionTest extends BaseTestCase
         $this->assertTrue($user->onTrial('main', 'monthly-10-1'));
         $this->assertTrue($user->onTrial('main'));
 
-        $this->assertEquals(0, OrderItem::count());
+        $this->assertEquals(0, Cashier::$orderItemModel::count());
 
         // Resume Subscription
         Event::fake();

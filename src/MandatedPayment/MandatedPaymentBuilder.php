@@ -88,7 +88,7 @@ class MandatedPaymentBuilder
         $createMolliePayment = app()->make(CreateMolliePayment::class);
         $molliePayment = $createMolliePayment->execute($this->getPayload($overrides));
 
-        Payment::createFromMolliePayment($molliePayment, $this->owner);
+        Cashier::$paymentModel::createFromMolliePayment($molliePayment, $this->owner);
 
         return $molliePayment;
     }

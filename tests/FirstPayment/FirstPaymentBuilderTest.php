@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Tests\FirstPayment;
 
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\FirstPayment\Actions\AddBalance;
 use Laravel\Cashier\FirstPayment\Actions\AddGenericOrderItem;
 use Laravel\Cashier\FirstPayment\FirstPaymentBuilder;
@@ -236,7 +237,7 @@ class FirstPaymentBuilderTest extends BaseTestCase
 
         $molliePayment = $builder->create();
 
-        $localPayment = Payment::findByPaymentIdOrFail($molliePayment->id);
+        $localPayment = Cashier::$paymentModel::findByPaymentIdOrFail($molliePayment->id);
         $this->assertNull($localPayment->order_id);
         $this->assertEquals('tr_dummy_payment_id', $localPayment->mollie_payment_id);
         $this->assertEquals('open', $localPayment->mollie_payment_status);

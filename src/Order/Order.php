@@ -8,6 +8,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Credit\Credit;
 use Laravel\Cashier\Events\BalanceTurnedStale;
 use Laravel\Cashier\Events\OrderCreated;
@@ -219,7 +220,7 @@ class Order extends Model
                     $this->mollie_payment_id = null;
 
                     // Add credit to the owner's balance
-                    $credit = Credit::addAmountForOwner($owner, money(-($this->total_due), $this->currency));
+                    $credit = Cashier::$creditModel::addAmountForOwner($owner, money(-($this->total_due), $this->currency));
 
                     if (! $owner->hasActiveSubscriptionWithCurrency($this->currency)) {
                         Event::dispatch(new BalanceTurnedStale($credit));
@@ -267,7 +268,7 @@ class Order extends Model
      */
     public function items()
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasMany(Cashier::$orderItemModel);
     }
 
     /**
@@ -277,7 +278,7 @@ class Order extends Model
      */
     public function refunds()
     {
-        return $this->hasMany(Refund::class);
+        return $this->hasMany(Cashier::$refundModel);
     }
 
     /**
@@ -396,23 +397,23 @@ class Order extends Model
      * Retrieve an Order by the Mollie Payment id.
      *
      * @param $id
-     * @return self
+     * @return ?static
      */
     public static function findByMolliePaymentId($id)
     {
-        return self::where('mollie_payment_id', $id)->first();
+        return static::where('mollie_payment_id', $id)->first();
     }
 
     /**
      * Retrieve an Order by the Mollie Payment id or throw an Exception if not found.
      *
      * @param $id
-     * @return self
+     * @return static
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public static function findByMolliePaymentIdOrFail($id)
     {
-        return self::where('mollie_payment_id', $id)->firstOrFail();
+        return static::where('mollie_payment_id', $id)->firstOrFail();
     }
 
     /**
@@ -449,7 +450,7 @@ class Order extends Model
 
             // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
             // In that case we create a record here.
-            $localPayment = Payment::findByMolliePaymentOrCreate($molliePayment, $this->owner);
+            $localPayment = Cashier::$paymentModel::findByMolliePaymentOrCreate($molliePayment, $this->owner);
             $localPayment->update([
                 'mollie_payment_status' => 'failed',
             ]);
@@ -514,7 +515,7 @@ class Order extends Model
 
             // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
             // In that case we create a record here.
-            $localPayment = Payment::findByMolliePaymentOrCreate($molliePayment, $this->owner);
+            $localPayment = Cashier::$paymentModel::findByMolliePaymentOrCreate($molliePayment, $this->owner);
             $localPayment->update([
                 'mollie_payment_status' => 'paid',
                 'order_id' => $this->id,
@@ -694,7 +695,7 @@ class Order extends Model
      */
     public function payments(): HasMany
     {
-        return $this->hasMany(Payment::class)->orderByDesc('updated_at');
+        return $this->hasMany(Cashier::$paymentModel)->orderByDesc('updated_at');
     }
 
     /**
