@@ -204,6 +204,25 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
         $newPlan = app(PlanRepository::class)::findOrFail($plan);
         $previousPlan = $this->plan;
 
+        if ($redeemedCoupons = $this->redeemedCoupons()) {
+            $fakeOrderItemFromPreviousPlan = $this->orderItems()->make(
+                [
+                    'owner_id' => $this->owner_id,
+                    'owner_type' => $this->owner_type,
+                    'process_at' => now()->subSecond(),
+                    'currency' => $this->plan()->amount()->getCurrency()->getCode(),
+                    'unit_price' => (int) $this->plan()->amount()->getAmount(),
+                    'quantity' => $this->quantity ?: 1,
+                    'tax_percentage' => $this->tax_percentage,
+                    'description' => $this->plan()->description(),
+                ]
+            )->toCollection();
+            
+            $redeemedCoupons->each(function ($coupon) use ($fakeOrderItemFromPreviousPlan) {
+                $item = $coupon->applyTo($fakeOrderItemFromPreviousPlan);
+            });
+        }
+
         if ($this->cancelled()) {
             $this->cycle_ends_at = $this->ends_at;
             $this->ends_at = null;
@@ -734,6 +753,12 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
                 // Create a new OrderItem, starting a new billing cycle
                 $orderItems[] = $this->scheduleNewOrderItemAt($now);
             }
+
+            // Create applied Coupons to the old plan, if plan was swapped
+            $unprocessedCoupons = $this->owner->orderItems()->where('orderable_type', 'Laravel\Cashier\Coupon\AppliedCoupon')->unprocessed()->get();
+            $unprocessedCoupons->each(function ($couponItem) use ($orderItems) {
+                $orderItems[] = $couponItem;
+            });
 
             $this->save();
 
