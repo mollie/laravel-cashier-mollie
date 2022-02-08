@@ -56,7 +56,7 @@ class Payment extends Model
      * @param array $overrides
      * @return static
      */
-    public static function createFromMolliePayment(MolliePayment $payment, Model $owner, array $actions = [], array $overrides = []): static
+    public static function createFromMolliePayment(MolliePayment $payment, Model $owner, array $actions = [], array $overrides = []): self
     {
         return tap(static::makeFromMolliePayment($payment, $owner, $actions, $overrides))->save();
     }
@@ -68,7 +68,7 @@ class Payment extends Model
      * @param array $overrides
      * @return static
      */
-    public static function makeFromMolliePayment(MolliePayment $payment, Model $owner, array $actions = [], array $overrides = []): static
+    public static function makeFromMolliePayment(MolliePayment $payment, Model $owner, array $actions = [], array $overrides = []): self
     {
         $amountChargedBack = $payment->amountChargedBack
             ? mollie_object_to_money($payment->amountChargedBack)
@@ -100,7 +100,7 @@ class Payment extends Model
      * @param $id
      * @return static
      */
-    public static function findByPaymentId($id): ?static
+    public static function findByPaymentId($id): ?self
     {
         return static::where('mollie_payment_id', $id)->first();
     }
@@ -112,7 +112,7 @@ class Payment extends Model
      * @return static
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public static function findByPaymentIdOrFail($id): static
+    public static function findByPaymentIdOrFail($id): self
     {
         return static::where('mollie_payment_id', $id)->firstOrFail();
     }
@@ -125,7 +125,7 @@ class Payment extends Model
      * @param array $actions
      * @return static
      */
-    public static function findByMolliePaymentOrCreate(MolliePayment $molliePayment, Model $owner, array $actions = []): static
+    public static function findByMolliePaymentOrCreate(MolliePayment $molliePayment, Model $owner, array $actions = []): self
     {
         $payment = static::findByPaymentId($molliePayment->id);
 

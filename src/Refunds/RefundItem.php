@@ -57,7 +57,7 @@ class RefundItem extends Model
      * @param array $overrides
      * @return static
      */
-    public static function makeFromOrderItem(OrderItem $orderItem, array $overrides = []): static
+    public static function makeFromOrderItem(OrderItem $orderItem, array $overrides = []): self
     {
         return static::make(array_merge([
             'original_order_item_id' => $orderItem->getKey(),

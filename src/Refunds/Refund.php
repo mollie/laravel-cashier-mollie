@@ -77,7 +77,7 @@ class Refund extends Model
         return $this->hasOne(Cashier::$orderModel, 'id', 'order_id');
     }
 
-    public function handleProcessed(): static
+    public function handleProcessed(): self
     {
         $refundItems = $this->items;
 
@@ -102,7 +102,7 @@ class Refund extends Model
         return $this;
     }
 
-    public function handleFailed(): static
+    public function handleFailed(): self
     {
         $refundItems = $this->items;
 
