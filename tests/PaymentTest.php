@@ -3,7 +3,6 @@
 namespace Laravel\Cashier\Tests;
 
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Payment;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 

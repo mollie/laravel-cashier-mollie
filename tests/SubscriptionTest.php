@@ -8,7 +8,6 @@ use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\SubscriptionResumed;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Mollie\GetMollieCustomer;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\Fixtures\User;
 use LogicException;

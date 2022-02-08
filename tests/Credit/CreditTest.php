@@ -3,7 +3,6 @@
 namespace Laravel\Cashier\Tests\Credit;
 
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Credit\Credit;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Money\Money;

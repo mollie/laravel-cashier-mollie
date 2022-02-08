@@ -4,7 +4,6 @@ namespace Laravel\Cashier\Tests\FirstPayment\Actions;
 
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\FirstPayment\Actions\AddBalance;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;

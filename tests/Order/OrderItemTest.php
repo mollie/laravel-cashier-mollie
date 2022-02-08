@@ -3,7 +3,6 @@
 namespace Laravel\Cashier\Tests\Order;
 
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
 

@@ -5,7 +5,6 @@ namespace Laravel\Cashier\Tests\Order;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Order\OrderNumberGenerator;
 use Laravel\Cashier\Tests\BaseTestCase;
 
