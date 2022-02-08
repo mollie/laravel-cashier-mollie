@@ -4,7 +4,6 @@ namespace Laravel\Cashier\Tests;
 
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Coupon\RedeemedCoupon;
 use Laravel\Cashier\Coupon\RedeemedCouponCollection;
 use Laravel\Cashier\Events\MandateClearedFromBillable;
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;

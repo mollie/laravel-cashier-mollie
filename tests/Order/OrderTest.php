@@ -16,7 +16,6 @@ use Laravel\Cashier\Mollie\Contracts\GetMollieMethodMinimumAmount;
 use Laravel\Cashier\Order\Invoice;
 use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Order\OrderCollection;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\BaseTestCase;

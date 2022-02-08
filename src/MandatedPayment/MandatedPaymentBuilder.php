@@ -5,7 +5,6 @@ namespace Laravel\Cashier\MandatedPayment;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
-use Laravel\Cashier\Payment;
 use Mollie\Api\Types\SequenceType;
 use Money\Money;
 

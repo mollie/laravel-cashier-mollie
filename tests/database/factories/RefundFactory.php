@@ -4,7 +4,6 @@ namespace Laravel\Cashier\Database\Factories;
 
 use Faker\Generator as Faker;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Refunds\Refund;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Mollie\Api\Types\RefundStatus;
 

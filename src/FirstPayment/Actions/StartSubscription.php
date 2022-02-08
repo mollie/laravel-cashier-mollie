@@ -6,8 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
-use Laravel\Cashier\Coupon\RedeemedCoupon;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Plan\Contracts\PlanRepository;
 use Laravel\Cashier\SubscriptionBuilder\Contracts\SubscriptionConfigurator;

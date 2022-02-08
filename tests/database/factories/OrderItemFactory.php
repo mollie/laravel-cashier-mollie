@@ -4,8 +4,6 @@ namespace Laravel\Cashier\Database\Factories;
 
 use Faker\Generator as Faker;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Order\OrderItem;
-use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\Fixtures\User;
 
 $factory->define(Cashier::$orderItemModel, function (Faker $faker) {

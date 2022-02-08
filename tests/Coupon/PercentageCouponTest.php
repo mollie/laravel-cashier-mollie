@@ -7,7 +7,6 @@ use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\Coupon\Coupon;
 use Laravel\Cashier\Coupon\CouponOrderItemPreprocessor;
 use Laravel\Cashier\Coupon\PercentageDiscountHandler;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\BaseTestCase;
 

@@ -9,7 +9,6 @@ use Laravel\Cashier\FirstPayment\FirstPaymentBuilder;
 use Laravel\Cashier\Mollie\Contracts\CreateMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
-use Laravel\Cashier\Payment;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Mollie\Api\MollieApiClient;

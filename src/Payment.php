@@ -7,7 +7,6 @@ use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\ConvertsToMoney;
-use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Traits\HasOwner;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;

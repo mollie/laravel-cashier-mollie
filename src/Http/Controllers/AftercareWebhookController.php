@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\ChargebackReceived;
 use Laravel\Cashier\Order\Order;
-use Laravel\Cashier\Payment;
 use Laravel\Cashier\Refunds\Refund;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Resources\Refund as MollieRefund;

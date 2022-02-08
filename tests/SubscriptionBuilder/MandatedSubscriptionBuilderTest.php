@@ -4,8 +4,6 @@ namespace Laravel\Cashier\Tests\SubscriptionBuilder;
 
 use Carbon\Carbon;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Coupon\AppliedCoupon;
-use Laravel\Cashier\Coupon\RedeemedCoupon;
 use Laravel\Cashier\Exceptions\CouponException;
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;

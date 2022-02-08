@@ -3,14 +3,11 @@
 namespace Laravel\Cashier\FirstPayment;
 
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\MandateUpdated;
 use Laravel\Cashier\FirstPayment\Actions\BaseAction;
-use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Order\OrderItemCollection;
-use Laravel\Cashier\Payment as LocalPayment;
 use Mollie\Api\Resources\Payment as MolliePayment;
 
 class FirstPaymentHandler

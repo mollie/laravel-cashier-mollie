@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\OrderInvoiceAvailable;
 use Laravel\Cashier\Events\OrderPaymentPaid;
-use Laravel\Cashier\Order\Order;
 
 class EventServiceProviderTest extends BaseTestCase
 {

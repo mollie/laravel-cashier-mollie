@@ -4,8 +4,6 @@ namespace Laravel\Cashier\Database\Factories;
 
 use Faker\Generator as Faker;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Coupon\RedeemedCoupon;
-use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\Fixtures\User;
 
 $factory->define(Cashier::$redeemedCouponModel, function (Faker $faker) {

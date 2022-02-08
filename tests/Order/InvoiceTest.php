@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\Invoice;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Tests\BaseTestCase;
 
 class InvoiceTest extends BaseTestCase

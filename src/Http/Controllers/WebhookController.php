@@ -5,7 +5,6 @@ namespace Laravel\Cashier\Http\Controllers;
 use Illuminate\Http\Request;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
-use Laravel\Cashier\Order\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentStatus;
 use Symfony\Component\HttpFoundation\Response;

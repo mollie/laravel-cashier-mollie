@@ -12,8 +12,6 @@ use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMethodMinimumAmount;
 use Laravel\Cashier\Mollie\GetMollieCustomer;
-use Laravel\Cashier\Order\OrderItem;
-use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;

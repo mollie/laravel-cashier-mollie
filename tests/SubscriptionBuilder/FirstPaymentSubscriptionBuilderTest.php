@@ -17,7 +17,6 @@ use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
-use Laravel\Cashier\Payment;
 use Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder;
 use Laravel\Cashier\SubscriptionBuilder\RedirectToCheckoutResponse;
 use Laravel\Cashier\Tests\BaseTestCase;

@@ -7,7 +7,6 @@ use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\FirstPaymentPaid;
 use Laravel\Cashier\Events\OrderInvoiceAvailable;
 use Laravel\Cashier\Events\OrderPaymentPaid;
-use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Order\OrderInvoiceSubscriber;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Mollie\Api\Resources\Payment;

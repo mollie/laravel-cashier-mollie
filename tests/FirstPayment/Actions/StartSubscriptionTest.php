@@ -4,12 +4,9 @@ namespace Laravel\Cashier\Tests\FirstPayment\Actions;
 
 use Carbon\Carbon;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Coupon\AppliedCoupon;
-use Laravel\Cashier\Coupon\RedeemedCoupon;
 use Laravel\Cashier\FirstPayment\Actions\StartSubscription;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Mollie\GetMollieCustomer;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Mollie\Api\MollieApiClient;
