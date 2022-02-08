@@ -217,7 +217,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
                     'description' => $this->plan()->description(),
                 ]
             )->toCollection();
-            
+
             $redeemedCoupons->each(function ($coupon) use ($fakeOrderItemFromPreviousPlan) {
                 $item = $coupon->applyTo($fakeOrderItemFromPreviousPlan);
             });
@@ -710,6 +710,9 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
         if ($this->onTrial()) {
             return null;
         }
+        if (round($this->getCycleLeftAttribute($now), 3) == 1) {
+            return null;
+        }
 
         $plan = $this->plan();
         $amount = $plan->amount()->negative()->multiply($this->getCycleLeftAttribute($now));
@@ -734,7 +737,6 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
             // Wrap up current billing cycle
             $this->removeScheduledOrderItem();
             $reimbursement = $this->reimburseUnusedTime($now);
-
             $orderItems = (new OrderItemCollection([$reimbursement]))->filter();
 
             // Apply new subscription settings
