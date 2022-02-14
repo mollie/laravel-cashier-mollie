@@ -6,17 +6,17 @@ You have the possibility to make certain configurations (optional).
 
 You can extend the models used internally by Cashier by defining your own model and extending the corresponding Cashier model.
 
-    ```php
-    namespace App\Models\Cashier;
+```php
+namespace App\Models\Cashier;
 
-    use Laravel\Cashier\Subscription as CashierSubscription;
+use Laravel\Cashier\Subscription as CashierSubscription;
 
-    class Subscription extends CashierSubscription
-    {
-        protected $table = 'subscriptions';
-    }
+class Subscription extends CashierSubscription
+{
+    protected $table = 'subscriptions';
+}
 
-    ```
+```
 
 This could be useful, if you want custom behavior or use other table names than the default ones to avoid conflict with existing tables.
 
@@ -35,17 +35,17 @@ Configurable models are:
 After defining your model, you may instruct Cashier to use your custom model via the `Laravel\Cashier\Cashier` class. Typically, you should inform Cashier about your custom models in the boot method of your application's `App\Providers\AppServiceProvider` class:
 
 
-    ```php
-    use App\Models\Cashier\Subscription;
+```php
+use App\Models\Cashier\Subscription;
 
-    /**
-    * Bootstrap any application services.
-    *
-    * @return void
-    */
-    public function boot()
-    {
-        Cashier::useSubscriptionModel(Subscription::class);
-        // ... use the same pattern for additional models
-    }
-    ```
+/**
+* Bootstrap any application services.
+*
+* @return void
+*/
+public function boot()
+{
+    Cashier::useSubscriptionModel(Subscription::class);
+    // ... use the same pattern for additional models
+}
+```
