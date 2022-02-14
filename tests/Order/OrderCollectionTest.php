@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Tests\Order;
 
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\Invoice;
 use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Tests\BaseTestCase;
@@ -14,7 +15,7 @@ class OrderCollectionTest extends BaseTestCase
     {
         $this->withPackageMigrations();
         $user = factory(User::class)->create();
-        $orders = $user->orders()->saveMany(factory(Order::class, 2)->make());
+        $orders = $user->orders()->saveMany(factory(Cashier::$orderModel, 2)->make());
 
         $invoices = $orders->invoices();
 

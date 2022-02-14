@@ -4,10 +4,10 @@ namespace Laravel\Cashier\Tests;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Event;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\SubscriptionResumed;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Mollie\GetMollieCustomer;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\Fixtures\User;
 use LogicException;
@@ -29,7 +29,7 @@ class SubscriptionTest extends BaseTestCase
         $user = factory(User::class)->create();
 
         $subscription = $user->subscriptions()->save(
-            factory(Subscription::class)->make()
+            factory(Cashier::$subscriptionModel)->make()
         );
 
         $this->assertTrue($user->is($subscription->owner));
@@ -38,10 +38,10 @@ class SubscriptionTest extends BaseTestCase
     /** @test */
     public function canAccessOrderItems()
     {
-        $subscription = factory(Subscription::class)->create();
+        $subscription = factory(Cashier::$subscriptionModel)->create();
 
         $items = $subscription->orderItems()->save(
-            factory(OrderItem::class)->make()
+            factory(Cashier::$orderItemModel)->make()
         );
 
         $this->assertNotNull($items);
@@ -64,7 +64,7 @@ class SubscriptionTest extends BaseTestCase
             ],
         ]]);
 
-        $subscription = factory(Subscription::class)->create([
+        $subscription = factory(Cashier::$subscriptionModel)->create([
             'scheduled_order_item_id' => 'should_be_empty',
         ]);
 
@@ -76,7 +76,7 @@ class SubscriptionTest extends BaseTestCase
     {
         $this->expectException(LogicException::class);
 
-        $subscription = factory(Subscription::class)->create();
+        $subscription = factory(Cashier::$subscriptionModel)->create();
 
         $this->assertFalse($subscription->cancelled());
 
@@ -92,7 +92,7 @@ class SubscriptionTest extends BaseTestCase
     {
         $this->expectException(LogicException::class);
 
-        $subscription = factory(Subscription::class)->create([
+        $subscription = factory(Cashier::$subscriptionModel)->create([
             'ends_at' => now()->subMonth(),
         ]);
 
@@ -110,17 +110,17 @@ class SubscriptionTest extends BaseTestCase
     public function getCycleProgressTest()
     {
         $now = now();
-        $completed_subscription = factory(Subscription::class)->make([
+        $completed_subscription = factory(Cashier::$subscriptionModel)->make([
             'cycle_started_at' => $now->copy()->subMonth(),
             'cycle_ends_at' => $now->copy()->subDay(),
         ]);
 
-        $progressing_subscription = factory(Subscription::class)->make([
+        $progressing_subscription = factory(Cashier::$subscriptionModel)->make([
             'cycle_started_at' => $now->copy()->subDays(3),
             'cycle_ends_at' => $now->copy()->addDays(3),
         ]);
 
-        $unstarted_subscription = factory(Subscription::class)->make([
+        $unstarted_subscription = factory(Cashier::$subscriptionModel)->make([
             'cycle_started_at' => $now->copy()->addDays(3),
             'cycle_ends_at' => $now->copy()->addMonth(),
         ]);
@@ -136,7 +136,7 @@ class SubscriptionTest extends BaseTestCase
         $user = factory(User::class)->create();
         $this->assertEquals(0, $user->taxPercentage());
 
-        $subscription = factory(Subscription::class)->create([
+        $subscription = factory(Cashier::$subscriptionModel)->create([
             'tax_percentage' => 21.5,
         ]);
 
@@ -165,7 +165,7 @@ class SubscriptionTest extends BaseTestCase
         $item_1 = $subscription->scheduledOrderItem;
         $this->assertNotNull($item_1);
         $this->assertSame("2018-01-01 00:00:00", $item_1->process_at->toDateTimeString());
-        $this->assertSame("Laravel\Cashier\Subscription", $item_1->orderable_type);
+        $this->assertSame(Cashier::$subscriptionModel, $item_1->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_1->owner_type);
         $this->assertSame(1, $item_1->orderable_id);
         $this->assertEquals(1, $item_1->owner_id);
@@ -190,7 +190,7 @@ class SubscriptionTest extends BaseTestCase
         $item_2 = $subscription->scheduledOrderItem;
 
         $this->assertSame("2018-02-01 00:00:00", $item_2->process_at->toDateTimeString());
-        $this->assertSame("Laravel\Cashier\Subscription", $item_2->orderable_type);
+        $this->assertSame(Cashier::$subscriptionModel, $item_2->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_2->owner_type);
         $this->assertSame(1, $item_2->orderable_id);
         $this->assertEquals(1, $item_2->owner_id);
@@ -216,7 +216,7 @@ class SubscriptionTest extends BaseTestCase
         $item_3 = $subscription->scheduledOrderItem;
 
         $this->assertSame("2018-03-01 00:00:00", $item_3->process_at->toDateTimeString());
-        $this->assertSame("Laravel\Cashier\Subscription", $item_3->orderable_type);
+        $this->assertSame(Cashier::$subscriptionModel, $item_3->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_3->owner_type);
         $this->assertSame(1, $item_3->orderable_id);
         $this->assertEquals(1, $item_3->owner_id);
@@ -249,7 +249,7 @@ class SubscriptionTest extends BaseTestCase
         $item_1 = $subscription->scheduledOrderItem;
         $this->assertNotNull($item_1);
         $this->assertSame("2019-01-29 00:00:00", $item_1->process_at->toDateTimeString());
-        $this->assertSame("Laravel\Cashier\Subscription", $item_1->orderable_type);
+        $this->assertSame(Cashier::$subscriptionModel, $item_1->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_1->owner_type);
         $this->assertSame(1, $item_1->orderable_id);
         $this->assertEquals(1, $item_1->owner_id);
@@ -274,7 +274,7 @@ class SubscriptionTest extends BaseTestCase
         $item_2 = $subscription->scheduledOrderItem;
 
         $this->assertSame("2019-02-28 00:00:00", $item_2->process_at->toDateTimeString());
-        $this->assertSame("Laravel\Cashier\Subscription", $item_2->orderable_type);
+        $this->assertSame(Cashier::$subscriptionModel, $item_2->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_2->owner_type);
         $this->assertSame(1, $item_2->orderable_id);
         $this->assertEquals(1, $item_2->owner_id);
@@ -300,7 +300,7 @@ class SubscriptionTest extends BaseTestCase
         $item_3 = $subscription->scheduledOrderItem;
 
         $this->assertSame("2019-03-29 00:00:00", $item_3->process_at->toDateTimeString());
-        $this->assertSame("Laravel\Cashier\Subscription", $item_3->orderable_type);
+        $this->assertSame(Cashier::$subscriptionModel, $item_3->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_3->owner_type);
         $this->assertSame(1, $item_3->orderable_id);
         $this->assertEquals(1, $item_3->owner_id);
@@ -333,7 +333,7 @@ class SubscriptionTest extends BaseTestCase
         $item_1 = $subscription->scheduledOrderItem;
         $this->assertNotNull($item_1);
         $this->assertSame("2019-01-31 00:00:00", $item_1->process_at->toDateTimeString());
-        $this->assertSame("Laravel\Cashier\Subscription", $item_1->orderable_type);
+        $this->assertSame(Cashier::$subscriptionModel, $item_1->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_1->owner_type);
         $this->assertSame(1, $item_1->orderable_id);
         $this->assertEquals(1, $item_1->owner_id);
@@ -358,7 +358,7 @@ class SubscriptionTest extends BaseTestCase
         $item_2 = $subscription->scheduledOrderItem;
 
         $this->assertSame("2019-02-28 00:00:00", $item_2->process_at->toDateTimeString());
-        $this->assertSame("Laravel\Cashier\Subscription", $item_2->orderable_type);
+        $this->assertSame(Cashier::$subscriptionModel, $item_2->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_2->owner_type);
         $this->assertSame(1, $item_2->orderable_id);
         $this->assertEquals(1, $item_2->owner_id);
@@ -384,7 +384,7 @@ class SubscriptionTest extends BaseTestCase
         $item_3 = $subscription->scheduledOrderItem;
 
         $this->assertSame("2019-03-31 00:00:00", $item_3->process_at->toDateTimeString());
-        $this->assertSame("Laravel\Cashier\Subscription", $item_3->orderable_type);
+        $this->assertSame(Cashier::$subscriptionModel, $item_3->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_3->owner_type);
         $this->assertSame(1, $item_3->orderable_id);
         $this->assertEquals(1, $item_3->owner_id);
@@ -409,7 +409,7 @@ class SubscriptionTest extends BaseTestCase
         $item_4 = $subscription->scheduledOrderItem;
 
         $this->assertSame("2019-04-30 00:00:00", $item_4->process_at->toDateTimeString());
-        $this->assertSame("Laravel\Cashier\Subscription", $item_4->orderable_type);
+        $this->assertSame(Cashier::$subscriptionModel, $item_4->orderable_type);
         $this->assertSame("Laravel\Cashier\Tests\Fixtures\User", $item_4->owner_type);
         $this->assertSame(1, $item_4->orderable_id);
         $this->assertEquals(1, $item_4->owner_id);
@@ -427,7 +427,7 @@ class SubscriptionTest extends BaseTestCase
     {
         $cycle_ends_at = now()->addWeek();
         $user = factory(User::class)->create();
-        $subscription = $user->subscriptions()->save(factory(Subscription::class)->make([
+        $subscription = $user->subscriptions()->save(factory(Cashier::$subscriptionModel)->make([
             'cycle_ends_at' => $cycle_ends_at,
         ]));
 
@@ -451,7 +451,7 @@ class SubscriptionTest extends BaseTestCase
     {
         $user = factory(User::class)->create();
         $subscription = $user->subscriptions()->save(
-            factory(Subscription::class)->make([
+            factory(Cashier::$subscriptionModel)->make([
             'cycle_ends_at' => now()->addWeek(), ])
         );
 
@@ -475,7 +475,7 @@ class SubscriptionTest extends BaseTestCase
     {
         $user = factory(User::class)->create();
         $subscription = $user->subscriptions()->save(
-            factory(Subscription::class)->make([
+            factory(Cashier::$subscriptionModel)->make([
             'cycle_ends_at' => now()->addWeek(), ])
         );
 
@@ -501,7 +501,7 @@ class SubscriptionTest extends BaseTestCase
         $user = factory(User::class)->create();
 
         /** @var Subscription $subscription */
-        $subscription = $user->subscriptions()->save(factory(Subscription::class)->make([
+        $subscription = $user->subscriptions()->save(factory(Cashier::$subscriptionModel)->make([
             'ends_at' => now()->addWeek(),
         ]));
 

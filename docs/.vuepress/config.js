@@ -38,6 +38,7 @@ module.exports = {
             ['/', 'Introduction'],
             '/01-installation',
             '/13-upgrade',
+            '/16-configuration',
             '/02-subscriptions',
             '/03-trials',
             '/04-charges',

@@ -3,11 +3,11 @@
 namespace Laravel\Cashier\Database\Factories;
 
 use Faker\Generator as Faker;
-use Laravel\Cashier\Refunds\Refund;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Mollie\Api\Types\RefundStatus;
 
-$factory->define(Refund::class, function (Faker $faker) {
+$factory->define(Cashier::$refundModel, function (Faker $faker) {
     return [
         'owner_id' => 1,
         'owner_type' => User::class,

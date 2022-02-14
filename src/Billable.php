@@ -5,10 +5,9 @@ namespace Laravel\Cashier;
 use Dompdf\Options;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Charge\ManagesCharges;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
-use Laravel\Cashier\Coupon\RedeemedCoupon;
-use Laravel\Cashier\Credit\Credit;
 use Laravel\Cashier\Events\MandateClearedFromBillable;
 use Laravel\Cashier\Exceptions\InvalidMandateException;
 use Laravel\Cashier\Mollie\Contracts\CreateMollieCustomer;
@@ -16,7 +15,6 @@ use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Order\Invoice;
 use Laravel\Cashier\Order\Order;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Plan\Contracts\PlanRepository;
 use Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder;
 use Laravel\Cashier\SubscriptionBuilder\MandatedSubscriptionBuilder;
@@ -39,7 +37,7 @@ trait Billable
      */
     public function subscriptions()
     {
-        return $this->morphMany(Subscription::class, 'owner');
+        return $this->morphMany(Cashier::$subscriptionModel, 'owner');
     }
 
     /**
@@ -280,7 +278,7 @@ trait Billable
      */
     public function orders()
     {
-        return $this->morphMany(Order::class, 'owner');
+        return $this->morphMany(Cashier::$orderModel, 'owner');
     }
 
     /**
@@ -290,7 +288,7 @@ trait Billable
      */
     public function orderItems()
     {
-        return $this->morphMany(OrderItem::class, 'owner');
+        return $this->morphMany(Cashier::$orderItemModel, 'owner');
     }
 
     /**
@@ -300,7 +298,7 @@ trait Billable
      */
     public function credits()
     {
-        return $this->morphMany(Credit::class, 'owner');
+        return $this->morphMany(Cashier::$creditModel, 'owner');
     }
 
     /**
@@ -351,7 +349,7 @@ trait Billable
      */
     public function addCredit(Money $amount)
     {
-        Credit::addAmountForOwner($this, $amount);
+        Cashier::$creditModel::addAmountForOwner($this, $amount);
 
         return $this;
     }
@@ -364,7 +362,7 @@ trait Billable
      */
     public function maxOutCredit(Money $amount)
     {
-        return Credit::maxOutForOwner($this, $amount);
+        return Cashier::$creditModel::maxOutForOwner($this, $amount);
     }
 
     /**
@@ -527,7 +525,7 @@ trait Billable
                 $otherCoupons->each->revoke();
             }
 
-            RedeemedCoupon::record($coupon, $subscription);
+            Cashier::$redeemedCouponModel::record($coupon, $subscription);
 
             return $this;
         });
@@ -540,7 +538,7 @@ trait Billable
      */
     public function redeemedCoupons()
     {
-        return $this->morphMany(RedeemedCoupon::class, 'owner');
+        return $this->morphMany(Cashier::$redeemedCouponModel, 'owner');
     }
 
     /**

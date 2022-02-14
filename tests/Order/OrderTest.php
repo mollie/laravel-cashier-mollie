@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Tests\Order;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Event;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\BalanceTurnedStale;
 use Laravel\Cashier\Events\OrderCreated;
 use Laravel\Cashier\Events\OrderPaymentFailedDueToInvalidMandate;
@@ -15,7 +16,6 @@ use Laravel\Cashier\Mollie\Contracts\GetMollieMethodMinimumAmount;
 use Laravel\Cashier\Order\Invoice;
 use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Order\OrderCollection;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\BaseTestCase;
@@ -92,7 +92,7 @@ class OrderTest extends BaseTestCase
         $subscription = $this->createMonthlySubscription();
 
         $subscription->orderItems()->saveMany(
-            factory(OrderItem::class, 2)->make([
+            factory(Cashier::$orderItemModel, 2)->make([
                 'process_at' => now()->subMinute(), // sub minute so we're sure it's ready to be processed
                 'owner_id' => $user->id,
                 'owner_type' => get_class($user),
@@ -103,7 +103,7 @@ class OrderTest extends BaseTestCase
             ])
         );
 
-        $order = Order::createFromItems(OrderItem::all());
+        $order = Cashier::$orderModel::createFromItems(Cashier::$orderItemModel::all());
 
         $this->assertEquals(2, $order->items()->count());
 
@@ -135,7 +135,7 @@ class OrderTest extends BaseTestCase
     public function creatingANewOrderSchedulesNextOrderItems()
     {
         $user = factory(User::class)->create(['id' => 2]);
-        $subscription = factory(Subscription::class)->create([
+        $subscription = factory(Cashier::$subscriptionModel)->create([
             'owner_id' => $user->id,
             'owner_type' => get_class($user),
             'plan' => 'monthly-10-1',
@@ -146,14 +146,14 @@ class OrderTest extends BaseTestCase
 
         $this->assertEquals(1, $subscription->orderItems()->count());
 
-        $order = Order::createFromItems($subscription->orderItems);
+        $order = Cashier::$orderModel::createFromItems($subscription->orderItems);
 
         $subscription = $subscription->fresh();
 
-        $this->assertEquals(1, Order::count());
+        $this->assertEquals(1, Cashier::$orderModel::count());
         $this->assertEquals(1, $order->items()->count());
         $this->assertEquals(2, $subscription->orderItems()->count());
-        $this->assertEquals(1, OrderItem::unprocessed()->count());
+        $this->assertEquals(1, Cashier::$orderItemModel::unprocessed()->count());
 
         $scheduled_item = $subscription->scheduled_order_item;
 
@@ -171,7 +171,7 @@ class OrderTest extends BaseTestCase
     /** @test */
     public function yieldsOrderCollection()
     {
-        $collection = factory(Order::class, 2)->make();
+        $collection = factory(Cashier::$orderModel, 2)->make();
 
         $this->assertInstanceOf(OrderCollection::class, $collection);
     }
@@ -186,7 +186,7 @@ class OrderTest extends BaseTestCase
 
         $this->assertMoneyEURCents(1500, $user->credit('EUR')->money());
 
-        $subscription = factory(Subscription::class)->create([
+        $subscription = factory(Cashier::$subscriptionModel)->create([
             'owner_id' => $user->id,
             'owner_type' => get_class($user),
             'plan' => 'monthly-10-1',
@@ -197,7 +197,7 @@ class OrderTest extends BaseTestCase
 
         $scheduled_item = $subscription->scheduled_order_item;
 
-        $order = Order::createFromItems(new OrderItemCollection([$scheduled_item]))->fresh();
+        $order = Cashier::$orderModel::createFromItems(new OrderItemCollection([$scheduled_item]))->fresh();
 
         $this->assertEquals(2, $order->owner_id);
         $this->assertSame(User::class, $order->owner_type);
@@ -249,14 +249,14 @@ class OrderTest extends BaseTestCase
     public function canGetInvoice()
     {
         $user = factory(User::class)->create(['extra_billing_information' => "Some dummy\nextra billing information"]);
-        $items = factory(OrderItem::class, 2)->states(['unlinked', 'EUR'])->create([
+        $items = factory(Cashier::$orderItemModel, 2)->states(['unlinked', 'EUR'])->create([
             'owner_id' => $user->id,
             'owner_type' => User::class,
             'unit_price' => 12150,
             'quantity' => 1,
             'tax_percentage' => 21.5,
         ]);
-        $order = Order::createFromItems($items, [
+        $order = Cashier::$orderModel::createFromItems($items, [
             'balance_before' => 500,
             'credit_used' => 500,
         ]);
@@ -283,7 +283,7 @@ class OrderTest extends BaseTestCase
         Event::fake();
 
         $user = $this->getMandatedUser(true);
-        $order = $user->orders()->save(factory(Order::class)->make([
+        $order = $user->orders()->save(factory(Cashier::$orderModel)->make([
             'total' => 0,
             'total_due' => 0,
             'currency' => 'EUR',
@@ -354,7 +354,7 @@ class OrderTest extends BaseTestCase
             'mollie_customer_id' => 'cst_unique_customer_id',
         ]);
 
-        $order = $user->orders()->save(factory(Order::class)->make([
+        $order = $user->orders()->save(factory(Cashier::$orderModel)->make([
             'total' => 1025,
             'total_due' => 1025,
             'currency' => 'EUR',
@@ -404,7 +404,7 @@ class OrderTest extends BaseTestCase
             'mollie_customer_id' => 'cst_unique_customer_id',
         ]);
 
-        $order = $user->orders()->save(factory(Order::class)->make([
+        $order = $user->orders()->save(factory(Cashier::$orderModel)->make([
             'total' => 1025,
             'total_due' => 1025,
             'currency' => 'EUR',
@@ -475,7 +475,7 @@ class OrderTest extends BaseTestCase
             'mollie_customer_id' => 'cst_unique_customer_id',
         ]);
 
-        $order = $user->orders()->save(factory(Order::class)->make([
+        $order = $user->orders()->save(factory(Cashier::$orderModel)->make([
             'processed_at' => now()->subMinutes(5),
             'total' => 10.25,
             'total_due' => 10.25,
@@ -541,11 +541,11 @@ class OrderTest extends BaseTestCase
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
             'mollie_customer_id' => 'cst_unique_customer_id',
         ]);
-        $subscription = $user->subscriptions()->save(factory(Subscription::class)->make([
+        $subscription = $user->subscriptions()->save(factory(Cashier::$subscriptionModel)->make([
             'plan' => 'monthly-10-1',
         ]));
 
-        $order = $user->orders()->save(factory(Order::class)->make([
+        $order = $user->orders()->save(factory(Cashier::$orderModel)->make([
             'total' => 25,
             'total_due' => 25, // minimum for processing is 100
             'currency' => 'EUR',
@@ -572,11 +572,11 @@ class OrderTest extends BaseTestCase
         Event::fake();
 
         $user = $this->getMandatedUser(true);
-        $subscription = $user->subscriptions()->save(factory(Subscription::class)->make([
+        $subscription = $user->subscriptions()->save(factory(Cashier::$subscriptionModel)->make([
             'plan' => 'monthly-10-1',
         ]));
 
-        $order = $user->orders()->save(factory(Order::class)->make([
+        $order = $user->orders()->save(factory(Cashier::$orderModel)->make([
             'total' => -1025,
             'total_due' => -1025,
             'currency' => 'EUR',
@@ -607,7 +607,7 @@ class OrderTest extends BaseTestCase
 
         $user = $this->getMandatedUser(true);
 
-        $order = $user->orders()->save(factory(Order::class)->make([
+        $order = $user->orders()->save(factory(Cashier::$orderModel)->make([
             'total' => -1,
             'total_due' => -1,
             'currency' => 'EUR',
@@ -642,7 +642,7 @@ class OrderTest extends BaseTestCase
         Event::fake();
         $user = factory(User::class)->create(); // user without subscription/mandate
 
-        factory(OrderItem::class, 2)->create([
+        factory(Cashier::$orderItemModel, 2)->create([
             'orderable_type' => null,
             'orderable_id' => null,
             'process_at' => now()->subMinute(), // sub minute so we're sure it's ready to be processed
@@ -654,7 +654,7 @@ class OrderTest extends BaseTestCase
             'tax_percentage' => 21.5,
         ]);
 
-        $order = Order::createFromItems(OrderItem::all());
+        $order = Cashier::$orderModel::createFromItems(Cashier::$orderItemModel::all());
 
         $this->assertEquals(2, $order->items()->count());
 
@@ -694,7 +694,7 @@ class OrderTest extends BaseTestCase
         $user = factory(User::class)->create(); // user without subscription/mandate
         $user->addCredit(money(29998, 'EUR'));
 
-        factory(OrderItem::class, 2)->create([
+        factory(Cashier::$orderItemModel, 2)->create([
             'orderable_type' => null,
             'orderable_id' => null,
             'process_at' => now()->subMinute(), // sub minute so we're sure it's ready to be processed
@@ -706,7 +706,7 @@ class OrderTest extends BaseTestCase
             'tax_percentage' => 21.5,
         ]);
 
-        $order = Order::createFromItems(OrderItem::all());
+        $order = Cashier::$orderModel::createFromItems(Cashier::$orderItemModel::all());
 
         $this->assertEquals(2, $order->items()->count());
 
@@ -749,20 +749,20 @@ class OrderTest extends BaseTestCase
         ]);
 
         $items = $user->orderItems()->saveMany(
-            factory(OrderItem::class, 3)->states(['unprocessed', 'unlinked'])->make()
+            factory(Cashier::$orderItemModel, 3)->states(['unprocessed', 'unlinked'])->make()
         );
 
         $items->each(function ($item) {
             $this->assertFalse($item->isProcessed());
         });
 
-        $order = Order::createProcessedFromItems($items, [
+        $order = Cashier::$orderModel::createProcessedFromItems($items, [
             'mollie_payment_id' => 'tr_123456',
             'mollie_payment_status' => PaymentStatus::STATUS_PAID,
         ]);
 
         $this->assertNotNull($order);
-        $this->assertInstanceOf(Order::class, $order);
+        $this->assertInstanceOf(Cashier::$orderModel, $order);
 
         $this->assertTrue($order->isProcessed());
 
@@ -779,12 +779,12 @@ class OrderTest extends BaseTestCase
     /** @test */
     public function findByMolliePaymentIdWorks()
     {
-        $this->assertNull(Order::findByMolliePaymentId('tr_xxxxx1234dummy'));
+        $this->assertNull(Cashier::$orderModel::findByMolliePaymentId('tr_xxxxx1234dummy'));
 
-        $order = factory(Order::class)->create(['mollie_payment_id' => 'tr_xxxxx1234dummy']);
-        $otherOrder = factory(Order::class)->create(['mollie_payment_id' => 'tr_wrong_order']);
+        $order = factory(Cashier::$orderModel)->create(['mollie_payment_id' => 'tr_xxxxx1234dummy']);
+        $otherOrder = factory(Cashier::$orderModel)->create(['mollie_payment_id' => 'tr_wrong_order']);
 
-        $found = Order::findByMolliePaymentId('tr_xxxxx1234dummy');
+        $found = Cashier::$orderModel::findByMolliePaymentId('tr_xxxxx1234dummy');
 
         $this->assertTrue($found->is($order));
         $this->assertTrue($found->isNot($otherOrder));
@@ -794,16 +794,16 @@ class OrderTest extends BaseTestCase
     public function findByMolliePaymentIdOrFailThrowsAnExceptionIfNotFound()
     {
         $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
-        Order::findByMolliePaymentIdOrFail('tr_xxxxx1234dummy');
+        Cashier::$orderModel::findByMolliePaymentIdOrFail('tr_xxxxx1234dummy');
     }
 
     /** @test */
     public function findByMolliePaymentIdOrFailWorks()
     {
-        $order = factory(Order::class)->create(['mollie_payment_id' => 'tr_xxxxx1234dummy']);
-        $otherOrder = factory(Order::class)->create(['mollie_payment_id' => 'tr_wrong_order']);
+        $order = factory(Cashier::$orderModel)->create(['mollie_payment_id' => 'tr_xxxxx1234dummy']);
+        $otherOrder = factory(Cashier::$orderModel)->create(['mollie_payment_id' => 'tr_wrong_order']);
 
-        $found = Order::findByMolliePaymentIdOrFail('tr_xxxxx1234dummy');
+        $found = Cashier::$orderModel::findByMolliePaymentIdOrFail('tr_xxxxx1234dummy');
 
         $this->assertTrue($found->is($order));
         $this->assertTrue($found->isNot($otherOrder));
@@ -817,12 +817,12 @@ class OrderTest extends BaseTestCase
     {
         $user = factory(User::class)->create(['extra_billing_information' => 'Some dummy extra billing information']);
         $user->addCredit(money(500, 'EUR'));
-        $items = factory(OrderItem::class, 2)->states(['unlinked', 'EUR'])->create([
+        $items = factory(Cashier::$orderItemModel, 2)->states(['unlinked', 'EUR'])->create([
             'owner_id' => $user->id,
             'owner_type' => User::class,
             'quantity' => 2,
         ]);
-        $order = Order::createFromItems($items);
+        $order = Cashier::$orderModel::createFromItems($items);
 
         $invoice = $order->invoice('2019-0000-0001', Carbon::parse('2019-05-06'));
 
@@ -860,7 +860,7 @@ class OrderTest extends BaseTestCase
      */
     private function createMonthlySubscription()
     {
-        return factory(Subscription::class)->create([
+        return factory(Cashier::$subscriptionModel)->create([
             'owner_id' => 2,
             'owner_type' => User::class,
             'plan' => 'monthly-10-1',

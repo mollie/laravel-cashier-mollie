@@ -3,11 +3,10 @@
 namespace Laravel\Cashier\Tests\FirstPayment;
 
 use Illuminate\Support\Facades\Event;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\MandateUpdated;
 use Laravel\Cashier\FirstPayment\Actions\AddBalance;
 use Laravel\Cashier\FirstPayment\FirstPaymentHandler;
-use Laravel\Cashier\Order\Order;
-use Laravel\Cashier\Payment as LocalPayment;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Mollie\Api\MollieApiClient;
@@ -28,7 +27,7 @@ class FirstPaymentHandlerTest extends BaseTestCase
             'id' => $molliePayment->metadata->owner->id,
             'mollie_customer_id' => 'cst_unique_customer_id',
         ]);
-        LocalPayment::createFromMolliePayment($molliePayment, $owner);
+        Cashier::$paymentModel::createFromMolliePayment($molliePayment, $owner);
 
         $handler = new FirstPaymentHandler($molliePayment);
 
@@ -64,12 +63,12 @@ class FirstPaymentHandlerTest extends BaseTestCase
         $this->assertEquals(2, $owner->orderItems()->count());
         $this->assertEquals(1, $owner->orders()->count());
 
-        $this->assertInstanceOf(Order::class, $order);
+        $this->assertInstanceOf(Cashier::$orderModel, $order);
         $this->assertTrue($order->isProcessed());
 
         $this->assertEquals(1, $order->payments()->count());
         $localPayment = $order->payments()->first();
-        $this->assertInstanceOf(LocalPayment::class, $localPayment);
+        $this->assertInstanceOf(Cashier::$paymentModel, $localPayment);
         $this->assertEquals('paid', $localPayment->mollie_payment_status);
         $this->assertMoneyEURCents(1000, $localPayment->getAmount());
         $this->assertCount(2, $localPayment->first_payment_actions);

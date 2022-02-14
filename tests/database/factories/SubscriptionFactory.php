@@ -4,10 +4,10 @@ namespace Laravel\Cashier\Database\Factories;
 
 use Carbon\Carbon;
 use Faker\Generator as Faker;
-use Laravel\Cashier\Subscription;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Tests\Fixtures\User;
 
-$factory->define(Subscription::class, function (Faker $faker) {
+$factory->define(Cashier::$subscriptionModel, function (Faker $faker) {
     return [
         'name' => 'dummy name',
         'plan' => 'monthly-10-1',

@@ -3,9 +3,9 @@
 namespace Laravel\Cashier\Tests;
 
 use Illuminate\Support\Facades\Event;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\OrderInvoiceAvailable;
 use Laravel\Cashier\Events\OrderPaymentPaid;
-use Laravel\Cashier\Order\Order;
 
 class EventServiceProviderTest extends BaseTestCase
 {
@@ -14,7 +14,7 @@ class EventServiceProviderTest extends BaseTestCase
     {
         Event::fake(OrderInvoiceAvailable::class);
 
-        $event = new OrderPaymentPaid(factory(Order::class)->make());
+        $event = new OrderPaymentPaid(factory(Cashier::$orderModel)->make());
         Event::dispatch($event);
 
         Event::assertDispatched(OrderInvoiceAvailable::class, function ($e) use ($event) {

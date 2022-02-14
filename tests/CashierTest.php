@@ -8,10 +8,28 @@ use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMethodMinimumAmount;
 use Laravel\Cashier\Mollie\GetMollieCustomer;
-use Laravel\Cashier\Order\Order;
-use Laravel\Cashier\Order\OrderItem;
-use Laravel\Cashier\Subscription;
+
+use Laravel\Cashier\Subscription as CashierSubscription;
+use Laravel\Cashier\Order\Order as CashierOrder;
+use Laravel\Cashier\Order\OrderItem as CashierOrderItem;
+use Laravel\Cashier\Coupon\AppliedCoupon as CashierAppliedCoupon;
+use Laravel\Cashier\Coupon\RedeemedCoupon as CashierRedeemedCoupon;
+use Laravel\Cashier\Credit\Credit as CashierCredit;
+use Laravel\Cashier\Payment as CashierPayment;
+use Laravel\Cashier\Refunds\Refund as CashierRefund;
+use Laravel\Cashier\Refunds\RefundItem as CashierRefundItem;
+
 use Laravel\Cashier\Tests\Fixtures\User;
+use Laravel\Cashier\Tests\Fixtures\Subscription as FixtureSubscription;
+use Laravel\Cashier\Tests\Fixtures\Order as FixtureOrder;
+use Laravel\Cashier\Tests\Fixtures\OrderItem as FixtureOrderItem;
+use Laravel\Cashier\Tests\Fixtures\AppliedCoupon as FixtureAppliedCoupon;
+use Laravel\Cashier\Tests\Fixtures\RedeemedCoupon as FixtureRedeemedCoupon;
+use Laravel\Cashier\Tests\Fixtures\Credit as FixtureCredit;
+use Laravel\Cashier\Tests\Fixtures\Payment as FixturePayment;
+use Laravel\Cashier\Tests\Fixtures\Refund as FixtureRefund;
+use Laravel\Cashier\Tests\Fixtures\RefundItem as FixtureRefundItem;
+
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Mandate;
@@ -41,6 +59,44 @@ class CashierTest extends BaseTestCase
     }
 
     /** @test */
+    public function cashierUsesPredefinedModels()
+    {
+        $this->assertEquals(Cashier::$subscriptionModel, CashierSubscription::class);
+        $this->assertEquals(Cashier::$orderModel, CashierOrder::class);
+        $this->assertEquals(Cashier::$orderItemModel, CashierOrderItem::class);
+        $this->assertEquals(Cashier::$appliedCouponModel, CashierAppliedCoupon::class);
+        $this->assertEquals(Cashier::$redeemedCouponModel, CashierRedeemedCoupon::class);
+        $this->assertEquals(Cashier::$creditModel, CashierCredit::class);
+        $this->assertEquals(Cashier::$paymentModel, CashierPayment::class);
+        $this->assertEquals(Cashier::$refundModel, CashierRefund::class);
+        $this->assertEquals(Cashier::$refundItemModel, CashierRefundItem::class);
+    }
+
+    /** @test */
+    public function cashierUsesConfiguredModels()
+    {
+        Cashier::useSubscriptionModel(FixtureSubscription::class);
+        Cashier::useOrderModel(FixtureOrder::class);
+        Cashier::useOrderItemModel(FixtureOrderItem::class);
+        Cashier::useAppliedCouponModel(FixtureAppliedCoupon::class);
+        Cashier::useRedeemedCouponModel(FixtureRedeemedCoupon::class);
+        Cashier::useCreditModel(FixtureCredit::class);
+        Cashier::usePaymentModel(FixturePayment::class);
+        Cashier::useRefundModel(FixtureRefund::class);
+        Cashier::useRefundItemModel(FixtureRefundItem::class);
+
+        $this->assertEquals(Cashier::$subscriptionModel, FixtureSubscription::class);
+        $this->assertEquals(Cashier::$orderModel, FixtureOrder::class);
+        $this->assertEquals(Cashier::$orderItemModel, FixtureOrderItem::class);
+        $this->assertEquals(Cashier::$appliedCouponModel, FixtureAppliedCoupon::class);
+        $this->assertEquals(Cashier::$redeemedCouponModel, FixtureRedeemedCoupon::class);
+        $this->assertEquals(Cashier::$creditModel, FixtureCredit::class);
+        $this->assertEquals(Cashier::$paymentModel, FixturePayment::class);
+        $this->assertEquals(Cashier::$refundModel, FixtureRefund::class);
+        $this->assertEquals(Cashier::$refundItemModel, FixtureRefundItem::class);
+    }
+
+    /** @test */
     public function testRunningCashierProcessesOpenOrderItems()
     {
         $this->withMockedGetMollieCustomer();
@@ -54,8 +110,8 @@ class CashierTest extends BaseTestCase
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
         ]);
 
-        $user->orderItems()->save(factory(OrderItem::class)->states('unlinked', 'processed')->make());
-        $user->orderItems()->save(factory(OrderItem::class)->states('unlinked', 'unprocessed')->make());
+        $user->orderItems()->save(factory(Cashier::$orderItemModel)->states('unlinked', 'processed')->make());
+        $user->orderItems()->save(factory(Cashier::$orderItemModel)->states('unlinked', 'unprocessed')->make());
 
         $this->assertEquals(0, $user->orders()->count());
         $this->assertOrderItemCounts($user, 1, 1);
@@ -98,11 +154,11 @@ class CashierTest extends BaseTestCase
             'mollie_mandate_id' => 'mdt_unique_mandate_id_2',
         ]);
 
-        $subscription1 = $user1->subscriptions()->save(factory(Subscription::class)->make());
-        $subscription2 = $user2->subscriptions()->save(factory(Subscription::class)->make());
+        $subscription1 = $user1->subscriptions()->save(factory(Cashier::$subscriptionModel)->make());
+        $subscription2 = $user2->subscriptions()->save(factory(Cashier::$subscriptionModel)->make());
 
         $subscription1->orderItems()->save(
-            factory(OrderItem::class)->states(['unprocessed', 'EUR'])->make([
+            factory(Cashier::$orderItemModel)->states(['unprocessed', 'EUR'])->make([
                 'owner_id' => 1,
                 'owner_type' => User::class,
                 'process_at' => now()->addHour(),
@@ -110,7 +166,7 @@ class CashierTest extends BaseTestCase
         );
 
         $subscription1->orderItems()->saveMany(
-            factory(OrderItem::class, 2)->states(['unprocessed', 'EUR'])->make([
+            factory(Cashier::$orderItemModel, 2)->states(['unprocessed', 'EUR'])->make([
                 'owner_id' => 1,
                 'owner_type' => User::class,
                 'process_at' => now()->subHour(),
@@ -118,18 +174,18 @@ class CashierTest extends BaseTestCase
         ); // should process these two
 
         $subscription1->orderItems()->save(
-            factory(OrderItem::class)->states('processed')->make()
+            factory(Cashier::$orderItemModel)->states('processed')->make()
         ); // should NOT process this (already processed)
 
         $subscription2->orderItems()->save(
-            factory(OrderItem::class)->states('unprocessed')->make([
+            factory(Cashier::$orderItemModel)->states('unprocessed')->make([
                 'owner_id' => 2,
                 'owner_type' => User::class,
                 'process_at' => now()->subHours(2),
             ])
         ); // should process this one
 
-        $this->assertEquals(0, Order::count());
+        $this->assertEquals(0, Cashier::$orderModel::count());
         $this->assertOrderItemCounts($user1, 1, 3);
         $this->assertOrderItemCounts($user2, 0, 1);
 

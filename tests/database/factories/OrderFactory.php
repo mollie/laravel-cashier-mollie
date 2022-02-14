@@ -3,10 +3,10 @@
 namespace Laravel\Cashier\Database\Factories;
 
 use Faker\Generator as Faker;
-use Laravel\Cashier\Order\Order;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Tests\Fixtures\User;
 
-$factory->define(Order::class, function (Faker $faker) {
+$factory->define(Cashier::$orderModel, function (Faker $faker) {
     return [
         'owner_id' => 1,
         'owner_type' => User::class,

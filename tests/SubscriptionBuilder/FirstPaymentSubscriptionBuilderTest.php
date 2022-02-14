@@ -17,7 +17,6 @@ use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
-use Laravel\Cashier\Payment;
 use Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder;
 use Laravel\Cashier\SubscriptionBuilder\RedirectToCheckoutResponse;
 use Laravel\Cashier\Tests\BaseTestCase;
@@ -87,7 +86,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
                 ],
             ],
         ], $payload);
-        $localPayment = Payment::find(1);
+        $localPayment = Cashier::$paymentModel::find(1);
         $this->assertEquals('Monthly payment', $localPayment->first_payment_actions[0]->description);
         $this->assertEquals('Laravel\\Cashier\\FirstPayment\\Actions\\StartSubscription', $localPayment->first_payment_actions[0]->handler);
         $this->assertEquals('EUR', $localPayment->first_payment_actions[0]->subtotal->currency);
@@ -124,7 +123,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
 
         $payload = $builder->getMandatePaymentBuilder()->getMolliePayload();
 
-        $localPayment = Payment::find(1);
+        $localPayment = Cashier::$paymentModel::find(1);
         $this->assertEquals(3, $localPayment->first_payment_actions[0]->quantity);
 
         $this->assertEquals([
@@ -180,7 +179,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
             ],
         ]));
 
-        Payment::createFromMolliePayment($molliePayment, $this->user);
+        Cashier::$paymentModel::createFromMolliePayment($molliePayment, $this->user);
 
         $this->mock(GetMolliePayment::class, function ($mock) use ($molliePayment) {
             return $mock->shouldReceive('execute')

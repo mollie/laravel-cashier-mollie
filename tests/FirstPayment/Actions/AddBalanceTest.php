@@ -2,8 +2,8 @@
 
 namespace Laravel\Cashier\Tests\FirstPayment\Actions;
 
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\FirstPayment\Actions\AddBalance;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
@@ -78,7 +78,7 @@ class AddBalanceTest extends BaseTestCase
 
         $this->assertInstanceOf(OrderItemCollection::class, $items);
         $this->assertCount(1, $items);
-        $this->assertInstanceOf(OrderItem::class, $item);
+        $this->assertInstanceOf(Cashier::$orderItemModel, $item);
         $this->assertEquals('Adding some test balance', $item->description);
 
         $this->assertEquals('EUR', $item->currency);

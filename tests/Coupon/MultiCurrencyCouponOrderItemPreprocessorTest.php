@@ -2,11 +2,10 @@
 
 namespace Laravel\Cashier\Tests\Coupon;
 
-use Laravel\Cashier\Coupon\AppliedCoupon;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\Coupon\CouponOrderItemPreprocessor;
 use Laravel\Cashier\Exceptions\CurrencyMismatchException;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\BaseTestCase;
@@ -25,13 +24,13 @@ class MultiCurrencyCouponOrderItemPreprocessorTest extends BaseTestCase
         $this->withMockedUsdCouponRepository();
 
         /** @var Subscription $subscription */
-        $subscription = factory(Subscription::class)->create();
-        $item = factory(OrderItem::class)->make();
+        $subscription = factory(Cashier::$subscriptionModel)->create();
+        $item = factory(Cashier::$orderItemModel)->make();
         $subscription->orderItems()->save($item);
 
         /** @var Subscription $subscriptionUsd */
-        $subscriptionUsd = factory(Subscription::class)->create();
-        $itemUsd = factory(OrderItem::class)->make(['currency' => 'USD']);
+        $subscriptionUsd = factory(Cashier::$subscriptionModel)->create();
+        $itemUsd = factory(Cashier::$orderItemModel)->make(['currency' => 'USD']);
         $subscriptionUsd->orderItems()->save($itemUsd);
 
         /** @var \Laravel\Cashier\Coupon\Coupon $coupon */
@@ -40,7 +39,7 @@ class MultiCurrencyCouponOrderItemPreprocessorTest extends BaseTestCase
         $redeemedUsdCoupon = $usdCoupon->redeemFor($subscription);
         $preprocessor = new CouponOrderItemPreprocessor();
 
-        $this->assertEquals(0, AppliedCoupon::count());
+        $this->assertEquals(0, Cashier::$appliedCouponModel::count());
         $this->assertEquals(1, $redeemedUsdCoupon->times_left);
 
         $this->expectException(CurrencyMismatchException::class);
@@ -50,13 +49,13 @@ class MultiCurrencyCouponOrderItemPreprocessorTest extends BaseTestCase
         $redeemedUsdCoupon = $usdCoupon->redeemFor($subscriptionUsd);
         $preprocessor = new CouponOrderItemPreprocessor();
 
-        $this->assertEquals(0, AppliedCoupon::count());
+        $this->assertEquals(0, Cashier::$appliedCouponModel::count());
         $this->assertEquals(1, $redeemedUsdCoupon->times_left);
 
 
         $result = $preprocessor->handle($itemUsd->toCollection());
 
-        $this->assertEquals(1, AppliedCoupon::count());
+        $this->assertEquals(1, Cashier::$appliedCouponModel::count());
         $this->assertInstanceOf(OrderItemCollection::class, $result);
         $this->assertNotEquals($item->toCollection(), $result);
         $this->assertEquals(0, $redeemedUsdCoupon->refresh()->times_left);

@@ -3,11 +3,11 @@
 namespace Laravel\Cashier\Coupon;
 
 use Illuminate\Support\Arr;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\Contracts\AcceptsCoupons;
 use Laravel\Cashier\Coupon\Contracts\CouponHandler;
 use Laravel\Cashier\Events\CouponApplied;
 use Laravel\Cashier\Exceptions\CouponException;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
 
 abstract class BaseCouponHandler implements CouponHandler
@@ -69,7 +69,7 @@ abstract class BaseCouponHandler implements CouponHandler
      */
     public function validateOwnersFirstUse(Coupon $coupon, AcceptsCoupons $model)
     {
-        $exists = RedeemedCoupon::whereName($coupon->name())
+        $exists = Cashier::$redeemedCouponModel::whereName($coupon->name())
                 ->whereOwnerType($model->ownerType())
                 ->whereOwnerId($model->ownerId())
                 ->count() > 0;
@@ -83,7 +83,7 @@ abstract class BaseCouponHandler implements CouponHandler
      */
     public function markApplied(RedeemedCoupon $redeemedCoupon)
     {
-        $appliedCoupon = $this->appliedCoupon = AppliedCoupon::create([
+        $appliedCoupon = $this->appliedCoupon = Cashier::$appliedCouponModel::create([
             'redeemed_coupon_id' => $redeemedCoupon->id,
             'model_type' => $redeemedCoupon->model_type,
             'model_id' => $redeemedCoupon->model_id,
@@ -109,7 +109,7 @@ abstract class BaseCouponHandler implements CouponHandler
             return $this->appliedCoupon->orderItems()->make($data);
         }
 
-        return OrderItem::make($data);
+        return Cashier::$orderItemModel::make($data);
     }
 
     /**

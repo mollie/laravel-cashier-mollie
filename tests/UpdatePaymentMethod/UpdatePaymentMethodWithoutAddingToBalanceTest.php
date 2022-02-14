@@ -4,6 +4,7 @@
 namespace Laravel\Cashier\Tests\UpdatePaymentMethod;
 
 use Illuminate\Support\Facades\Event;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\MandateUpdated;
 use Laravel\Cashier\FirstPayment\Actions\AddGenericOrderItem;
 use Laravel\Cashier\FirstPayment\FirstPaymentHandler;
@@ -25,7 +26,7 @@ class UpdatePaymentMethodWithoutAddingToBalanceTest extends BaseTestCase
         ]);
 
         $newPayment = $this->getNewMandatePaymentStub();
-        LocalPayment::createFromMolliePayment($newPayment, $owner);
+        Cashier::$paymentModel::createFromMolliePayment($newPayment, $owner);
 
         $newHandler = new FirstPaymentHandler($newPayment);
 

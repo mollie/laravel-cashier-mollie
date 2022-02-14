@@ -4,8 +4,8 @@ namespace Laravel\Cashier\Tests\Order;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\Invoice;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Tests\BaseTestCase;
 
 class InvoiceTest extends BaseTestCase
@@ -13,21 +13,21 @@ class InvoiceTest extends BaseTestCase
     /** @test */
     public function canAddItemsToInvoice()
     {
-        $itemA = factory(OrderItem::class)->make([
+        $itemA = factory(Cashier::$orderItemModel)->make([
             'unit_price' => 1000,
             'quantity' => 2,
             'tax_percentage' => 21.5,
             'currency' => 'EUR',
         ]);
 
-        $itemB = factory(OrderItem::class)->make([
+        $itemB = factory(Cashier::$orderItemModel)->make([
             'unit_price' => 1000,
             'quantity' => 2,
             'tax_percentage' => 21.5,
             'currency' => 'EUR',
         ]);
 
-        $itemC = factory(OrderItem::class)->make([
+        $itemC = factory(Cashier::$orderItemModel)->make([
             'unit_price' => 1000,
             'quantity' => 2,
             'tax_percentage' => 9.5,
@@ -163,7 +163,7 @@ class InvoiceTest extends BaseTestCase
     /** @test */
     public function canGetAsView()
     {
-        $items = factory(OrderItem::class, 2)->make();
+        $items = factory(Cashier::$orderItemModel, 2)->make();
 
         $invoice = new Invoice('EUR');
         $invoice = $invoice->addItems($items);
@@ -182,7 +182,7 @@ class InvoiceTest extends BaseTestCase
     /** @test */
     public function canGetAsPdf()
     {
-        $items = factory(OrderItem::class, 2)->make();
+        $items = factory(Cashier::$orderItemModel, 2)->make();
 
         $invoice = new Invoice('EUR');
         $invoice = $invoice->addItems($items);
@@ -196,7 +196,7 @@ class InvoiceTest extends BaseTestCase
     public function canGetAsDownloadResponse()
     {
         Carbon::setTestNow(Carbon::parse('2018-12-31'));
-        $items = factory(OrderItem::class, 2)->make();
+        $items = factory(Cashier::$orderItemModel, 2)->make();
         config(['app.name' => 'FooBar']);
 
         $invoice = new Invoice('EUR');

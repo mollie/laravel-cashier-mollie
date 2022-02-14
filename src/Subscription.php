@@ -6,9 +6,8 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use Laravel\Cashier\Coupon\AppliedCoupon;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\Contracts\AcceptsCoupons;
-use Laravel\Cashier\Coupon\RedeemedCoupon;
 use Laravel\Cashier\Events\SubscriptionCancelled;
 use Laravel\Cashier\Events\SubscriptionPlanSwapped;
 use Laravel\Cashier\Events\SubscriptionQuantityUpdated;
@@ -16,7 +15,6 @@ use Laravel\Cashier\Events\SubscriptionResumed;
 use Laravel\Cashier\Events\SubscriptionStarted;
 use Laravel\Cashier\Order\Contracts\InteractsWithOrderItems;
 use Laravel\Cashier\Order\Contracts\PreprocessesOrderItems;
-use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Plan\Contracts\Plan;
@@ -369,7 +367,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public function orderItems()
     {
-        return $this->morphMany(OrderItem::class, 'orderable');
+        return $this->morphMany(Cashier::$orderItemModel, 'orderable');
     }
 
     /**
@@ -379,7 +377,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public function scheduledOrderItem()
     {
-        return $this->hasOne(OrderItem::class, 'id', 'scheduled_order_item_id');
+        return $this->hasOne(Cashier::$orderItemModel, 'id', 'scheduled_order_item_id');
     }
 
     /**
@@ -738,7 +736,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
             $this->save();
 
             if ($invoiceNow) {
-                $order = Order::createFromItems($orderItems);
+                $order = Cashier::$orderModel::createFromItems($orderItems);
                 $order->processPayment();
             }
 
@@ -766,7 +764,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public function redeemedCoupons()
     {
-        return $this->morphMany(RedeemedCoupon::class, 'model');
+        return $this->morphMany(Cashier::$redeemedCouponModel, 'model');
     }
 
     /**
@@ -776,7 +774,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public function appliedCoupons()
     {
-        return $this->morphMany(AppliedCoupon::class, 'model');
+        return $this->morphMany(Cashier::$appliedCouponModel, 'model');
     }
 
     /**

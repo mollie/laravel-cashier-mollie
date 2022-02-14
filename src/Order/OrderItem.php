@@ -5,6 +5,7 @@ namespace Laravel\Cashier\Order;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\Contracts\InteractsWithOrderItems;
 use Laravel\Cashier\Order\Contracts\InvoicableItem;
 use Laravel\Cashier\Refunds\RefundItem;
@@ -70,7 +71,7 @@ class OrderItem extends Model implements InvoicableItem
      */
     public function order()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Cashier::$orderModel);
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace Laravel\Cashier\Tests;
 
 use Illuminate\Support\Facades\Event;
-use Laravel\Cashier\Coupon\RedeemedCoupon;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\RedeemedCouponCollection;
 use Laravel\Cashier\Events\MandateClearedFromBillable;
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
@@ -124,7 +124,7 @@ class BillableTest extends BaseTestCase
         ]);
 
         $subscription = $user->newSubscription('default', 'monthly-10-1')->create();
-        $subscription->redeemedCoupons()->saveMany(factory(RedeemedCoupon::class, 2)->make());
+        $subscription->redeemedCoupons()->saveMany(factory(Cashier::$redeemedCouponModel, 2)->make());
         $this->assertEquals(2, $subscription->redeemedCoupons()->active()->count());
         $this->assertEquals(0, $subscription->appliedCoupons()->count());
 

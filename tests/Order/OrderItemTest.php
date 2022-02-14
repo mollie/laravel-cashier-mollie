@@ -2,7 +2,7 @@
 
 namespace Laravel\Cashier\Tests\Order;
 
-use Laravel\Cashier\Order\OrderItem;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
 
@@ -10,7 +10,7 @@ class OrderItemTest extends BaseTestCase
 {
     public function testGetSubtotalAttribute()
     {
-        $item = new OrderItem;
+        $item = new Cashier::$orderItemModel;
         $item->currency = 'EUR';
         $item->quantity = 4;
         $item->unit_price = 110;
@@ -24,7 +24,7 @@ class OrderItemTest extends BaseTestCase
 
     public function testGetTaxAttribute()
     {
-        $item = new OrderItem;
+        $item = new Cashier::$orderItemModel;
         $item->currency = 'EUR';
         $item->quantity = 4;
         $item->unit_price = 110;
@@ -38,7 +38,7 @@ class OrderItemTest extends BaseTestCase
 
     public function testGetTotalAttribute()
     {
-        $item = new OrderItem;
+        $item = new Cashier::$orderItemModel;
         $item->currency = 'EUR';
         $item->quantity = 4;
         $item->unit_price = 110;
@@ -52,7 +52,7 @@ class OrderItemTest extends BaseTestCase
 
     public function testGetAttributesAsMoney()
     {
-        $item = new OrderItem;
+        $item = new Cashier::$orderItemModel;
         $item->currency = 'EUR';
         $item->quantity = 4;
         $item->unit_price = 110;
@@ -67,78 +67,78 @@ class OrderItemTest extends BaseTestCase
     {
         $this->withPackageMigrations();
 
-        factory(OrderItem::class, 3)->create([
+        factory(Cashier::$orderItemModel, 3)->create([
             'order_id' => null,
         ]);
-        factory(OrderItem::class, 2)->create([
+        factory(Cashier::$orderItemModel, 2)->create([
             'order_id' => 1,
         ]);
 
-        $this->assertEquals(2, OrderItem::processed()->count());
-        $this->assertEquals(2, OrderItem::processed(true)->count());
-        $this->assertEquals(3, OrderItem::processed(false)->count());
+        $this->assertEquals(2, Cashier::$orderItemModel::processed()->count());
+        $this->assertEquals(2, Cashier::$orderItemModel::processed(true)->count());
+        $this->assertEquals(3, Cashier::$orderItemModel::processed(false)->count());
     }
 
     public function testScopeUnprocessed()
     {
         $this->withPackageMigrations();
 
-        factory(OrderItem::class, 3)->create([
+        factory(Cashier::$orderItemModel, 3)->create([
             'order_id' => null,
         ]);
-        factory(OrderItem::class, 2)->create([
+        factory(Cashier::$orderItemModel, 2)->create([
             'order_id' => 1,
         ]);
 
-        $this->assertEquals(3, OrderItem::unprocessed()->count());
-        $this->assertEquals(3, OrderItem::unprocessed(true)->count());
-        $this->assertEquals(2, OrderItem::unprocessed(false)->count());
+        $this->assertEquals(3, Cashier::$orderItemModel::unprocessed()->count());
+        $this->assertEquals(3, Cashier::$orderItemModel::unprocessed(true)->count());
+        $this->assertEquals(2, Cashier::$orderItemModel::unprocessed(false)->count());
     }
 
     public function testScopeShouldProcess()
     {
         $this->withPackageMigrations();
 
-        factory(OrderItem::class, 2)->create([
+        factory(Cashier::$orderItemModel, 2)->create([
             'order_id' => 1,
             'process_at' => now()->subHour(),
         ]);
-        factory(OrderItem::class, 2)->create([
+        factory(Cashier::$orderItemModel, 2)->create([
             'order_id' => null,
             'process_at' => now()->addDay(),
         ]);
-        factory(OrderItem::class, 3)->create([
+        factory(Cashier::$orderItemModel, 3)->create([
             'order_id' => null,
             'process_at' => now()->subHour(),
         ]);
 
-        $this->assertEquals(3, OrderItem::shouldProcess()->count());
+        $this->assertEquals(3, Cashier::$orderItemModel::shouldProcess()->count());
     }
 
     public function testScopeDue()
     {
         $this->withPackageMigrations();
 
-        factory(OrderItem::class, 2)->create([
+        factory(Cashier::$orderItemModel, 2)->create([
             'process_at' => now()->subHour(),
         ]);
-        factory(OrderItem::class, 3)->create([
+        factory(Cashier::$orderItemModel, 3)->create([
             'process_at' => now()->addMinutes(5),
         ]);
 
-        $this->assertEquals(2, OrderItem::due()->count());
+        $this->assertEquals(2, Cashier::$orderItemModel::due()->count());
     }
 
     public function testNewCollection()
     {
-        $collection = factory(OrderItem::class, 2)->make();
+        $collection = factory(Cashier::$orderItemModel, 2)->make();
         $this->assertInstanceOf(OrderItemCollection::class, $collection);
     }
 
     public function testIsProcessed()
     {
-        $unprocessedItem = factory(OrderItem::class)->make(['order_id' => null]);
-        $processedItem = factory(OrderItem::class)->make(['order_id' => 1]);
+        $unprocessedItem = factory(Cashier::$orderItemModel)->make(['order_id' => null]);
+        $processedItem = factory(Cashier::$orderItemModel)->make(['order_id' => 1]);
 
         $this->assertFalse($unprocessedItem->isProcessed());
         $this->assertTrue($unprocessedItem->isProcessed(false));

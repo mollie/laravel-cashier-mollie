@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Charge;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Charge\Contracts\ChargeBuilder as Contract;
 use Laravel\Cashier\Order\Order;
 
@@ -68,7 +69,7 @@ class MandatedChargeBuilder implements Contract
         ])->save();
 
         if ($this->processNow) {
-            return Order::createFromItems($items)->processPayment();
+            return Cashier::$orderModel::createFromItems($items)->processPayment();
         }
 
         return null;

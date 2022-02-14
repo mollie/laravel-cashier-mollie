@@ -4,11 +4,18 @@ namespace Laravel\Cashier;
 
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Order\OrderItem;
+use Laravel\Cashier\Coupon\AppliedCoupon;
+use Laravel\Cashier\Coupon\RedeemedCoupon;
+use Laravel\Cashier\Credit\Credit;
 use Money\Currencies\ISOCurrencies;
 use Money\Formatter\IntlMoneyFormatter;
 use Money\Money;
+use Laravel\Cashier\Refunds\Refund;
+use Laravel\Cashier\Refunds\RefundItem;
+use Laravel\Cashier\Payment;
 
 class Cashier
 {
@@ -55,16 +62,79 @@ class Cashier
     public static $registersRoutes = true;
 
     /**
+     * The subscription model class name.
+     *
+     * @var string
+     */
+    public static $subscriptionModel = Subscription::class;
+
+    /**
+     * The order model class name.
+     *
+     * @var string
+     */
+    public static $orderModel = Order::class;
+
+    /**
+     * The orderItem model class name.
+     *
+     * @var string
+     */
+    public static $orderItemModel = OrderItem::class;
+
+    /**
+     * The appliedCoupon model class name.
+     *
+     * @var string
+     */
+    public static $appliedCouponModel = AppliedCoupon::class;
+
+    /**
+     * The redeemedCoupon model class name.
+     *
+     * @var string
+     */
+    public static $redeemedCouponModel = RedeemedCoupon::class;
+
+    /**
+     * The credit model class name.
+     *
+     * @var string
+     */
+    public static $creditModel = Credit::class;
+
+    /**
+     * The payment model class name.
+     *
+     * @var string
+     */
+    public static $paymentModel = Payment::class;
+
+    /**
+     * The refund model class name.
+     *
+     * @var string
+     */
+    public static $refundModel = Refund::class;
+
+    /**
+     * The refund model class name.
+     *
+     * @var string
+     */
+    public static $refundItemModel = RefundItem::class;
+
+    /**
      * Process scheduled OrderItems
      *
      * @return \Illuminate\Support\Collection
      */
     public static function run()
     {
-        $items = OrderItem::shouldProcess()->get();
+        $items = static::$orderItemModel::shouldProcess()->get();
 
         $orders = $items->chunkByOwnerAndCurrency()->map(function ($chunk) {
-            return Order::createFromItems($chunk)->processPayment();
+            return static::$orderModel::createFromItems($chunk)->processPayment();
         });
 
         return $orders;
@@ -187,6 +257,105 @@ class Cashier
         $moneyFormatter = new IntlMoneyFormatter($numberFormatter, new ISOCurrencies);
 
         return $moneyFormatter->format($money);
+    }
+
+    /**
+     * Set the subscription model class name.
+     *
+     * @param  string  $subscriptionModel
+     * @return void
+     */
+    public static function useSubscriptionModel($subscriptionModel)
+    {
+        static::$subscriptionModel = $subscriptionModel;
+    }
+
+    /**
+     * Set the order model class name.
+     *
+     * @param  ordertring  $customerModel
+     * @return void
+     */
+    public static function useOrderModel($orderModel)
+    {
+        static::$orderModel = $orderModel;
+    }
+
+    /**
+     * Set the orderItem model class name.
+     *
+     * @param  string  $orderItemModel
+     * @return void
+     */
+    public static function useOrderItemModel($orderItemModel)
+    {
+        static::$orderItemModel = $orderItemModel;
+    }
+
+    /**
+     * Set the appliedCoupon model class name.
+     *
+     * @param  string  $appliedCouponModel
+     * @return void
+     */
+    public static function useAppliedCouponModel($appliedCouponModel)
+    {
+        static::$appliedCouponModel = $appliedCouponModel;
+    }
+
+    /**
+     * Set the redeemedCoupon model class name.
+     *
+     * @param  string  $redeemedCouponModel
+     * @return void
+     */
+    public static function useRedeemedCouponModel($redeemedCouponModel)
+    {
+        static::$redeemedCouponModel = $redeemedCouponModel;
+    }
+
+    /**
+     * Set the credit model class name.
+     *
+     * @param  string  $creditModel
+     * @return void
+     */
+    public static function useCreditModel($creditModel)
+    {
+        static::$creditModel = $creditModel;
+    }
+
+    /**
+     * Set the payment model class name.
+     *
+     * @param  string  $paymentModel
+     * @return void
+     */
+    public static function usePaymentModel($paymentModel)
+    {
+        static::$paymentModel = $paymentModel;
+    }
+
+    /**
+     * Set the refund model class name.
+     *
+     * @param  string  $refundModel
+     * @return void
+     */
+    public static function useRefundModel($refundModel)
+    {
+        static::$refundModel = $refundModel;
+    }
+
+    /**
+     * Set the refundItem model class name.
+     *
+     * @param  string  $refundItemModel
+     * @return void
+     */
+    public static function useRefundItemModel($refundItemModel)
+    {
+        static::$refundItemModel = $refundItemModel;
     }
 
     /**

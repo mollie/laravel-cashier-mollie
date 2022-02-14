@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Laravel\Cashier\Refunds;
 
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\RefundInitiated;
 use Laravel\Cashier\Mollie\Contracts\CreateMollieRefund;
 use Laravel\Cashier\Order\Order;
@@ -66,7 +67,7 @@ class RefundBuilder
 
     public function addItemFromOrderItem(OrderItem $orderItem, array $overrides = []): self
     {
-        return $this->addItem(RefundItem::makeFromOrderItem($orderItem, $overrides));
+        return $this->addItem(Cashier::$refundItemModel::makeFromOrderItem($orderItem, $overrides));
     }
 
     public function addItemsFromOrderItemCollection(OrderItemCollection $orderItems, array $overrides = []): self
@@ -93,7 +94,7 @@ class RefundBuilder
             ],
         ]);
 
-        $refundRecord = Refund::create([
+        $refundRecord = Cashier::$refundModel::create([
             'owner_type' => $this->order->owner_type,
             'owner_id' => $this->order->owner_id,
             'original_order_id' => $this->order->getKey(),

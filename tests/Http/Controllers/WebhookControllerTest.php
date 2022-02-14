@@ -4,16 +4,14 @@ namespace Laravel\Cashier\Tests\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\OrderPaymentFailed;
 use Laravel\Cashier\Events\OrderPaymentPaid;
 use Laravel\Cashier\Events\SubscriptionCancelled;
 use Laravel\Cashier\Http\Controllers\WebhookController;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
-use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Order\OrderItemCollection;
-use Laravel\Cashier\Payment as LocalPayment;
-use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Laravel\Cashier\Types\SubscriptionCancellationReason;
@@ -97,14 +95,14 @@ class WebhookControllerTest extends BaseTestCase
         Event::fake();
 
         $user = factory(User::class)->create();
-        $subscription = $user->subscriptions()->save(factory(Subscription::class)->make([
+        $subscription = $user->subscriptions()->save(factory(Cashier::$subscriptionModel)->make([
             'plan' => 'monthly-10-1',
         ]));
         $item = $subscription->scheduleNewOrderItemAt(now());
 
         $paymentId = 'tr_failed_payment_id';
 
-        $order = Order::createFromItems(new OrderItemCollection([$item]), [
+        $order = Cashier::$orderModel::createFromItems(new OrderItemCollection([$item]), [
             'mollie_payment_id' => $paymentId,
             'mollie_payment_status' => 'open',
             'balance_before' => 500,
@@ -125,7 +123,7 @@ class WebhookControllerTest extends BaseTestCase
         ];
         $payment->mandateId = 'mdt_dummy_mandate_id';
 
-        LocalPayment::createFromMolliePayment($payment, $user);
+        Cashier::$paymentModel::createFromMolliePayment($payment, $user);
         $payment->status = 'failed';
 
         $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($payment, $paymentId) {
@@ -152,7 +150,7 @@ class WebhookControllerTest extends BaseTestCase
         $this->assertMoneyEURCents(0, $order->getCreditUsed());
         $this->assertMoneyEURCents(500, $user->credit('EUR')->money());
 
-        $this->assertEquals('failed', LocalPayment::first()->mollie_payment_status);
+        $this->assertEquals('failed', Cashier::$paymentModel::first()->mollie_payment_status);
 
         Event::assertDispatched(OrderPaymentFailed::class, function (OrderPaymentFailed $event) use ($order) {
             return $event->order->is($order);
@@ -174,12 +172,12 @@ class WebhookControllerTest extends BaseTestCase
         Event::fake();
 
         $user = factory(User::class)->create();
-        $subscription = $user->subscriptions()->save(factory(Subscription::class)->make([
+        $subscription = $user->subscriptions()->save(factory(Cashier::$subscriptionModel)->make([
             'plan' => 'monthly-10-1',
         ]));
         $item = $subscription->scheduleNewOrderItemAt(now());
 
-        $order = Order::createFromItems(new OrderItemCollection([$item]));
+        $order = Cashier::$orderModel::createFromItems(new OrderItemCollection([$item]));
 
         $paymentId = 'tr_payment_paid_id';
 
@@ -198,7 +196,7 @@ class WebhookControllerTest extends BaseTestCase
             'value' => '10.00',
         ];
         $payment->mandateId = 'mdt_dummy_mandate_id';
-        LocalPayment::createFromMolliePayment($payment, $user);
+        Cashier::$paymentModel::createFromMolliePayment($payment, $user);
         $payment->status = 'paid';
 
         $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($payment, $paymentId) {
@@ -224,7 +222,7 @@ class WebhookControllerTest extends BaseTestCase
         $this->assertEquals('paid', $order->fresh()->mollie_payment_status);
         $this->assertTrue($subscription->fresh()->active());
 
-        $this->assertEquals('paid', LocalPayment::first()->mollie_payment_status);
+        $this->assertEquals('paid', Cashier::$paymentModel::first()->mollie_payment_status);
 
         Event::assertDispatched(OrderPaymentPaid::class, function (OrderPaymentPaid $event) use ($order) {
             return $event->order->is($order);
@@ -239,7 +237,7 @@ class WebhookControllerTest extends BaseTestCase
 
         $paymentId = 'tr_payment_paid_id';
 
-        factory(Order::class)->create([
+        factory(Cashier::$orderModel)->create([
             'mollie_payment_id' => $paymentId,
             'mollie_payment_status' => 'paid',
         ]);

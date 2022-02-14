@@ -5,8 +5,8 @@ namespace Laravel\Cashier;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\ConvertsToMoney;
-use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Traits\HasOwner;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
@@ -98,23 +98,23 @@ class Payment extends Model
      * Retrieve an Order by the Mollie Payment id.
      *
      * @param $id
-     * @return self
+     * @return static
      */
     public static function findByPaymentId($id): ?self
     {
-        return self::where('mollie_payment_id', $id)->first();
+        return static::where('mollie_payment_id', $id)->first();
     }
 
     /**
      * Retrieve a Payment by the Mollie Payment id or throw an Exception if not found.
      *
      * @param $id
-     * @return self
+     * @return static
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public static function findByPaymentIdOrFail($id): self
     {
-        return self::where('mollie_payment_id', $id)->firstOrFail();
+        return static::where('mollie_payment_id', $id)->firstOrFail();
     }
 
     /**
@@ -127,13 +127,13 @@ class Payment extends Model
      */
     public static function findByMolliePaymentOrCreate(MolliePayment $molliePayment, Model $owner, array $actions = []): self
     {
-        $payment = self::findByPaymentId($molliePayment->id);
+        $payment = static::findByPaymentId($molliePayment->id);
 
         if ($payment) {
             return $payment;
         }
 
-        $newPayment = self::createFromMolliePayment($molliePayment, $owner, $actions);
+        $newPayment = static::createFromMolliePayment($molliePayment, $owner, $actions);
 
         if ($newPayment->mollie_payment_status === PaymentStatus::STATUS_PAID) {
             $molliePayment->webhookUrl = route('webhooks.mollie.aftercare');
@@ -151,7 +151,7 @@ class Payment extends Model
      */
     public function order()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Cashier::$orderModel);
     }
 
     /**

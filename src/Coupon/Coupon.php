@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Coupon;
 
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\Contracts\AcceptsCoupons;
 use Laravel\Cashier\Coupon\Contracts\CouponHandler;
 use Laravel\Cashier\Order\OrderItemCollection;
@@ -89,7 +90,7 @@ class Coupon
      */
     public function redeemFor(AcceptsCoupons $model)
     {
-        return RedeemedCoupon::record($this, $model);
+        return Cashier::$redeemedCouponModel::record($this, $model);
     }
 
     /**

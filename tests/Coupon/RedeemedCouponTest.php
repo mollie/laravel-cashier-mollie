@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Tests\Coupon;
 
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\RedeemedCoupon;
 use Laravel\Cashier\Tests\BaseTestCase;
 
@@ -13,7 +14,7 @@ class RedeemedCouponTest extends BaseTestCase
         $this->withPackageMigrations();
 
         /** @var RedeemedCoupon $redeemedCoupon */
-        $redeemedCoupon = factory(RedeemedCoupon::class)->create(['times_left' => 5]);
+        $redeemedCoupon = factory(Cashier::$redeemedCouponModel)->create(['times_left' => 5]);
 
         $this->assertEquals(5, $redeemedCoupon->times_left);
         $this->assertTrue($redeemedCoupon->isActive());

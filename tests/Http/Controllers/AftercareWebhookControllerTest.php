@@ -6,6 +6,7 @@ namespace Laravel\Cashier\Tests\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\ChargebackReceived;
 use Laravel\Cashier\Http\Controllers\AftercareWebhookController;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
@@ -34,7 +35,7 @@ class AftercareWebhookControllerTest extends BaseTestCase
         $molliePayment->amountChargedBack = null;
         $molliePayment->_links = (object) [];
 
-        $localPayment = Payment::createFromMolliePayment($molliePayment, $this->getUser());
+        $localPayment = Cashier::$paymentModel::createFromMolliePayment($molliePayment, $this->getUser());
         $molliePayment->amountChargedBack = (object) [
             'value' => '10.00',
             'currency' => 'EUR',

@@ -5,9 +5,9 @@ namespace Laravel\Cashier\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\ChargebackReceived;
 use Laravel\Cashier\Order\Order;
-use Laravel\Cashier\Payment;
 use Laravel\Cashier\Refunds\Refund;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Resources\Refund as MollieRefund;
@@ -26,13 +26,13 @@ class AftercareWebhookController extends BaseWebhookController
         $molliePayment = $this->getMolliePaymentById($request->get('id'));
 
         if ($molliePayment && $molliePayment->hasRefunds()) {
-            $order = Order::findByMolliePaymentId($molliePayment->id);
+            $order = Cashier::$orderModel::findByMolliePaymentId($molliePayment->id);
 
             $this->handleRefunds($order, $molliePayment);
         }
 
         if ($molliePayment && $molliePayment->hasChargebacks()) {
-            $localPayment = Payment::findByPaymentId($molliePayment->id);
+            $localPayment = Cashier::$paymentModel::findByPaymentId($molliePayment->id);
 
             $molliePaymentAmountChargedBackTotal = mollie_object_to_money($molliePayment->amountChargedBack);
             $locallyKnownAmountChargedBack = $localPayment->getAmountChargedBack();

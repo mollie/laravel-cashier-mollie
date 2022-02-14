@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Laravel\Cashier\Refunds;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\ConvertsToMoney;
 use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Traits\HasOwner;
@@ -72,7 +73,7 @@ class RefundItem extends Model
 
     public function originalOrderItem()
     {
-        return $this->hasOne(OrderItem::class, 'id', 'original_order_item_id');
+        return $this->hasOne(Cashier::$orderItemModel, 'id', 'original_order_item_id');
     }
 
     /**
