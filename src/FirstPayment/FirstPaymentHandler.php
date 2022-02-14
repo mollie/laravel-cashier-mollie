@@ -85,7 +85,7 @@ class FirstPaymentHandler
 
         $ownerClass = Relation::getMorphedModel($ownerType) ?? $ownerType;
 
-        return $ownerClass::findOrFail($ownerID);
+        return $ownerClass::query()->findOrFail($ownerID);
     }
 
     /**
