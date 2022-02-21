@@ -833,4 +833,14 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     {
         return $this->owner_id;
     }
+
+    /**
+     * Retrieve the latest processed order item.
+     *
+     * @return OrderItem|null
+     */
+    public function latestProcessedOrderItem()
+    {
+        return $this->orderItems()->processed()->orderByDesc('process_at')->first();
+    }
 }
