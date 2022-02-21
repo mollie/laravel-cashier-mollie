@@ -42,7 +42,6 @@ use Money\Money;
  * @property \Carbon\Carbon trial_ends_at
  * @property float cycle_progress
  * @property float cycle_left
- * @property \Illuminate\Database\Eloquent\Collection $appliedCoupons
  */
 class Subscription extends Model implements InteractsWithOrderItems, PreprocessesOrderItems, AcceptsCoupons, IsRefundable
 {
@@ -736,7 +735,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
 
         $amount = $this->reimbursableAmount()
             ->negative()
-            ->multiply($this->getCycleLeftAttribute($now));
+            ->multiply(sprintf('%.8F', $this->getCycleLeftAttribute($now)));
 
         if ($amount->isZero()) {
             return null;

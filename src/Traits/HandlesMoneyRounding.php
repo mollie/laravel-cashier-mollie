@@ -16,11 +16,17 @@ trait HandlesMoneyRounding
      */
     public function roundingMode(Money $total, float $taxPercentage)
     {
-        $vat = $total->divide(1 + $taxPercentage)->multiply($taxPercentage);
+        $vat = $total->divide(
+            sprintf('%.6F', 1 + $taxPercentage)
+        )->multiply(
+            sprintf('%.6F', $taxPercentage)
+        );
 
         $subtotal = $total->subtract($vat);
 
-        $recalculatedTax = $subtotal->multiply($taxPercentage * 100)->divide(100);
+        $recalculatedTax = $subtotal->multiply(
+            sprintf('%.6F', $taxPercentage * 100)
+        )->divide(100);
 
         $finalTotal = $subtotal->add($recalculatedTax);
 
