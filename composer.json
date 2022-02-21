@@ -38,7 +38,7 @@
         "illuminate/support": "^8.0|^9.0",
         "mollie/laravel-mollie": "^2.9",
         "mollie/mollie-api-php": "^2.27",
-        "moneyphp/money": "^4.0",
+        "moneyphp/money": "^3.2|^4.0.3",
         "nesbot/carbon": "^2.31"
     },
     "require-dev": {
