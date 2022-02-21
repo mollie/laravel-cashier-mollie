@@ -131,7 +131,9 @@ abstract class BaseAction
     public function getTax()
     {
         return $this->getSubtotal()
-                    ->multiply($this->getTaxPercentage())
+                    ->multiply(
+                        sprintf('%.6F', $this->getTaxPercentage())
+                    )
                     ->divide(100, $this->getRoundingMode());
     }
 

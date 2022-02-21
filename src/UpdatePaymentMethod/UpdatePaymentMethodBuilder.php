@@ -127,36 +127,13 @@ class UpdatePaymentMethodBuilder implements Contract
      */
     protected function subtotalForTotalIncludingTax(Money $total, float $taxPercentage)
     {
-        $vat = $total->divide(1 + $taxPercentage)->multiply($taxPercentage, $this->roundingMode($total, $taxPercentage));
+        $vat = $total->divide(
+            sprintf('%.8F', 1 + $taxPercentage)
+        )->multiply(
+            sprintf('%.8F', $taxPercentage),
+            $this->roundingMode($total, $taxPercentage)
+        );
 
         return $total->subtract($vat);
-    }
-
-    /**
-     * Format the money as basic decimal
-     *
-     * @param \Money\Money $total
-     * @param float $taxPercentage
-     *
-     * @return int
-     */
-    public function roundingMode(Money $total, float $taxPercentage)
-    {
-        $vat = $total->divide(1 + $taxPercentage)->multiply($taxPercentage);
-
-        $subtotal = $total->subtract($vat);
-
-        $recalculatedTax = $subtotal->multiply($taxPercentage * 100)->divide(100);
-
-        $finalTotal = $subtotal->add($recalculatedTax);
-
-        if ($finalTotal->equals($total)) {
-            return Money::ROUND_HALF_UP;
-        }
-        if ($finalTotal->greaterThan($total)) {
-            return Money::ROUND_UP;
-        }
-
-        return  Money::ROUND_DOWN;
     }
 }

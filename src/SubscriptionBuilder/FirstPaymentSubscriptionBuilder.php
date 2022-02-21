@@ -95,8 +95,11 @@ class FirstPaymentSubscriptionBuilder implements Contract
             if ($total->isZero()) {
                 $vat = $total->subtract($total); // zero VAT
             } else {
-                $vat = $total->divide(1 + $taxPercentage)
-                             ->multiply($taxPercentage, $this->roundingMode($total, $taxPercentage));
+                $vat = $total->divide(sprintf('%.8F', 1 + $taxPercentage))
+                    ->multiply(
+                        sprintf('%.8F', $taxPercentage),
+                        $this->roundingMode($total, $taxPercentage)
+                    );
             }
             $subtotal = $total->subtract($vat);
 
