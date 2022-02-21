@@ -680,20 +680,61 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     }
 
     /**
+     * The maximum amount that can be reimbursed, ranging from zero to a positive Money amount.
+     *
+     * @return \Money\Money
+     */
+    protected function reimbursableAmount()
+    {
+        // Determine base amount eligible to reimburse
+        $latestProcessedOrderItem = $this->latestProcessedOrderItem();
+        $reimbursableAmount = $latestProcessedOrderItem->getTotal();
+
+        // Take any refunds into account
+        /** @var \Laravel\Cashier\Refunds\RefundItemCollection $refundItems */
+        $refundItems = RefundItem::where('original_order_item_id', $latestProcessedOrderItem->id)->get();
+        $reimbursableAmount = $reimbursableAmount->subtract($refundItems->getTotal());
+
+        // Take any applied coupons into account
+        $order = $latestProcessedOrderItem->order;
+        $orderItems = $order->items;
+        $appliedCoupons = $this->appliedCoupons; // TODO optimize retrieval
+
+        // TODO implement coupon: $reimbursableAmount -= $latestProcessedOrderItem->appliedCoupons->getTotal() (if only it was this simple ;) )
+
+        // Guard against a negative value
+        if ($reimbursableAmount->isNegative()) {
+            return $reimbursableAmount->multiply(0);
+        }
+
+        return $reimbursableAmount;
+    }
+
+    /**
      * @param \Carbon\Carbon|null $now
      * @return null|\Laravel\Cashier\Order\OrderItem
      */
     protected function reimburseUnusedTime(?Carbon $now = null)
     {
         $now = $now ?: now();
+
         if ($this->onTrial()) {
             return null;
         }
 
-        $plan = $this->plan();
-        $amount = $plan->amount()->negative()->multiply($this->getCycleLeftAttribute($now));
+        if (round($this->getCycleLeftAttribute($now), 3) == 1) {
+            return null;
+        }
 
-        return $this->reimburse($amount, [ 'description' => $plan->description() ]);
+        $amount = $this->reimbursableAmount()
+            ->negative()
+            ->multiply($this->getCycleLeftAttribute($now));
+
+        if ($amount->isZero()) {
+            return null;
+        }
+
+        return $this->reimburse($amount, [ 'description' => $this->plan()->description() ]);
     }
 
     /**
