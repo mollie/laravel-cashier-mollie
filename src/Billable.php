@@ -5,7 +5,6 @@ namespace Laravel\Cashier;
 use Dompdf\Options;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
-use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Charge\ManagesCharges;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\Events\MandateClearedFromBillable;

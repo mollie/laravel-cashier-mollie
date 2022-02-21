@@ -23,6 +23,7 @@ use Laravel\Cashier\Traits\HasOwner;
  * @property mixed orderable_id
  * @property mixed $id
  * @property Order $order
+ * @property mixed $order_id
  * @method static create(array $array)
  * @method static make(array $array)
  */

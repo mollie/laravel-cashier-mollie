@@ -5,7 +5,6 @@ namespace Laravel\Cashier;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
-use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\ConvertsToMoney;
 use Laravel\Cashier\Traits\HasOwner;
 use Mollie\Api\Resources\Payment as MolliePayment;

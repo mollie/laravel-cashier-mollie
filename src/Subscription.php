@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Coupon\AppliedCoupon;
 use Laravel\Cashier\Coupon\Contracts\AcceptsCoupons;
 use Laravel\Cashier\Events\SubscriptionCancelled;
 use Laravel\Cashier\Events\SubscriptionPlanSwapped;
@@ -42,6 +42,7 @@ use Money\Money;
  * @property \Carbon\Carbon trial_ends_at
  * @property float cycle_progress
  * @property float cycle_left
+ * @property string $currency
  */
 class Subscription extends Model implements InteractsWithOrderItems, PreprocessesOrderItems, AcceptsCoupons, IsRefundable
 {
@@ -686,28 +687,41 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     protected function reimbursableAmount()
     {
+        $zeroAmount = \money('0.00', $this->currency);
+
         // Determine base amount eligible to reimburse
         $latestProcessedOrderItem = $this->latestProcessedOrderItem();
+        if (! $latestProcessedOrderItem) {
+            return $zeroAmount;
+        }
+
         $reimbursableAmount = $latestProcessedOrderItem->getTotal();
-        $zeroAmount = $reimbursableAmount->multiply(0);
 
         // Subtract any refunds
         /** @var \Laravel\Cashier\Refunds\RefundItemCollection $refundItems */
         $refundItems = RefundItem::where('original_order_item_id', $latestProcessedOrderItem->id)->get();
-        $reimbursableAmount = $reimbursableAmount->subtract($refundItems->getTotal());
+
+        if ($refundItems->isNotEmpty()) {
+            $reimbursableAmount = $reimbursableAmount->subtract($refundItems->getTotal());
+        }
 
         // Subtract any applied coupons
         $order = $latestProcessedOrderItem->order;
-        $appliedCoupons = $this->appliedCoupons; // TODO optimize retrieval
+        $orderId = $order->id;
+        $appliedCoupons = $this->appliedCoupons()->with('orderItems')->get();
 
-        /** @var OrderItemCollection $appliedCouponOrderItems */
-        $appliedCouponOrderItems = $appliedCoupons
-            ->orderItems()
-            ->where('order_id', $order->id)
-            ->get();
+        $appliedCouponOrderItems = $appliedCoupons->reduce(function (OrderItemCollection $carry, AppliedCoupon $coupon) use ($orderId) {
+            $items = $coupon->orderItems->filter(function (OrderItem $item) use ($orderId) {
+                return $item->order_id === $orderId;
+            });
 
-        $discountTotal = $appliedCouponOrderItems->getTotal();
-        $reimbursableAmount = $reimbursableAmount->subtract($discountTotal->absolute());
+            return $carry->concat($items->toArray());
+        }, new OrderItemCollection);
+
+        if ($appliedCouponOrderItems->isNotEmpty()) {
+            $discountTotal = $appliedCouponOrderItems->getTotal();
+            $reimbursableAmount = $reimbursableAmount->subtract($discountTotal->absolute());
+        }
 
         // Guard against a negative value
         if ($reimbursableAmount->isNegative()) {

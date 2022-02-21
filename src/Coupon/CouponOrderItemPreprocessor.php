@@ -2,10 +2,10 @@
 
 namespace Laravel\Cashier\Coupon;
 
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\BaseOrderItemPreprocessor;
 use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
-use Laravel\Cashier\Cashier;
 
 class CouponOrderItemPreprocessor extends BaseOrderItemPreprocessor
 {

@@ -9,6 +9,7 @@ use Laravel\Cashier\Order\OrderItem;
 
 /**
  * @method static create(array $array)
+ * @property \Laravel\Cashier\Order\OrderItemCollection $orderItems
  */
 class AppliedCoupon extends Model implements InteractsWithOrderItems
 {

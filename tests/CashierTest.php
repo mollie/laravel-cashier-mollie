@@ -4,31 +4,31 @@ namespace Laravel\Cashier\Tests;
 
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
-use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
-use Laravel\Cashier\Mollie\Contracts\GetMollieMethodMinimumAmount;
-use Laravel\Cashier\Mollie\GetMollieCustomer;
-
-use Laravel\Cashier\Subscription as CashierSubscription;
-use Laravel\Cashier\Order\Order as CashierOrder;
-use Laravel\Cashier\Order\OrderItem as CashierOrderItem;
 use Laravel\Cashier\Coupon\AppliedCoupon as CashierAppliedCoupon;
 use Laravel\Cashier\Coupon\RedeemedCoupon as CashierRedeemedCoupon;
 use Laravel\Cashier\Credit\Credit as CashierCredit;
+use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
+
+use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
+use Laravel\Cashier\Mollie\Contracts\GetMollieMethodMinimumAmount;
+use Laravel\Cashier\Mollie\GetMollieCustomer;
+use Laravel\Cashier\Order\Order as CashierOrder;
+use Laravel\Cashier\Order\OrderItem as CashierOrderItem;
 use Laravel\Cashier\Payment as CashierPayment;
 use Laravel\Cashier\Refunds\Refund as CashierRefund;
 use Laravel\Cashier\Refunds\RefundItem as CashierRefundItem;
+use Laravel\Cashier\Subscription as CashierSubscription;
 
-use Laravel\Cashier\Tests\Fixtures\User;
-use Laravel\Cashier\Tests\Fixtures\Subscription as FixtureSubscription;
+use Laravel\Cashier\Tests\Fixtures\AppliedCoupon as FixtureAppliedCoupon;
+use Laravel\Cashier\Tests\Fixtures\Credit as FixtureCredit;
 use Laravel\Cashier\Tests\Fixtures\Order as FixtureOrder;
 use Laravel\Cashier\Tests\Fixtures\OrderItem as FixtureOrderItem;
-use Laravel\Cashier\Tests\Fixtures\AppliedCoupon as FixtureAppliedCoupon;
-use Laravel\Cashier\Tests\Fixtures\RedeemedCoupon as FixtureRedeemedCoupon;
-use Laravel\Cashier\Tests\Fixtures\Credit as FixtureCredit;
 use Laravel\Cashier\Tests\Fixtures\Payment as FixturePayment;
+use Laravel\Cashier\Tests\Fixtures\RedeemedCoupon as FixtureRedeemedCoupon;
 use Laravel\Cashier\Tests\Fixtures\Refund as FixtureRefund;
 use Laravel\Cashier\Tests\Fixtures\RefundItem as FixtureRefundItem;
+use Laravel\Cashier\Tests\Fixtures\Subscription as FixtureSubscription;
+use Laravel\Cashier\Tests\Fixtures\User;
 
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
