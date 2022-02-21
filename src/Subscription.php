@@ -42,6 +42,7 @@ use Money\Money;
  * @property \Carbon\Carbon trial_ends_at
  * @property float cycle_progress
  * @property float cycle_left
+ * @property \Illuminate\Database\Eloquent\Collection $appliedCoupons
  */
 class Subscription extends Model implements InteractsWithOrderItems, PreprocessesOrderItems, AcceptsCoupons, IsRefundable
 {
@@ -689,22 +690,29 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
         // Determine base amount eligible to reimburse
         $latestProcessedOrderItem = $this->latestProcessedOrderItem();
         $reimbursableAmount = $latestProcessedOrderItem->getTotal();
+        $zeroAmount = $reimbursableAmount->multiply(0);
 
-        // Take any refunds into account
+        // Subtract any refunds
         /** @var \Laravel\Cashier\Refunds\RefundItemCollection $refundItems */
         $refundItems = RefundItem::where('original_order_item_id', $latestProcessedOrderItem->id)->get();
         $reimbursableAmount = $reimbursableAmount->subtract($refundItems->getTotal());
 
-        // Take any applied coupons into account
+        // Subtract any applied coupons
         $order = $latestProcessedOrderItem->order;
-        $orderItems = $order->items;
         $appliedCoupons = $this->appliedCoupons; // TODO optimize retrieval
 
-        // TODO implement coupon: $reimbursableAmount -= $latestProcessedOrderItem->appliedCoupons->getTotal() (if only it was this simple ;) )
+        /** @var OrderItemCollection $appliedCouponOrderItems */
+        $appliedCouponOrderItems = $appliedCoupons
+            ->orderItems()
+            ->where('order_id', $order->id)
+            ->get();
+
+        $discountTotal = $appliedCouponOrderItems->getTotal();
+        $reimbursableAmount = $reimbursableAmount->subtract($discountTotal->absolute());
 
         // Guard against a negative value
         if ($reimbursableAmount->isNegative()) {
-            return $reimbursableAmount->multiply(0);
+            return $zeroAmount;
         }
 
         return $reimbursableAmount;
