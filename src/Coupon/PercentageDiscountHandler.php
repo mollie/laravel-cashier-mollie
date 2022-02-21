@@ -48,7 +48,6 @@ class PercentageDiscountHandler extends BaseCouponHandler
             throw new CouponException('Percentage has to be between 1 and 100');
         }
 
-        // get Amount of Base and divide it with 100 to get the calculation good
         $amount = $base->getAmount() / 100;
 
         // calculate new price

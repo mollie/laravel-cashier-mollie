@@ -93,7 +93,9 @@ class OrderItem extends Model implements InvoicableItem
     {
         $beforeTax = $this->getSubtotal();
 
-        return (int) $beforeTax->multiply($this->tax_percentage / 100)->getAmount();
+        return (int) $beforeTax->multiply(
+            sprintf('%.6F', $this->tax_percentage / 100)
+        )->getAmount();
     }
 
     /**

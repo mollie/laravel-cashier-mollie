@@ -691,7 +691,9 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
         }
 
         $plan = $this->plan();
-        $amount = $plan->amount()->negative()->multiply($this->getCycleLeftAttribute($now));
+        $amount = $plan->amount()->negative()->multiply(
+            sprintf('%.8F', $this->getCycleLeftAttribute($now))
+        );
 
         return $this->reimburse($amount, [ 'description' => $plan->description() ]);
     }
