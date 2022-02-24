@@ -41,7 +41,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
 
         $user = $this->getUserWithZeroBalance();
         $subscription = $this->getSubscriptionForUser($user);
-        $alreadyPaidOrderItem = factory(OrderItem::class)->create([
+        $alreadyPaidOrderItem = factory(Cashier::$orderItemModel)->create([
             'owner_id' => $user->id,
             'order_id' => 1,
             'unit_price' => 1000,
