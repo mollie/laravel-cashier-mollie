@@ -695,7 +695,8 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
             return $zeroAmount;
         }
 
-        $reimbursableAmount = $latestProcessedOrderItem->getTotal();
+        $reimbursableAmount = $latestProcessedOrderItem->getTotal()
+            ->subtract($latestProcessedOrderItem->getTax()); // tax calculated elsewhere
 
         // Subtract any refunds
         /** @var \Laravel\Cashier\Refunds\RefundItemCollection $refundItems */
