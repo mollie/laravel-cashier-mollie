@@ -550,6 +550,12 @@ trait Billable
         return new UpdatePaymentMethodBuilder($this);
     }
 
+    /**
+     * Find an invoice using an order number.
+     *
+     * @param $orderNumber
+     * @return \Laravel\Cashier\Order\Invoice|null
+     */
     public function findInvoice($orderNumber)
     {
         /** @var Order $order */
@@ -566,6 +572,13 @@ trait Billable
         return $order->invoice();
     }
 
+    /**
+     * Find an invoice using an order number or throw a NotFoundHttpException.
+     *
+     * @param $orderNumber
+     * @return \Laravel\Cashier\Order\Invoice
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
     public function findInvoiceOrFail($orderNumber)
     {
         $invoice = $this->findInvoice($orderNumber);

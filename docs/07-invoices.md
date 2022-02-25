@@ -39,14 +39,15 @@ Route::middleware('auth')->get('/download-invoice/{orderId}', function($orderId)
 
 ### Find invoice by order id
 
-It's possible to find a specific invoice by its order id.
+It's possible to find a specific invoice by its order number.
 
 ```php
-$user->findInvoice($orderId);
+$user->findInvoice($orderNumber);
 ```
 
 ::: tip
-If the invoice is not associated with the user you're searching for, it will throw an `UnauthorizedInvoiceAccessException`.
+If the invoice is not associated with the user you're searching for, it will throw a
+```\Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException```
 :::
 
 ### findInvoiceOrFail
@@ -55,7 +56,7 @@ If you wish to show a 404 error page whenever the invoice is not found, you may 
 your billable model.
 
 ```php
-$user->findInvoiceOrFail($orderId);
+$user->findInvoiceOrFail($orderNumber);
 ```
 
 If the invoice cannot be found, a
