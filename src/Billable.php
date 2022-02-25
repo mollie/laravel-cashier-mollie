@@ -9,6 +9,7 @@ use Laravel\Cashier\Charge\ManagesCharges;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\Events\MandateClearedFromBillable;
 use Laravel\Cashier\Exceptions\InvalidMandateException;
+use Laravel\Cashier\Exceptions\UnauthorizedInvoiceAccessException;
 use Laravel\Cashier\Mollie\Contracts\CreateMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
@@ -546,5 +547,21 @@ trait Billable
     public function updatePaymentMethod()
     {
         return new UpdatePaymentMethodBuilder($this);
+    }
+
+    public function findInvoice($orderNumber)
+    {
+        /** @var Order $order */
+        $order = Cashier::$orderModel::where('number', $orderNumber)->first();
+
+        if(! $order ) {
+            return null;
+        }
+
+        if($order->owner_id !== $this->id || $order->owner_type !== $this->getMorphClass()) {
+            throw new UnauthorizedInvoiceAccessException;
+        }
+
+        return $order->invoice();
     }
 }

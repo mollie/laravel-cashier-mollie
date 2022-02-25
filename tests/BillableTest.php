@@ -6,8 +6,10 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\RedeemedCouponCollection;
 use Laravel\Cashier\Events\MandateClearedFromBillable;
+use Laravel\Cashier\Exceptions\UnauthorizedInvoiceAccessException;
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
+use Laravel\Cashier\Order\Invoice;
 use Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder;
 use Laravel\Cashier\SubscriptionBuilder\MandatedSubscriptionBuilder;
 use Laravel\Cashier\Tests\Fixtures\User;
@@ -154,6 +156,51 @@ class BillableTest extends BaseTestCase
             return true;
         });
     }
+
+    /** @test */
+    public function canFindInvoice()
+    {
+        $this->withPackageMigrations();
+        $user = $this->getUser();
+        factory(Cashier::$orderModel, 2)->create([
+            'owner_id' => $user->id,
+            'owner_type' => $user->getMorphClass(),
+        ])->first()->update(['number' => 'find_invoice_test_1']);
+
+        $invoice = $user->findInvoice('find_invoice_test_1');
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+        $this->assertEquals('find_invoice_test_1', $invoice->id());
+    }
+
+    /** @test */
+    public function findInvoiceReturnsNullIfInvoiceDoesNotExist()
+    {
+        $this->withPackageMigrations();
+        $user = $this->getUser();
+
+        $invoice = $user->findInvoice('does_not_exist');
+
+        $this->assertNull($invoice);
+    }
+
+    /** @test */
+    public function findInvoiceThrowsExceptionIfInvoiceExistButIsAssociatedWithOtherBillableModel()
+    {
+        $this->withPackageMigrations();
+        $userA = $this->getUser();
+        factory(Cashier::$orderModel)->create([
+            'number' => 'foo-bar',
+            'owner_id' => $userA->id,
+        ]);
+
+        $userB = $this->getUser();
+        $this->assertTrue($userA->isNot($userB));
+        $this->expectException(UnauthorizedInvoiceAccessException::class);
+
+        $userB->findInvoice('foo-bar');
+    }
+
 
     protected function withMockedGetMollieCustomer(): void
     {
