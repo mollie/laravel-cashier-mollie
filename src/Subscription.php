@@ -700,7 +700,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
 
         // Subtract any refunds
         /** @var \Laravel\Cashier\Refunds\RefundItemCollection $refundItems */
-        $refundItems = RefundItem::where('original_order_item_id', $latestProcessedOrderItem->id)->get();
+        $refundItems = Cashier::$refundItemModel::where('original_order_item_id', $latestProcessedOrderItem->id)->get();
 
         if ($refundItems->isNotEmpty()) {
             $reimbursableAmount = $reimbursableAmount->subtract($refundItems->getTotal());
