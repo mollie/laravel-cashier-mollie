@@ -246,6 +246,52 @@ class BillableTest extends BaseTestCase
         $userB->findInvoiceOrFail('foo-bar');
     }
 
+    /** @test */
+    public function canFindInvoiceByOrderId()
+    {
+        $this->withPackageMigrations();
+        $user = $this->getUser();
+
+        $user->orders()->saveMany([
+            factory(Cashier::$orderModel)->make([
+                'id' => 1,
+                'number' => '2018-0000-0001',
+            ]),
+            factory(Cashier::$orderModel)->make([
+                'id' => 2,
+                'number' => '2018-0000-0002',
+            ]),
+        ]);
+
+        $invoice = $user->findInvoiceByOrderId(2);
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+        $this->assertEquals('2018-0000-0002', $invoice->id());
+    }
+
+    /** @test */
+    public function canFindInvoiceByOrderIdUsingFindInvoiceByOrderIdOrFail()
+    {
+        $this->withPackageMigrations();
+        $user = $this->getUser();
+
+        $user->orders()->saveMany([
+            factory(Cashier::$orderModel)->make([
+                'id' => 1,
+                'number' => '2018-0000-0001',
+            ]),
+            factory(Cashier::$orderModel)->make([
+                'id' => 2,
+                'number' => '2018-0000-0002',
+            ]),
+        ]);
+
+        $invoice = $user->findInvoiceByOrderIdOrFail(2);
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+        $this->assertEquals('2018-0000-0002', $invoice->id());
+    }
+
     protected function withMockedGetMollieCustomer(): void
     {
         $this->mock(GetMollieCustomer::class, function ($mock) {

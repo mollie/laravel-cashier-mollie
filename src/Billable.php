@@ -555,6 +555,7 @@ trait Billable
      *
      * @param $orderNumber
      * @return \Laravel\Cashier\Order\Invoice|null
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
     public function findInvoice($orderNumber)
     {
@@ -578,6 +579,7 @@ trait Billable
      * @param $orderNumber
      * @return \Laravel\Cashier\Order\Invoice
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
     public function findInvoiceOrFail($orderNumber)
     {
@@ -585,6 +587,46 @@ trait Billable
 
         if(!$invoice) {
             throw new NotFoundHttpException('Unable to find invoice with number '. $orderNumber .'.');
+        }
+
+        return $invoice;
+    }
+
+    /**
+     * Find an invoice by order id.
+     *
+     * @param $orderId
+     * @return \Laravel\Cashier\Order\Invoice|null
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     */
+    public function findInvoiceByOrderId($orderId)
+    {
+        /** @var Order $order */
+        $order = Cashier::$orderModel::find($orderId);
+
+        if(! $order ) {
+            return null;
+        }
+
+        if($order->owner_id !== $this->id || $order->owner_type !== $this->getMorphClass()) {
+            throw new AccessDeniedHttpException;
+        }
+
+        return $order->invoice();
+    }
+
+    /**
+     * @param $orderId
+     * @return \Laravel\Cashier\Order\Invoice
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function findInvoiceByOrderIdOrFail($orderId)
+    {
+        $invoice = $this->findInvoiceByOrderId($orderId);
+
+        if(!$invoice) {
+            throw new NotFoundHttpException('Unable to find invoice for order id '. $orderId .'.');
         }
 
         return $invoice;
