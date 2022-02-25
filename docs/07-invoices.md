@@ -39,7 +39,7 @@ Route::middleware('auth')->get('/download-invoice/{orderId}', function($orderId)
 
 ### Find invoice by order id
 
-It's possible to find a specific invoice by it's order id.
+It's possible to find a specific invoice by its order id.
 
 ```php
 $user->findInvoice($orderId);

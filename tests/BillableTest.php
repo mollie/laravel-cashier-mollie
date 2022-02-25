@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\RedeemedCouponCollection;
 use Laravel\Cashier\Events\MandateClearedFromBillable;
-use Laravel\Cashier\Exceptions\UnauthorizedInvoiceAccessException;
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Order\Invoice;
@@ -16,6 +15,8 @@ use Laravel\Cashier\Tests\Fixtures\User;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Mandate;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class BillableTest extends BaseTestCase
 {
@@ -196,11 +197,54 @@ class BillableTest extends BaseTestCase
 
         $userB = $this->getUser();
         $this->assertTrue($userA->isNot($userB));
-        $this->expectException(UnauthorizedInvoiceAccessException::class);
+        $this->expectException(AccessDeniedHttpException::class);
 
         $userB->findInvoice('foo-bar');
     }
 
+    /** @test */
+    public function canFindInvoiceUsingFindInvoiceOrFail()
+    {
+        $this->withPackageMigrations();
+        $user = $this->getUser();
+        factory(Cashier::$orderModel, 2)->create([
+            'owner_id' => $user->id,
+            'owner_type' => $user->getMorphClass(),
+        ])->first()->update(['number' => 'find_invoice_test_1']);
+
+        $invoice = $user->findInvoiceOrFail('find_invoice_test_1');
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+        $this->assertEquals('find_invoice_test_1', $invoice->id());
+    }
+
+    /** @test */
+    public function findInvoiceOrFailThrowsExceptionWhenNotFindingTheInvoice()
+    {
+        $this->withPackageMigrations();
+        $user = $this->getUser();
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $user->findInvoiceOrFail('does_not_exist');
+    }
+
+    /** @test */
+    public function findInvoiceOrFailThrowsExceptionIfInvoiceExistButIsAssociatedWithOtherBillableModel()
+    {
+        $this->withPackageMigrations();
+        $userA = $this->getUser();
+        factory(Cashier::$orderModel)->create([
+            'number' => 'foo-bar',
+            'owner_id' => $userA->id,
+        ]);
+
+        $userB = $this->getUser();
+        $this->assertTrue($userA->isNot($userB));
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $userB->findInvoiceOrFail('foo-bar');
+    }
 
     protected function withMockedGetMollieCustomer(): void
     {

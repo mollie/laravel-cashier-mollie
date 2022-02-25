@@ -9,7 +9,6 @@ use Laravel\Cashier\Charge\ManagesCharges;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\Events\MandateClearedFromBillable;
 use Laravel\Cashier\Exceptions\InvalidMandateException;
-use Laravel\Cashier\Exceptions\UnauthorizedInvoiceAccessException;
 use Laravel\Cashier\Mollie\Contracts\CreateMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
@@ -24,6 +23,8 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Customer;
 use Mollie\Api\Types\MandateMethod;
 use Money\Money;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait Billable
 {
@@ -559,9 +560,20 @@ trait Billable
         }
 
         if($order->owner_id !== $this->id || $order->owner_type !== $this->getMorphClass()) {
-            throw new UnauthorizedInvoiceAccessException;
+            throw new AccessDeniedHttpException;
         }
 
         return $order->invoice();
+    }
+
+    public function findInvoiceOrFail($orderNumber)
+    {
+        $invoice = $this->findInvoice($orderNumber);
+
+        if(!$invoice) {
+            throw new NotFoundHttpException('Unable to find invoice with number '. $orderNumber .'.');
+        }
+
+        return $invoice;
     }
 }
