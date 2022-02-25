@@ -23,6 +23,8 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Customer;
 use Mollie\Api\Types\MandateMethod;
 use Money\Money;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait Billable
 {
@@ -546,5 +548,87 @@ trait Billable
     public function updatePaymentMethod()
     {
         return new UpdatePaymentMethodBuilder($this);
+    }
+
+    /**
+     * Find an invoice using an order number.
+     *
+     * @param $orderNumber
+     * @return \Laravel\Cashier\Order\Invoice|null
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     */
+    public function findInvoice($orderNumber)
+    {
+        /** @var Order $order */
+        $order = Cashier::$orderModel::where('number', $orderNumber)->first();
+
+        if(! $order ) {
+            return null;
+        }
+
+        if($this->isNot($order->owner)) {
+            throw new AccessDeniedHttpException('User is denied access to invoice for order with number ' . $orderNumber);
+        }
+
+        return $order->invoice();
+    }
+
+    /**
+     * Find an invoice using an order number or throw a NotFoundHttpException.
+     *
+     * @param $orderNumber
+     * @return \Laravel\Cashier\Order\Invoice
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     */
+    public function findInvoiceOrFail($orderNumber)
+    {
+        $invoice = $this->findInvoice($orderNumber);
+
+        if(!$invoice) {
+            throw new NotFoundHttpException('Unable to find invoice with number '. $orderNumber .'.');
+        }
+
+        return $invoice;
+    }
+
+    /**
+     * Find an invoice by order id.
+     *
+     * @param $orderId
+     * @return \Laravel\Cashier\Order\Invoice|null
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     */
+    public function findInvoiceByOrderId($orderId)
+    {
+        /** @var Order $order */
+        $order = Cashier::$orderModel::find($orderId);
+
+        if(! $order ) {
+            return null;
+        }
+
+        if($this->isNot($order->owner)) {
+            throw new AccessDeniedHttpException('User is denied access to invoice for order id ' . $orderId);
+        }
+
+        return $order->invoice();
+    }
+
+    /**
+     * @param $orderId
+     * @return \Laravel\Cashier\Order\Invoice
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function findInvoiceByOrderIdOrFail($orderId)
+    {
+        $invoice = $this->findInvoiceByOrderId($orderId);
+
+        if(!$invoice) {
+            throw new NotFoundHttpException('Unable to find invoice for order id '. $orderId .'.');
+        }
+
+        return $invoice;
     }
 }
