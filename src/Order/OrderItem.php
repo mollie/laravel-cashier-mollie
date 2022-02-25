@@ -21,6 +21,9 @@ use Laravel\Cashier\Traits\HasOwner;
  * @property float tax_percentage
  * @property string orderable_type
  * @property mixed orderable_id
+ * @property mixed $id
+ * @property Order $order
+ * @property mixed $order_id
  * @method static create(array $array)
  * @method static make(array $array)
  */

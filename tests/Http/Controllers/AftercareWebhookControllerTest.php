@@ -10,7 +10,6 @@ use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\ChargebackReceived;
 use Laravel\Cashier\Http\Controllers\AftercareWebhookController;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
-use Laravel\Cashier\Payment;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;

@@ -5,7 +5,6 @@ namespace Laravel\Cashier\Tests\FirstPayment\Actions;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\FirstPayment\Actions\ApplySubscriptionCouponToPayment as Action;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;

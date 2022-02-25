@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Coupon\AppliedCoupon;
 use Laravel\Cashier\Coupon\Contracts\AcceptsCoupons;
 use Laravel\Cashier\Events\SubscriptionCancelled;
 use Laravel\Cashier\Events\SubscriptionPlanSwapped;
@@ -42,6 +42,7 @@ use Money\Money;
  * @property \Carbon\Carbon trial_ends_at
  * @property float cycle_progress
  * @property float cycle_left
+ * @property string $currency
  */
 class Subscription extends Model implements InteractsWithOrderItems, PreprocessesOrderItems, AcceptsCoupons, IsRefundable
 {
@@ -680,22 +681,82 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     }
 
     /**
+     * The maximum amount that can be reimbursed, ranging from zero to a positive Money amount.
+     *
+     * @return \Money\Money
+     */
+    protected function reimbursableAmount()
+    {
+        $zeroAmount = \money('0.00', $this->currency);
+
+        // Determine base amount eligible to reimburse
+        $latestProcessedOrderItem = $this->latestProcessedOrderItem();
+        if (! $latestProcessedOrderItem) {
+            return $zeroAmount;
+        }
+
+        $reimbursableAmount = $latestProcessedOrderItem->getTotal()
+            ->subtract($latestProcessedOrderItem->getTax()); // tax calculated elsewhere
+
+        // Subtract any refunds
+        /** @var \Laravel\Cashier\Refunds\RefundItemCollection $refundItems */
+        $refundItems = Cashier::$refundItemModel::where('original_order_item_id', $latestProcessedOrderItem->id)->get();
+
+        if ($refundItems->isNotEmpty()) {
+            $reimbursableAmount = $reimbursableAmount->subtract($refundItems->getTotal());
+        }
+
+        // Subtract any applied coupons
+        $order = $latestProcessedOrderItem->order;
+        $orderId = $order->id;
+        $appliedCoupons = $this->appliedCoupons()->with('orderItems')->get();
+
+        $appliedCouponOrderItems = $appliedCoupons->reduce(function (OrderItemCollection $carry, AppliedCoupon $coupon) use ($orderId) {
+            $items = $coupon->orderItems->filter(function (OrderItem $item) use ($orderId) {
+                return $item->order_id === $orderId;
+            });
+
+            return $carry->concat($items->toArray());
+        }, new OrderItemCollection);
+
+        if ($appliedCouponOrderItems->isNotEmpty()) {
+            $discountTotal = $appliedCouponOrderItems->getTotal();
+            $reimbursableAmount = $reimbursableAmount->subtract($discountTotal->absolute());
+        }
+
+        // Guard against a negative value
+        if ($reimbursableAmount->isNegative()) {
+            return $zeroAmount;
+        }
+
+        return $reimbursableAmount;
+    }
+
+    /**
      * @param \Carbon\Carbon|null $now
      * @return null|\Laravel\Cashier\Order\OrderItem
      */
     protected function reimburseUnusedTime(?Carbon $now = null)
     {
         $now = $now ?: now();
+
         if ($this->onTrial()) {
             return null;
         }
 
-        $plan = $this->plan();
-        $amount = $plan->amount()->negative()->multiply(
-            sprintf('%.8F', $this->getCycleLeftAttribute($now))
-        );
+        if (round($this->getCycleLeftAttribute($now), 3) == 1) {
+            return null;
+        }
 
-        return $this->reimburse($amount, [ 'description' => $plan->description() ]);
+        $amount = $this->reimbursableAmount()
+            ->negative()
+            ->multiply(sprintf('%.8F', $this->getCycleLeftAttribute($now)));
+
+        if ($amount->isZero()) {
+            return null;
+        }
+
+        return $this->reimburse($amount, [ 'description' => $this->plan()->description() ]);
     }
 
     /**
@@ -793,5 +854,15 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     public function ownerId()
     {
         return $this->owner_id;
+    }
+
+    /**
+     * Retrieve the latest processed order item.
+     *
+     * @return OrderItem|null
+     */
+    public function latestProcessedOrderItem()
+    {
+        return $this->orderItems()->processed()->orderByDesc('process_at')->first();
     }
 }

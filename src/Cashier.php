@@ -4,18 +4,16 @@ namespace Laravel\Cashier;
 
 use Exception;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Cashier\Subscription;
-use Laravel\Cashier\Order\Order;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Coupon\AppliedCoupon;
 use Laravel\Cashier\Coupon\RedeemedCoupon;
 use Laravel\Cashier\Credit\Credit;
+use Laravel\Cashier\Order\Order;
+use Laravel\Cashier\Order\OrderItem;
+use Laravel\Cashier\Refunds\Refund;
+use Laravel\Cashier\Refunds\RefundItem;
 use Money\Currencies\ISOCurrencies;
 use Money\Formatter\IntlMoneyFormatter;
 use Money\Money;
-use Laravel\Cashier\Refunds\Refund;
-use Laravel\Cashier\Refunds\RefundItem;
-use Laravel\Cashier\Payment;
 
 class Cashier
 {

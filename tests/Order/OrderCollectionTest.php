@@ -4,7 +4,6 @@ namespace Laravel\Cashier\Tests\Order;
 
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\Invoice;
-use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
 
