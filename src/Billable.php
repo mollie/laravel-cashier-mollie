@@ -566,7 +566,7 @@ trait Billable
             return null;
         }
 
-        if($order->owner_id !== $this->id || $order->owner_type !== $this->getMorphClass()) {
+        if($this->isNot($order->owner)) {
             throw new AccessDeniedHttpException('User is denied access to invoice for order with number ' . $orderNumber);
         }
 
@@ -608,7 +608,7 @@ trait Billable
             return null;
         }
 
-        if($order->owner_id !== $this->id || $order->owner_type !== $this->getMorphClass()) {
+        if($this->isNot($order->owner)) {
             throw new AccessDeniedHttpException('User is denied access to invoice for order id ' . $orderId);
         }
 
