@@ -61,3 +61,9 @@ Chargeback was received.
 
 ### `RefundInitiated` event
 A refund was initiated.
+
+### `RefundProcessed` event
+The refund was processed.
+
+### `RefundFailed` event
+The refund has failed.
