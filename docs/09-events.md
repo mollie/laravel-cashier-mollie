@@ -57,4 +57,7 @@ The subscription plan was swapped.
 The subscription quantity was updated.
 
 ### `ChargebackReceived` event
-Chargeback was received
+Chargeback was received.
+
+### `RefundInitiated` event
+A refund was initiated.
