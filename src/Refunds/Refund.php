@@ -56,10 +56,7 @@ class Refund extends Model
      */
     public function scopeWhereUnprocessed(Builder $query)
     {
-        return $query->whereIn('mollie_refund_status', [
-            RefundStatus::STATUS_REFUNDED,
-            RefundStatus::STATUS_FAILED,
-        ]);
+        return $query->where('mollie_refund_status', RefundStatus::STATUS_PENDING);
     }
 
     public function items(): HasMany

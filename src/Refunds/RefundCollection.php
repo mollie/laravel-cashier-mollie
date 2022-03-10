@@ -2,8 +2,8 @@
 
 namespace Laravel\Cashier\Refunds;
 
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
-class RefundCollection extends Collection
+class RefundCollection extends EloquentCollection
 {
 }

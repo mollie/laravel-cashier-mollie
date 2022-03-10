@@ -275,7 +275,7 @@ class Order extends Model
      */
     public function refunds()
     {
-        return $this->hasMany(Cashier::$refundModel);
+        return $this->hasMany(Cashier::$refundModel, 'original_order_id', 'id');
     }
 
     /**

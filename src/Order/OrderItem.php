@@ -8,6 +8,7 @@ use Illuminate\Database\Query\Builder;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\Contracts\InteractsWithOrderItems;
 use Laravel\Cashier\Order\Contracts\InvoicableItem;
+use Laravel\Cashier\Refunds\Contracts\IsRefundable;
 use Laravel\Cashier\Refunds\RefundItem;
 use Laravel\Cashier\Traits\FormatsAmount;
 use Laravel\Cashier\Traits\HasOwner;
@@ -335,7 +336,10 @@ class OrderItem extends Model implements InvoicableItem
     public function handlePaymentRefunded(RefundItem $refundItem)
     {
         if ($this->orderableIsSet()) {
-            $this->getOrderableClass()::handlePaymentRefunded($refundItem);
+            $orderable = $this->getOrderableClass();
+            if ($orderable instanceof IsRefundable) {
+                $orderable::handlePaymentRefunded($refundItem);
+            }
         }
 
         return $this;
@@ -351,7 +355,10 @@ class OrderItem extends Model implements InvoicableItem
     public function handlePaymentRefundFailed(RefundItem $refundItem)
     {
         if ($this->orderableIsSet()) {
-            $this->getOrderableClass()::handlePaymentRefundFailed($refundItem);
+            $orderable = $this->getOrderableClass();
+            if ($orderable instanceof IsRefundable) {
+                $orderable::handlePaymentRefundFailed($refundItem);
+            }
         }
 
         return $this;
