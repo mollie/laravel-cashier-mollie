@@ -45,7 +45,6 @@ use Mollie\Api\Types\PaymentStatus;
  * @property int amount_charged_back
  * @property \Laravel\Cashier\Order\OrderItemCollection items
  * @property \Laravel\Cashier\Refunds\RefundCollection refunds
- * @property \Laravel\Cashier\Payment payment;
  * @method static create(array $data)
  */
 class Order extends Model
