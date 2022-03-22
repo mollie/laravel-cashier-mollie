@@ -9,7 +9,6 @@ use Laravel\Cashier\FirstPayment\Actions\ActionCollection;
 use Laravel\Cashier\FirstPayment\Traits\PaymentMethodString;
 use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
-use Laravel\Cashier\Payment;
 use Mollie\Api\Types\SequenceType;
 
 class FirstPaymentBuilder
@@ -131,7 +130,7 @@ class FirstPaymentBuilder
         $createMolliePayment = app()->make(CreateMolliePayment::class);
         $this->molliePayment = $createMolliePayment->execute($payload);
 
-        Payment::createFromMolliePayment($this->molliePayment, $this->owner, $this->actions->toPlainArray());
+        Cashier::$paymentModel::createFromMolliePayment($this->molliePayment, $this->owner, $this->actions->toPlainArray());
 
         $redirectUrl = $payload['redirectUrl'];
 
