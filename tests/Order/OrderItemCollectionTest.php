@@ -48,6 +48,25 @@ class OrderItemCollectionTest extends BaseTestCase
     }
 
     /** @test */
+    public function canGetTotal()
+    {
+        $collection = new OrderItemCollection([
+            factory(Cashier::$orderItemModel)->states('EUR')->make([
+                'unit_price' => 12150,
+                'quantity' => 1,
+                'tax_percentage' => 10.0,
+            ]),
+            factory(Cashier::$orderItemModel)->states('EUR')->make([
+                'unit_price' => 12150,
+                'quantity' => 2,
+                'tax_percentage' => 10.0,
+            ]),
+        ]);
+
+        $this->assertMoneyEURCents(40095, $collection->getTotal());
+    }
+
+    /** @test */
     public function cannotGetTotalForMultipleCurrencies()
     {
         $collection = new OrderItemCollection([
@@ -59,7 +78,6 @@ class OrderItemCollectionTest extends BaseTestCase
 
         $collection->getTotal();
     }
-
 
     /** @test */
     public function testOwners()
