@@ -23,6 +23,45 @@ class OrderItemCollectionTest extends BaseTestCase
     }
 
     /** @test */
+    public function testCurrency()
+    {
+        $collection = new OrderItemCollection([
+            factory(Cashier::$orderItemModel)->states('USD')->make(),
+            factory(Cashier::$orderItemModel)->states('USD')->make(),
+        ]);
+
+        $this->assertEquals('USD', $collection->currency());
+    }
+
+    /** @test */
+    public function testCurrencyThrowsExceptionWhenMultipleCurrenciesAreUsed()
+    {
+        $collection = new OrderItemCollection([
+            factory(Cashier::$orderItemModel)->states('USD')->make(),
+            factory(Cashier::$orderItemModel)->states('EUR')->make(),
+        ]);
+
+        $this->assertEquals(collect(['USD', 'EUR']), $collection->currencies());
+        $this->expectException(\LogicException::class);
+
+        $collection->currency();
+    }
+
+    /** @test */
+    public function cannotGetTotalForMultipleCurrencies()
+    {
+        $collection = new OrderItemCollection([
+            factory(Cashier::$orderItemModel)->states('USD')->make(),
+            factory(Cashier::$orderItemModel)->states('EUR')->make(),
+        ]);
+
+        $this->expectException(\LogicException::class);
+
+        $collection->getTotal();
+    }
+
+
+    /** @test */
     public function testOwners()
     {
         $this->withPackageMigrations();
