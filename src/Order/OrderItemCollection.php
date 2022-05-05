@@ -4,6 +4,8 @@ namespace Laravel\Cashier\Order;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
+use Laravel\Cashier\Cashier;
+use LogicException;
 use Money\Money;
 
 class OrderItemCollection extends Collection
@@ -154,8 +156,33 @@ class OrderItemCollection extends Collection
         return collect(array_values($this->pluck('tax_percentage')->unique()->sort()->all()));
     }
 
+    /**
+     * @return \Money\Money
+     * @throws \LogicException
+     */
     public function getTotal(): Money
     {
-        return money($this->sum('total'), $this->getCurrency());
+        if (count($this->currencies()) > 1) {
+            throw new LogicException('Calculating the total requires items to be of the same currency.');
+        }
+
+        return money($this->sum('total'), $this->currency());
+    }
+
+    public function currency(): string
+    {
+        $currencies = $this->currencies();
+
+        if (count($currencies) > 1) {
+            throw new LogicException(
+                'Unable to retrieve a single currency as this collection contains multiple currencies.'
+            );
+        }
+
+        if (empty($currencies)) {
+            return strtoupper(Cashier::usesCurrency());
+        }
+
+        return strtoupper($currencies[0]);
     }
 }

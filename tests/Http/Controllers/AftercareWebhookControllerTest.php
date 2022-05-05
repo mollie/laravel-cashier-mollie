@@ -88,7 +88,7 @@ class AftercareWebhookControllerTest extends BaseTestCase
         ]));
 
         $orderItems = new OrderItemCollection([
-            $subscription->scheduleNewOrderItemAt(now())
+            $subscription->scheduleNewOrderItemAt(now()),
         ]);
 
         /** @var \Laravel\Cashier\Order\Order */
