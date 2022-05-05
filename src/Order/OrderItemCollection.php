@@ -162,7 +162,7 @@ class OrderItemCollection extends Collection
      */
     public function getTotal(): Money
     {
-        if(count($this->currencies()) > 1) {
+        if (count($this->currencies()) > 1) {
             throw new LogicException('Calculating the total requires items to be of the same currency.');
         }
 
@@ -173,9 +173,9 @@ class OrderItemCollection extends Collection
     {
         $currencies = $this->currencies();
 
-        if(count($currencies) > 1) {
+        if (count($currencies) > 1) {
             throw new LogicException(
-                'Unable to get the currency. This collection contains multiple currencies.'
+                'Unable to retrieve a single currency as this collection contains multiple currencies.'
             );
         }
 
