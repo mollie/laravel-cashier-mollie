@@ -562,11 +562,11 @@ trait Billable
         /** @var Order $order */
         $order = Cashier::$orderModel::where('number', $orderNumber)->first();
 
-        if(! $order ) {
+        if (! $order) {
             return null;
         }
 
-        if($this->isNot($order->owner)) {
+        if ($this->isNot($order->owner)) {
             throw new AccessDeniedHttpException('User is denied access to invoice for order with number ' . $orderNumber);
         }
 
@@ -585,7 +585,7 @@ trait Billable
     {
         $invoice = $this->findInvoice($orderNumber);
 
-        if(!$invoice) {
+        if (! $invoice) {
             throw new NotFoundHttpException('Unable to find invoice with number '. $orderNumber .'.');
         }
 
@@ -604,11 +604,11 @@ trait Billable
         /** @var Order $order */
         $order = Cashier::$orderModel::find($orderId);
 
-        if(! $order ) {
+        if (! $order) {
             return null;
         }
 
-        if($this->isNot($order->owner)) {
+        if ($this->isNot($order->owner)) {
             throw new AccessDeniedHttpException('User is denied access to invoice for order id ' . $orderId);
         }
 
@@ -625,7 +625,7 @@ trait Billable
     {
         $invoice = $this->findInvoiceByOrderId($orderId);
 
-        if(!$invoice) {
+        if (! $invoice) {
             throw new NotFoundHttpException('Unable to find invoice for order id '. $orderId .'.');
         }
 
