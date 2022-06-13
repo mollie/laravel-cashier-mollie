@@ -150,7 +150,7 @@ class SubscriptionTest extends BaseTestCase
     {
         Carbon::setTestNow(Carbon::parse('2018-01-01'));
         $this->withConfiguredPlans();
-        $this->withMockedGetMollieCustomer();
+        $this->withMockedGetMollieCustomer('cst_unique_customer_id', 2);
         $this->withMockedGetMollieMandate();
 
         $user = factory(User::class)->create([
@@ -234,7 +234,7 @@ class SubscriptionTest extends BaseTestCase
     {
         Carbon::setTestNow(Carbon::parse('2019-01-29'));
         $this->withConfiguredPlansWithIntervalArray();
-        $this->withMockedGetMollieCustomer();
+        $this->withMockedGetMollieCustomer('cst_unique_customer_id', 2);
         $this->withMockedGetMollieMandate();
 
         $user = factory(User::class)->create([
@@ -318,7 +318,7 @@ class SubscriptionTest extends BaseTestCase
     {
         Carbon::setTestNow(Carbon::parse('2019-01-31'));
         $this->withConfiguredPlansWithIntervalArray();
-        $this->withMockedGetMollieCustomer();
+        $this->withMockedGetMollieCustomer('cst_unique_customer_id', 2);
         $this->withMockedGetMollieMandate();
 
         $user = factory(User::class)->create([
@@ -526,7 +526,7 @@ class SubscriptionTest extends BaseTestCase
     protected function withMockedGetMollieMandate($attributes = [[
         'mandateId' => 'mdt_unique_mandate_id',
         'customerId' => 'cst_unique_customer_id',
-    ]], $times = 1): void
+    ]], $times = 2): void
     {
         $this->mock(GetMollieMandate::class, function ($mock) use ($times, $attributes) {
             foreach ($attributes as $data) {

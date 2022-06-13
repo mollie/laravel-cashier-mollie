@@ -108,8 +108,8 @@ class BillableTest extends BaseTestCase
         $this->withPackageMigrations();
         $this->withConfiguredPlans();
         $this->withMockedCouponRepository(); // 'test-coupon'
-        $this->withMockedGetMollieCustomerTwice();
-        $this->withMockedGetMollieMandateTwice();
+        $this->withMockedGetMollieCustomerThreeTimes();
+        $this->withMockedGetMollieMandateThreeTimes();
 
         $user = $this->getMandatedUser(true, [
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
@@ -132,8 +132,8 @@ class BillableTest extends BaseTestCase
         $this->withPackageMigrations();
         $this->withConfiguredPlans();
         $this->withMockedCouponRepository(); // 'test-coupon'
-        $this->withMockedGetMollieCustomerTwice();
-        $this->withMockedGetMollieMandateTwice();
+        $this->withMockedGetMollieCustomerThreeTimes();
+        $this->withMockedGetMollieMandateThreeTimes();
 
         $user = $this->getMandatedUser(true, [
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
@@ -316,13 +316,13 @@ class BillableTest extends BaseTestCase
         });
     }
 
-    protected function withMockedGetMollieCustomerTwice(): void
+    protected function withMockedGetMollieCustomerThreeTimes(): void
     {
         $this->mock(GetMollieCustomer::class, function ($mock) {
             $customer = new Customer(new MollieApiClient);
             $customer->id = 'cst_unique_customer_id';
 
-            return $mock->shouldReceive('execute')->with('cst_unique_customer_id')->twice()->andReturn($customer);
+            return $mock->shouldReceive('execute')->with('cst_unique_customer_id')->times(3)->andReturn($customer);
         });
     }
 
@@ -361,7 +361,7 @@ class BillableTest extends BaseTestCase
         });
     }
 
-    protected function withMockedGetMollieMandateTwice(): void
+    protected function withMockedGetMollieMandateThreeTimes(): void
     {
         $this->mock(GetMollieMandate::class, function ($mock) {
             $mandate = new Mandate(new MollieApiClient);
@@ -369,7 +369,7 @@ class BillableTest extends BaseTestCase
             $mandate->status = 'valid';
             $mandate->method = 'directdebit';
 
-            return $mock->shouldReceive('execute')->with('cst_unique_customer_id', 'mdt_unique_mandate_id')->twice()->andReturn($mandate);
+            return $mock->shouldReceive('execute')->with('cst_unique_customer_id', 'mdt_unique_mandate_id')->times(3)->andReturn($mandate);
         });
     }
 }

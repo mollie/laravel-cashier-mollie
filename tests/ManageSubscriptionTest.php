@@ -34,11 +34,11 @@ class ManageSubscriptionTest extends BaseTestCase
      */
     public function canCreateDirectDebitSubscriptionForMandatedCustomer()
     {
-        $this->withMockedGetMollieCustomer('cst_unique_customer_id', 5);
+        $this->withMockedGetMollieCustomer('cst_unique_customer_id', 6);
         $this->withMockedGetMollieMandate([[
             'mandateId' => 'mdt_unique_mandate_id',
             'customerId' => 'cst_unique_customer_id',
-        ]], 5);
+        ]], 6);
         $this->withMockedGetMollieMethodMinimumAmount(4);
         $this->withMockedCreateMolliePayment(4);
 
@@ -228,11 +228,11 @@ class ManageSubscriptionTest extends BaseTestCase
 
     public function testCreatingSubscriptionWithTrial()
     {
-        $this->withMockedGetMollieCustomer('cst_unique_customer_id', 1);
+        $this->withMockedGetMollieCustomer('cst_unique_customer_id', 2);
         $this->withMockedGetMollieMandate([[
             'mandateId' => 'mdt_unique_mandate_id',
             'customerId' => 'cst_unique_customer_id',
-        ]], 1);
+        ]], 2);
 
         $user = $this->getMandatedUser(true, [
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
