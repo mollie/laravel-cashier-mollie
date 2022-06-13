@@ -29,6 +29,7 @@ $chargeItem2 = $item2->make();
 $result = $user->newCharge()
     ->addItem($chargeItem)
     ->addItem($chargeItem2)
+    ->setRedirectUrl('https://www.example.com')
     ->create();
 
 if(is_a($result, \Laravel\Cashier\Http\RedirectToCheckoutResponse::class)) {

@@ -15,15 +15,25 @@ class FirstPaymentChargeBuilder implements Contract
 
     protected array $molliePaymentOverrides = [];
 
+    protected string $redirectUrl;
+
     public function __construct(Model $owner)
     {
         $this->owner = $owner;
+        $this->redirectUrl = url(config('cashier.first_payment.redirect_url', config('cashier.redirect_url')));
         $this->items = new ChargeItemCollection;
     }
 
     public function setItems(ChargeItemCollection $items): self
     {
         $this->items = $items;
+
+        return $this;
+    }
+
+    public function setRedirectUrl(string $redirectUrl)
+    {
+        $this->redirectUrl = url($redirectUrl);
 
         return $this;
     }
@@ -52,6 +62,7 @@ class FirstPaymentChargeBuilder implements Contract
 
         $molliePayment = $firstPaymentBuilder
             ->inOrderTo($this->items->toFirstPaymentActionCollection()->all())
+            ->setRedirectUrl($this->redirectUrl)
             ->create();
 
         return RedirectToCheckoutResponse::forPayment($molliePayment);
