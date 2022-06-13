@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\RedeemedCouponCollection;
 use Laravel\Cashier\Events\MandateClearedFromBillable;
+use Laravel\Cashier\Exceptions\MandateIsNotYetFinalizedException;
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Order\Invoice;
@@ -58,6 +59,19 @@ class BillableTest extends BaseTestCase
         $builder = $user->newSubscription('default', 'monthly-10-1');
 
         $this->assertInstanceOf(FirstPaymentSubscriptionBuilder::class, $builder);
+    }
+
+    /** @test */
+    public function throwExceptionIfMandateIsInPendintState()
+    {
+        $this->expectException(MandateIsNotYetFinalizedException::class);
+
+        $this->withConfiguredPlans();
+        $this->withMockedGetMollieCustomer();
+        $this->withMockedGetMolliePendingMandate();
+        $user = $this->getPendingMandatedUser(false);
+
+        $user->newSubscriptionForMandateId('mdt_unique_mandate_id', 'main', 'monthly-10-1')->create();
     }
 
     /** @test */
@@ -329,6 +343,18 @@ class BillableTest extends BaseTestCase
             $mandate = new Mandate(new MollieApiClient);
             $mandate->id = 'mdt_unique_mandate_id';
             $mandate->status = 'valid';
+            $mandate->method = 'directdebit';
+
+            return $mock->shouldReceive('execute')->with('cst_unique_customer_id', 'mdt_unique_mandate_id')->once()->andReturn($mandate);
+        });
+    }
+
+    protected function withMockedGetMolliePendingMandate(): void
+    {
+        $this->mock(GetMollieMandate::class, function ($mock) {
+            $mandate = new Mandate(new MollieApiClient);
+            $mandate->id = 'mdt_unique_mandate_id';
+            $mandate->status = 'pending';
             $mandate->method = 'directdebit';
 
             return $mock->shouldReceive('execute')->with('cst_unique_customer_id', 'mdt_unique_mandate_id')->once()->andReturn($mandate);

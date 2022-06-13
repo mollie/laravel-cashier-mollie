@@ -310,6 +310,14 @@ abstract class BaseTestCase extends TestCase
         ], $overrides));
     }
 
+    protected function getPendingMandatedUser($persist = true, $overrides = [])
+    {
+        return $this->getCustomerUser($persist, array_merge([
+            'mollie_mandate_id' => 'mdt_unique_mandate_id',
+            'status' => 'pending',
+        ], $overrides));
+    }
+
     protected function getCustomerUser($persist = true, $overrides = [])
     {
         return $this->getUser($persist, array_merge([
