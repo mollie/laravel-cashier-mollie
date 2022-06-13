@@ -314,7 +314,7 @@ abstract class BaseTestCase extends TestCase
     {
         return $this->getCustomerUser($persist, array_merge([
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
-            'status' => 'pending',
+            'mollie_mandate_status' => 'pending',
         ], $overrides));
     }
 
