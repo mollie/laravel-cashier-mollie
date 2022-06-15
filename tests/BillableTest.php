@@ -62,7 +62,7 @@ class BillableTest extends BaseTestCase
     }
 
     /** @test */
-    public function throwExceptionIfMandateIsInPendintState()
+    public function throwExceptionIfMandateIsInPendingState()
     {
         $this->expectException(MandateIsNotYetFinalizedException::class);
 
