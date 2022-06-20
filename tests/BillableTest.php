@@ -69,7 +69,7 @@ class BillableTest extends BaseTestCase
         $this->withConfiguredPlans();
         $this->withMockedGetMollieCustomer();
         $this->withMockedGetMolliePendingMandate();
-        $user = $this->getPendingMandatedUser(false);
+        $user = $this->getMandatedUser(false);
 
         $user->newSubscriptionForMandateId('mdt_unique_mandate_id', 'main', 'monthly-10-1')->create();
     }
