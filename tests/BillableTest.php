@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\RedeemedCouponCollection;
 use Laravel\Cashier\Events\MandateClearedFromBillable;
+use Laravel\Cashier\Exceptions\MandateIsNotYetFinalizedException;
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Order\Invoice;
@@ -61,6 +62,19 @@ class BillableTest extends BaseTestCase
     }
 
     /** @test */
+    public function throwExceptionIfMandateIsInPendingState()
+    {
+        $this->expectException(MandateIsNotYetFinalizedException::class);
+
+        $this->withConfiguredPlans();
+        $this->withMockedGetMollieCustomer();
+        $this->withMockedGetMolliePendingMandate();
+        $user = $this->getMandatedUser(false);
+
+        $user->newSubscriptionForMandateId('mdt_unique_mandate_id', 'main', 'monthly-10-1')->create();
+    }
+
+    /** @test */
     public function returnsDefaultSubscriptionBuilderIfOwnerHasValidMandateId()
     {
         $this->withConfiguredPlans();
@@ -94,8 +108,8 @@ class BillableTest extends BaseTestCase
         $this->withPackageMigrations();
         $this->withConfiguredPlans();
         $this->withMockedCouponRepository(); // 'test-coupon'
-        $this->withMockedGetMollieCustomerTwice();
-        $this->withMockedGetMollieMandateTwice();
+        $this->withMockedGetMollieCustomerThreeTimes();
+        $this->withMockedGetMollieMandateThreeTimes();
 
         $user = $this->getMandatedUser(true, [
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
@@ -118,8 +132,8 @@ class BillableTest extends BaseTestCase
         $this->withPackageMigrations();
         $this->withConfiguredPlans();
         $this->withMockedCouponRepository(); // 'test-coupon'
-        $this->withMockedGetMollieCustomerTwice();
-        $this->withMockedGetMollieMandateTwice();
+        $this->withMockedGetMollieCustomerThreeTimes();
+        $this->withMockedGetMollieMandateThreeTimes();
 
         $user = $this->getMandatedUser(true, [
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
@@ -302,13 +316,13 @@ class BillableTest extends BaseTestCase
         });
     }
 
-    protected function withMockedGetMollieCustomerTwice(): void
+    protected function withMockedGetMollieCustomerThreeTimes(): void
     {
         $this->mock(GetMollieCustomer::class, function ($mock) {
             $customer = new Customer(new MollieApiClient);
             $customer->id = 'cst_unique_customer_id';
 
-            return $mock->shouldReceive('execute')->with('cst_unique_customer_id')->twice()->andReturn($customer);
+            return $mock->shouldReceive('execute')->with('cst_unique_customer_id')->times(3)->andReturn($customer);
         });
     }
 
@@ -335,7 +349,19 @@ class BillableTest extends BaseTestCase
         });
     }
 
-    protected function withMockedGetMollieMandateTwice(): void
+    protected function withMockedGetMolliePendingMandate(): void
+    {
+        $this->mock(GetMollieMandate::class, function ($mock) {
+            $mandate = new Mandate(new MollieApiClient);
+            $mandate->id = 'mdt_unique_mandate_id';
+            $mandate->status = 'pending';
+            $mandate->method = 'directdebit';
+
+            return $mock->shouldReceive('execute')->with('cst_unique_customer_id', 'mdt_unique_mandate_id')->once()->andReturn($mandate);
+        });
+    }
+
+    protected function withMockedGetMollieMandateThreeTimes(): void
     {
         $this->mock(GetMollieMandate::class, function ($mock) {
             $mandate = new Mandate(new MollieApiClient);
@@ -343,7 +369,7 @@ class BillableTest extends BaseTestCase
             $mandate->status = 'valid';
             $mandate->method = 'directdebit';
 
-            return $mock->shouldReceive('execute')->with('cst_unique_customer_id', 'mdt_unique_mandate_id')->twice()->andReturn($mandate);
+            return $mock->shouldReceive('execute')->with('cst_unique_customer_id', 'mdt_unique_mandate_id')->times(3)->andReturn($mandate);
         });
     }
 }

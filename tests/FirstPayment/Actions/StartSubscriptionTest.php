@@ -692,7 +692,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertEquals($payload, $result);
     }
 
-    protected function withMockedGetMollieCustomer($customerId = 'cst_unique_customer_id', $times = 1): void
+    protected function withMockedGetMollieCustomer($customerId = 'cst_unique_customer_id', $times = 2): void
     {
         $this->mock(GetMollieCustomer::class, function ($mock) use ($customerId, $times) {
             $customer = new Customer(new MollieApiClient);
@@ -705,7 +705,7 @@ class StartSubscriptionTest extends BaseTestCase
     protected function withMockedGetMollieMandate($attributes = [[
         'mandateId' => 'mdt_unique_mandate_id',
         'customerId' => 'cst_unique_customer_id',
-    ]], $times = 1): void
+    ]], $times = 2): void
     {
         $this->mock(GetMollieMandate::class, function ($mock) use ($times, $attributes) {
             foreach ($attributes as $data) {

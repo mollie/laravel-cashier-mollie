@@ -9,6 +9,7 @@ use Laravel\Cashier\Charge\ManagesCharges;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\Events\MandateClearedFromBillable;
 use Laravel\Cashier\Exceptions\InvalidMandateException;
+use Laravel\Cashier\Exceptions\MandateIsNotYetFinalizedException;
 use Laravel\Cashier\Mollie\Contracts\CreateMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
@@ -452,12 +453,26 @@ trait Billable
     }
 
     /**
+     * @return bool
+     */
+    public function pendingMollieMandate()
+    {
+        $mandate = $this->mollieMandate();
+
+        return is_null($mandate) ? false : $mandate->isPending();
+    }
+
+    /**
      * Checks whether the Mollie mandate is still valid. If not, clears it.
      *
      * @return bool
      */
     public function validateMollieMandate()
     {
+        if ($this->pendingMollieMandate()) {
+            throw new MandateIsNotYetFinalizedException();
+        }
+
         if ($this->validMollieMandate()) {
             return true;
         }

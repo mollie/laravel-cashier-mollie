@@ -196,7 +196,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
 
             return $mock->shouldReceive('execute')
                 ->with('cst_unique_customer_id', 'mdt_unique_mandate_id')
-                ->once()
+                ->twice()
                 ->andReturn($mandate);
         });
 
@@ -319,7 +319,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
 
             return $mock->shouldReceive('execute')
                 ->with('cst_unique_customer_id')
-                ->once()
+                ->twice()
                 ->andReturn($customer);
         });
     }

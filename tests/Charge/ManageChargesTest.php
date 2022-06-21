@@ -49,7 +49,7 @@ class ManageChargesTest extends BaseTestCase
             $mandate->status = 'valid';
             $mandate->method = 'directdebit';
 
-            return $mock->shouldReceive('execute')->with('cst_unique_customer_id', 'mdt_unique_mandate_id')->once()->andReturn($mandate);
+            return $mock->shouldReceive('execute')->with('cst_unique_customer_id', 'mdt_unique_mandate_id')->twice()->andReturn($mandate);
         });
     }
 
@@ -59,7 +59,7 @@ class ManageChargesTest extends BaseTestCase
             $customer = new Customer(new MollieApiClient);
             $customer->id = 'cst_unique_customer_id';
 
-            return $mock->shouldReceive('execute')->with('cst_unique_customer_id')->once()->andReturn($customer);
+            return $mock->shouldReceive('execute')->with('cst_unique_customer_id')->twice()->andReturn($customer);
         });
     }
 }
