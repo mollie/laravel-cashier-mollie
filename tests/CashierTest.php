@@ -259,6 +259,46 @@ class CashierTest extends BaseTestCase
     }
 
     /** @test */
+    public function canSwapSubscriptionPlanAndReimburseUnusedTime()
+    {
+        $this->withTestNow('2019-01-01');
+        $user = $this->getMandatedUser(true, [
+            'id' => 1,
+            'mollie_customer_id' => 'cst_unique_customer_id',
+            'mollie_mandate_id' => 'mdt_unique_mandate_id',
+        ]);
+
+        $this->withMockedGetMollieCustomer(['cst_unique_customer_id'], 5);
+        $this->withMockedGetMollieMandate([[
+            'mandateId' => 'mdt_unique_mandate_id',
+            'customerId' => 'cst_unique_customer_id',
+        ]], 5);
+        $this->withMockedGetMollieMethodMinimumAmount(2);
+        $this->withMockedCreateMolliePayment(2);
+
+        $subscription = $user->newSubscription('default', 'monthly-10-1')->create();
+
+        $this->assertOrderItemCounts($user, 0, 1);
+
+        Cashier::run();
+
+        $subscription = $subscription->fresh();
+        $this->assertEquals(1, $user->orders()->count());
+
+        $this->assertOrderItemCounts($user, 1, 1);
+        $processedOrderItem = $user->orderItems()->processed()->first();
+        $scheduledOrderItem = $subscription->scheduledOrderItem;
+
+        $this->withTestNow(now()->copy()->addMinutes(1));
+        $subscription = $subscription->swap('monthly-20-1');
+
+        $this->assertEquals('monthly-20-1', $subscription->plan);
+        // Swapping results in a new Order being created
+        $this->assertEquals(2, $user->orders()->count());
+        $this->assertEquals(1000, $user->orders()->latest()->first()->total);
+    }
+
+    /** @test */
     public function testFormatAmount()
     {
         $this->assertEquals('1.000,00 €', Cashier::formatAmount(money(100000, 'EUR')));

@@ -743,8 +743,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
         if ($this->onTrial()) {
             return null;
         }
-
-        if (round($this->getCycleLeftAttribute($now), 3) == 1) {
+        if (round($this->getCycleLeftAttribute($now), 5) == 0) {
             return null;
         }
 
