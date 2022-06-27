@@ -16,6 +16,7 @@ trait RegistersMollieInteractions
             Contracts\CreateMolliePayment::class => CreateMolliePayment::class,
             Contracts\GetMolliePayment::class => GetMolliePayment::class,
             Contracts\GetMollieMethodMinimumAmount::class => GetMollieMethodMinimumAmount::class,
+            Contracts\GetMollieMethodMaximumAmount::class => GetMollieMethodMaximumAmount::class,
             Contracts\CreateMollieRefund::class => CreateMollieRefund::class,
             Contracts\GetMollieRefund::class => GetMollieRefund::class,
             Contracts\UpdateMolliePayment::class => UpdateMolliePayment::class,

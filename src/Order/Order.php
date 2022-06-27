@@ -18,6 +18,7 @@ use Laravel\Cashier\Events\OrderProcessed;
 use Laravel\Cashier\Exceptions\InvalidMandateException;
 use Laravel\Cashier\Exceptions\OrderRetryRequiresStatusFailedException;
 use Laravel\Cashier\MandatedPayment\MandatedPaymentBuilder;
+use Laravel\Cashier\Order\Contracts\MaximumPayment;
 use Laravel\Cashier\Order\Contracts\MinimumPayment;
 use Laravel\Cashier\Refunds\RefundBuilder;
 use Laravel\Cashier\Traits\HasOwner;
@@ -198,6 +199,7 @@ class Order extends Model
 
             try {
                 $minimumPaymentAmount = $this->ensureValidMandateAndMinimumPaymentAmountWhenTotalDuePositive();
+                $maximumPaymentAmount = $this->ensureValidMandateAndMaximumPaymentAmount();
             } catch (InvalidMandateException $e) {
                 return $this->handlePaymentFailedDueToInvalidMandate();
             }
@@ -211,6 +213,7 @@ class Order extends Model
 
                     break;
 
+                case $totalDue->greaterThan($maximumPaymentAmount):
                 case $totalDue->lessThan($minimumPaymentAmount):
                     // No payment processing required
                     $this->mollie_payment_id = null;
@@ -682,6 +685,18 @@ class Order extends Model
         }
 
         return $minimumPaymentAmount;
+    }
+
+    /**
+     * @return \Money\Money
+     * @throws InvalidMandateException
+     */
+    private function ensureValidMandateAndMaximumPaymentAmount(): \Money\Money
+    {
+        $mandate = $this->owner->mollieMandate();
+        $this->guardMandate($mandate);
+
+        return app(MaximumPayment::class)::forMollieMandate($mandate, $this->getCurrency());
     }
 
     /**
