@@ -15,6 +15,7 @@ use Laravel\Cashier\Events\OrderPaymentFailed;
 use Laravel\Cashier\Events\OrderPaymentFailedDueToInvalidMandate;
 use Laravel\Cashier\Events\OrderPaymentPaid;
 use Laravel\Cashier\Events\OrderProcessed;
+use Laravel\Cashier\Exceptions\AmountExceedsMolliePaymentMethodLimit;
 use Laravel\Cashier\Exceptions\InvalidMandateException;
 use Laravel\Cashier\Exceptions\OrderRetryRequiresStatusFailedException;
 use Laravel\Cashier\MandatedPayment\MandatedPaymentBuilder;
@@ -206,6 +207,15 @@ class Order extends Model
 
             $totalDue = money($this->total_due, $this->currency);
 
+            if ($totalDue->greaterThan($maximumPaymentAmount)) {
+                $this->items->each(function (OrderItem $item) {
+                    $item->update(['order_id' => null]);
+                });
+                $this->delete();
+
+                throw new AmountExceedsMolliePaymentMethodLimit();
+            }
+
             switch (true) {
                 case $totalDue->isZero():
                     // No payment processing required
@@ -213,7 +223,6 @@ class Order extends Model
 
                     break;
 
-                case $totalDue->greaterThan($maximumPaymentAmount):
                 case $totalDue->lessThan($minimumPaymentAmount):
                     // No payment processing required
                     $this->mollie_payment_id = null;
