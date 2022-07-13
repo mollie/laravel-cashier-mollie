@@ -200,7 +200,7 @@ class Order extends Model
 
             try {
                 $minimumPaymentAmount = $this->ensureValidMandateAndMinimumPaymentAmountWhenTotalDuePositive();
-                $maximumPaymentAmount = $this->ensureValidMandateAndMaximumPaymentAmount();
+                $maximumPaymentAmount = $this->ensureValidMandateAndMaximumPaymentAmountWhenTotalDuePositive();
             } catch (InvalidMandateException $e) {
                 return $this->handlePaymentFailedDueToInvalidMandate();
             }
@@ -700,12 +700,20 @@ class Order extends Model
      * @return \Money\Money
      * @throws InvalidMandateException
      */
-    private function ensureValidMandateAndMaximumPaymentAmount(): \Money\Money
+    private function ensureValidMandateAndMaximumPaymentAmountWhenTotalDuePositive(): \Money\Money
     {
-        $mandate = $this->owner->mollieMandate();
-        $this->guardMandate($mandate);
+        if ((int) $this->getTotalDue()->getAmount() > 0) {
+            $mandate = $this->owner->mollieMandate();
+            $this->guardMandate($mandate);
 
-        return app(MaximumPayment::class)::forMollieMandate($mandate, $this->getCurrency());
+            $maximumPaymentAnount = app(MaximumPayment::class)::forMollieMandate($mandate, $this->getCurrency());
+
+        } else {
+            $maximumPaymentAnount = money(0, $this->getCurrency());
+        }
+
+        return $maximumPaymentAnount;
+
     }
 
     /**
