@@ -17,6 +17,7 @@ use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
+use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder;
 use Laravel\Cashier\SubscriptionBuilder\RedirectToCheckoutResponse;
 use Laravel\Cashier\Tests\BaseTestCase;
@@ -235,6 +236,8 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
 
             return true;
         });
+        $this->assertSame(Order::first()->items->first()->description_extra_lines[0], "From 2019-01-01 to 2019-02-01");
+
     }
 
     /** @test */
