@@ -470,7 +470,7 @@ class OrderTest extends BaseTestCase
                 ->andReturn(money(10, 'EUR'));
         });
 
-        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock)  {
+        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) {
             return $mock->shouldReceive('execute')
                 ->with('directdebit', 'EUR')
                 ->once()
