@@ -272,14 +272,14 @@ class CashierTest extends BaseTestCase
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
         ]);
 
-        $this->withMockedGetMollieCustomer(['cst_unique_customer_id'], 5);
+        $this->withMockedGetMollieCustomer(['cst_unique_customer_id'], 7);
         $this->withMockedGetMollieMandate([[
             'mandateId' => 'mdt_unique_mandate_id',
             'customerId' => 'cst_unique_customer_id',
-        ]], 5);
+        ]], 7);
         $this->withMockedGetMollieMethodMinimumAmount(2);
         $this->withMockedCreateMolliePayment(2);
-
+        $this->withMockedGetMollieMethodMaximumAmount(2);
         $subscription = $user->newSubscription('default', 'monthly-10-1')->create();
 
         $this->assertOrderItemCounts($user, 0, 1);
