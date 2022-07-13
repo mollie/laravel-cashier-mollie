@@ -675,7 +675,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
             'description' => $this->plan()->description(),
             'currency' => $amount->getCurrency()->getCode(),
             'unit_price' => $amount->getAmount(),
-            'quantity' => $this->quantity ?: 1,
+            'quantity' => 1,
             'tax_percentage' => $this->tax_percentage,
         ], $overrides));
     }
@@ -743,8 +743,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
         if ($this->onTrial()) {
             return null;
         }
-
-        if (round($this->getCycleLeftAttribute($now), 3) == 1) {
+        if (round($this->getCycleLeftAttribute($now), 5) == 0) {
             return null;
         }
 
