@@ -9,6 +9,7 @@ use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMethodMinimumAmount;
 use Laravel\Cashier\Mollie\GetMollieCustomer;
+use Laravel\Cashier\Mollie\GetMollieMethodMaximumAmount;
 use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Subscription;
@@ -37,6 +38,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
         $this->withMockedGetMollieCustomer();
         $this->withMockedGetMollieMandate();
         $this->withMockedGetMollieMethodMinimumAmount();
+        $this->withMockedGetMollieMethodMaximumAmount();
         $this->withMockedCreateMolliePayment();
 
         $user = $this->getUserWithZeroBalance();
@@ -217,7 +219,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
         ]));
     }
 
-    protected function withMockedGetMollieCustomer($customerIds = ['cst_unique_customer_id'], $times = 1): void
+    protected function withMockedGetMollieCustomer($customerIds = ['cst_unique_customer_id'], $times = 2): void
     {
         $this->mock(GetMollieCustomer::class, function ($mock) use ($customerIds, $times) {
             foreach ($customerIds as $id) {
@@ -233,7 +235,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     protected function withMockedGetMollieMandate($attributes = [[
         'mandateId' => 'mdt_unique_mandate_id',
         'customerId' => 'cst_unique_customer_id',
-    ]], $times = 1): void
+    ]], $times = 2): void
     {
         $this->mock(GetMollieMandate::class, function ($mock) use ($times, $attributes) {
             foreach ($attributes as $data) {
@@ -253,6 +255,13 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     {
         $this->mock(GetMollieMethodMinimumAmount::class, function ($mock) use ($times) {
             return $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(money(100, 'EUR'));
+        });
+    }
+
+    protected function withMockedGetMollieMethodMaximumAmount($times = 1): void
+    {
+        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) use ($times) {
+            return $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(money(30000, 'EUR'));
         });
     }
 
