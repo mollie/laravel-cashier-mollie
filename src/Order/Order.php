@@ -706,12 +706,12 @@ class Order extends Model
             $mandate = $this->owner->mollieMandate();
             $this->guardMandate($mandate);
 
-            $maximumPaymentAnount = app(MaximumPayment::class)::forMollieMandate($mandate, $this->getCurrency());
+            $maximumPaymentAmount = app(MaximumPayment::class)::forMollieMandate($mandate, $this->getCurrency());
         } else {
-            $maximumPaymentAnount = money(0, $this->getCurrency());
+            $maximumPaymentAmount = money(0, $this->getCurrency());
         }
 
-        return $maximumPaymentAnount;
+        return $maximumPaymentAmount;
     }
 
     /**
