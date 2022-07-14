@@ -152,6 +152,12 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
             'owner_id' => $this->owner->getKey(),
             'process_at' => now(),
             'description' => $this->getDescription(),
+            'description_extra_lines' => [
+                trans('cashier::order_item.cycle', [
+                    'from' => now()->format('Y-m-d'),
+                    'to' => $this->plan->interval()->getEndOfNextSubscriptionCycle()->format('Y-m-d'),
+                ]),
+            ] ,
             'currency' => $this->getCurrency(),
             'unit_price' => $this->getUnitPrice()->getAmount(),
             'tax_percentage' => $this->getTaxPercentage(),
