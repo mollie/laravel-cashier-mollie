@@ -15,9 +15,11 @@ use Laravel\Cashier\Events\OrderPaymentFailed;
 use Laravel\Cashier\Events\OrderPaymentFailedDueToInvalidMandate;
 use Laravel\Cashier\Events\OrderPaymentPaid;
 use Laravel\Cashier\Events\OrderProcessed;
+use Laravel\Cashier\Exceptions\AmountExceedsMolliePaymentMethodLimit;
 use Laravel\Cashier\Exceptions\InvalidMandateException;
 use Laravel\Cashier\Exceptions\OrderRetryRequiresStatusFailedException;
 use Laravel\Cashier\MandatedPayment\MandatedPaymentBuilder;
+use Laravel\Cashier\Order\Contracts\MaximumPayment;
 use Laravel\Cashier\Order\Contracts\MinimumPayment;
 use Laravel\Cashier\Refunds\RefundBuilder;
 use Laravel\Cashier\Traits\HasOwner;
@@ -198,11 +200,21 @@ class Order extends Model
 
             try {
                 $minimumPaymentAmount = $this->ensureValidMandateAndMinimumPaymentAmountWhenTotalDuePositive();
+                $maximumPaymentAmount = $this->ensureValidMandateAndMaximumPaymentAmountWhenTotalDuePositive();
             } catch (InvalidMandateException $e) {
                 return $this->handlePaymentFailedDueToInvalidMandate();
             }
 
             $totalDue = money($this->total_due, $this->currency);
+
+            if ($totalDue->greaterThan($maximumPaymentAmount)) {
+                $this->items->each(function (OrderItem $item) {
+                    $item->update(['order_id' => null]);
+                });
+                $this->delete();
+
+                throw new AmountExceedsMolliePaymentMethodLimit();
+            }
 
             switch (true) {
                 case $totalDue->isZero():
@@ -682,6 +694,24 @@ class Order extends Model
         }
 
         return $minimumPaymentAmount;
+    }
+
+    /**
+     * @return \Money\Money
+     * @throws InvalidMandateException
+     */
+    private function ensureValidMandateAndMaximumPaymentAmountWhenTotalDuePositive(): \Money\Money
+    {
+        if ((int) $this->getTotalDue()->getAmount() > 0) {
+            $mandate = $this->owner->mollieMandate();
+            $this->guardMandate($mandate);
+
+            $maximumPaymentAmount = app(MaximumPayment::class)::forMollieMandate($mandate, $this->getCurrency());
+        } else {
+            $maximumPaymentAmount = money(0, $this->getCurrency());
+        }
+
+        return $maximumPaymentAmount;
     }
 
     /**

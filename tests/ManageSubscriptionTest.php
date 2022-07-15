@@ -12,6 +12,7 @@ use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMethodMinimumAmount;
 use Laravel\Cashier\Mollie\GetMollieCustomer;
+use Laravel\Cashier\Mollie\GetMollieMethodMaximumAmount;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
@@ -34,12 +35,13 @@ class ManageSubscriptionTest extends BaseTestCase
      */
     public function canCreateDirectDebitSubscriptionForMandatedCustomer()
     {
-        $this->withMockedGetMollieCustomer('cst_unique_customer_id', 6);
+        $this->withMockedGetMollieCustomer('cst_unique_customer_id', 10);
         $this->withMockedGetMollieMandate([[
             'mandateId' => 'mdt_unique_mandate_id',
             'customerId' => 'cst_unique_customer_id',
-        ]], 6);
+        ]], 10);
         $this->withMockedGetMollieMethodMinimumAmount(4);
+        $this->withMockedGetMollieMethodMaximumAmount(4);
         $this->withMockedCreateMolliePayment(4);
 
         $user = $this->getMandatedUser(true, [
@@ -341,6 +343,13 @@ class ManageSubscriptionTest extends BaseTestCase
     {
         $this->mock(GetMollieMethodMinimumAmount::class, function ($mock) use ($times) {
             return $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(money(100, 'EUR'));
+        });
+    }
+
+    protected function withMockedGetMollieMethodMaximumAmount($times = 1): void
+    {
+        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) use ($times) {
+            return $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(money(30000, 'EUR'));
         });
     }
 

@@ -9,10 +9,12 @@ use Laravel\Cashier\Events\BalanceTurnedStale;
 use Laravel\Cashier\Events\OrderCreated;
 use Laravel\Cashier\Events\OrderPaymentFailedDueToInvalidMandate;
 use Laravel\Cashier\Events\OrderProcessed;
+use Laravel\Cashier\Exceptions\AmountExceedsMolliePaymentMethodLimit;
 use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMethodMinimumAmount;
+use Laravel\Cashier\Mollie\GetMollieMethodMaximumAmount;
 use Laravel\Cashier\Order\Invoice;
 use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Order\OrderCollection;
@@ -49,7 +51,7 @@ class OrderTest extends BaseTestCase
 
             return $mock->shouldReceive('execute')
                 ->with('cst_unique_customer_id', 'mdt_unique_mandate_id')
-                ->once()
+                ->twice()
                 ->andReturn($mandate);
         });
 
@@ -59,7 +61,7 @@ class OrderTest extends BaseTestCase
 
             return $mock->shouldReceive('execute')
                 ->with('cst_unique_customer_id')
-                ->once()
+                ->twice()
                 ->andReturn($customer);
         });
 
@@ -68,6 +70,13 @@ class OrderTest extends BaseTestCase
                 ->with('directdebit', 'EUR')
                 ->once()
                 ->andReturn(money(10, 'EUR'));
+        });
+
+        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) {
+            return $mock->shouldReceive('execute')
+                ->with('directdebit', 'EUR')
+                ->once()
+                ->andReturn(money(30000, 'EUR'));
         });
 
         $this->mock(CreateMolliePayment::class, function ($mock) {
@@ -313,7 +322,7 @@ class OrderTest extends BaseTestCase
 
             return $mock->shouldReceive('execute')
                 ->with('cst_unique_customer_id', 'mdt_unique_mandate_id')
-                ->once()
+                ->twice()
                 ->andReturn($mandate);
         });
 
@@ -323,7 +332,7 @@ class OrderTest extends BaseTestCase
 
             return $mock->shouldReceive('execute')
                 ->with('cst_unique_customer_id')
-                ->once()
+                ->twice()
                 ->andReturn($customer);
         });
 
@@ -332,6 +341,13 @@ class OrderTest extends BaseTestCase
                 ->with('directdebit', 'EUR')
                 ->once()
                 ->andReturn(money(10, 'EUR'));
+        });
+
+        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) {
+            return $mock->shouldReceive('execute')
+                ->with('directdebit', 'EUR')
+                ->once()
+                ->andReturn(money(30000, 'EUR'));
         });
 
         $this->mock(CreateMolliePayment::class, function ($mock) {
@@ -369,6 +385,66 @@ class OrderTest extends BaseTestCase
         $this->assertEquals('open', $order->mollie_payment_status);
 
         $this->assertDispatchedOrderProcessed($order);
+    }
+
+    /** @test */
+    public function notCreatesAMolliePaymentIfTotalDueIsGreathenThanMolliesMaximum()
+    {
+        Event::fake();
+
+        $this->mock(GetMollieMandate::class, function ($mock) {
+            $mandate = new Mandate(new MollieApiClient);
+            $mandate->id = 'mdt_unique_mandate_id';
+            $mandate->status = 'valid';
+            $mandate->method = 'directdebit';
+
+            return $mock->shouldReceive('execute')
+                ->with('cst_unique_customer_id', 'mdt_unique_mandate_id')
+                ->twice()
+                ->andReturn($mandate);
+        });
+
+        $this->mock(GetMollieCustomer::class, function ($mock) {
+            $customer = new Customer(new MollieApiClient);
+            $customer->id = 'cst_unique_customer_id';
+
+            return $mock->shouldReceive('execute')
+                ->with('cst_unique_customer_id')
+                ->twice()
+                ->andReturn($customer);
+        });
+
+        $this->mock(GetMollieMethodMinimumAmount::class, function ($mock) {
+            return $mock->shouldReceive('execute')
+                ->with('directdebit', 'EUR')
+                ->once()
+                ->andReturn(money(1, 'EUR'));
+        });
+
+        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) {
+            return $mock->shouldReceive('execute')
+                ->with('directdebit', 'EUR')
+                ->once()
+                ->andReturn(money(10, 'EUR'));
+        });
+
+        $user = $this->getMandatedUser(true, [
+            'id' => 2,
+            'mollie_mandate_id' => 'mdt_unique_mandate_id',
+            'mollie_customer_id' => 'cst_unique_customer_id',
+        ]);
+
+        $order = $user->orders()->save(factory(Cashier::$orderModel)->make([
+            'total' => 1025,
+            'total_due' => 1025,
+            'currency' => 'EUR',
+        ]));
+        $this->assertFalse($order->isProcessed());
+        $this->assertFalse($user->hasCredit('EUR'));
+
+        $this->expectException(AmountExceedsMolliePaymentMethodLimit::class);
+        $order->processPayment();
+
     }
 
     /** @test */
@@ -434,7 +510,7 @@ class OrderTest extends BaseTestCase
 
             return $mock->shouldReceive('execute')
                 ->with('cst_unique_customer_id', 'mdt_unique_mandate_id')
-                ->twice()
+                ->times(3)
                 ->andReturn($mandate);
         });
 
@@ -444,7 +520,7 @@ class OrderTest extends BaseTestCase
 
             return $mock->shouldReceive('execute')
                 ->with('cst_unique_customer_id')
-                ->twice()
+                ->times(3)
                 ->andReturn($customer);
         });
 
@@ -453,6 +529,13 @@ class OrderTest extends BaseTestCase
                 ->with('directdebit', 'EUR')
                 ->once()
                 ->andReturn(money(10, 'EUR'));
+        });
+
+        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) {
+            return $mock->shouldReceive('execute')
+                ->with('directdebit', 'EUR')
+                ->once()
+                ->andReturn(money(30000, 'EUR'));
         });
 
         $this->mock(CreateMolliePayment::class, function ($mock) {
@@ -515,7 +598,7 @@ class OrderTest extends BaseTestCase
 
             return $mock->shouldReceive('execute')
                 ->with('cst_unique_customer_id', 'mdt_unique_mandate_id')
-                ->once()
+                ->twice()
                 ->andReturn($mandate);
         });
 
@@ -525,7 +608,7 @@ class OrderTest extends BaseTestCase
 
             return $mock->shouldReceive('execute')
                 ->with('cst_unique_customer_id')
-                ->once()
+                ->twice()
                 ->andReturn($customer);
         });
 
@@ -534,6 +617,13 @@ class OrderTest extends BaseTestCase
                 ->with('directdebit', 'EUR')
                 ->once()
                 ->andReturn(money(100, 'EUR'));
+        });
+
+        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) {
+            return $mock->shouldReceive('execute')
+                ->with('directdebit', 'EUR')
+                ->once()
+                ->andReturn(money(30000, 'EUR'));
         });
 
         $user = $this->getMandatedUser(true, [
