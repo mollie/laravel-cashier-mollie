@@ -6,20 +6,18 @@ use Faker\Generator as Faker;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Tests\Fixtures\User;
 
-$factory->define(Cashier::$orderItemModel, function (Faker $faker) {
-    return [
-        'owner_type' => User::class,
-        'owner_id' => 1,
-        'orderable_type' => Cashier::$subscriptionModel,
-        'orderable_id' => 1,
-        'description' => 'Some dummy description',
-        'unit_price' => 12150,
-        'quantity' => 1,
-        'tax_percentage' => 21.5,
-        'currency' => 'EUR',
-        'process_at' => now()->subMinute(),
-    ];
-});
+$factory->define(Cashier::$orderItemModel, fn(Faker $faker) => [
+    'owner_type' => User::class,
+    'owner_id' => 1,
+    'orderable_type' => Cashier::$subscriptionModel,
+    'orderable_id' => 1,
+    'description' => 'Some dummy description',
+    'unit_price' => 12150,
+    'quantity' => 1,
+    'tax_percentage' => 21.5,
+    'currency' => 'EUR',
+    'process_at' => now()->subMinute(),
+]);
 
 $factory->state(Cashier::$orderItemModel, 'unlinked', [
     'orderable_type' => null,

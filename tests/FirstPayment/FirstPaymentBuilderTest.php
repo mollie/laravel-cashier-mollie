@@ -25,10 +25,8 @@ class FirstPaymentBuilderTest extends BaseTestCase
         $customer = new Customer(new MollieApiClient);
         $customer->id = 'cst_unique_customer_id';
 
-        $this->mock(CreateMollieCustomer::class, function ($mock) use ($customer) {
-            return $mock->shouldReceive('execute')
-                ->andReturn($customer);
-        });
+        $this->mock(CreateMollieCustomer::class, fn($mock) => $mock->shouldReceive('execute')
+            ->andReturn($customer));
     }
 
     /** @test */

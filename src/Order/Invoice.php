@@ -17,7 +17,7 @@ class Invoice
 {
     use FormatsAmount;
 
-    const DEFAULT_VIEW = 'cashier::receipt';
+    public const DEFAULT_VIEW = 'cashier::receipt';
 
     /**
      * The invoice id. Also know as "reference".
@@ -265,13 +265,9 @@ class Invoice
         $total_per_percentage = function ($percentage) {
             $items = $this->items->where('tax_percentage', $percentage);
 
-            $raw_over_subtotal = $items->sum(function (InvoicableItem $item) {
-                return $item->getSubtotal()->getAmount();
-            });
+            $raw_over_subtotal = $items->sum(fn(InvoicableItem $item) => $item->getSubtotal()->getAmount());
 
-            $raw_total = $items->sum(function (InvoicableItem $item) {
-                return $item->getTax()->getAmount();
-            });
+            $raw_total = $items->sum(fn(InvoicableItem $item) => $item->getTax()->getAmount());
 
             return [
                 'tax_percentage' => (float) $percentage,

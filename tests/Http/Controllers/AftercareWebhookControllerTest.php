@@ -51,12 +51,10 @@ class AftercareWebhookControllerTest extends BaseTestCase
             'type' => 'application/json',
         ];
 
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($molliePaymentId, $molliePayment) {
-            return $mock->shouldReceive('execute')
-                ->with($molliePaymentId, [])
-                ->once()
-                ->andReturn($molliePayment);
-        });
+        $this->mock(GetMolliePayment::class, fn(GetMolliePayment $mock) => $mock->shouldReceive('execute')
+            ->with($molliePaymentId, [])
+            ->once()
+            ->andReturn($molliePayment));
 
         /** @var AftercareWebhookController $controller */
         $controller = $this->app->make(AftercareWebhookController::class);
@@ -147,12 +145,10 @@ class AftercareWebhookControllerTest extends BaseTestCase
             'type' => 'application/hal+json',
         ];
 
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($molliePaymentId, $molliePayment) {
-            return $mock->shouldReceive('execute')
-                ->with($molliePaymentId, [])
-                ->once()
-                ->andReturn($molliePayment);
-        });
+        $this->mock(GetMolliePayment::class, fn(GetMolliePayment $mock) => $mock->shouldReceive('execute')
+            ->with($molliePaymentId, [])
+            ->once()
+            ->andReturn($molliePayment));
 
         /** @var AftercareWebhookController $controller */
         $controller = $this->app->make(AftercareWebhookController::class);

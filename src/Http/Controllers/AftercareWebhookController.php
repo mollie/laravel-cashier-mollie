@@ -93,8 +93,6 @@ class AftercareWebhookController extends BaseWebhookController
      */
     protected function extractMatchingMollieRefundForLocalRefund(Refund $localRefund, Collection $mollieRefunds)
     {
-        return $mollieRefunds->first(function (MollieRefund $mollieRefund) use ($localRefund) {
-            return $mollieRefund->id === $localRefund->mollie_refund_id;
-        });
+        return $mollieRefunds->first(fn(MollieRefund $mollieRefund) => $mollieRefund->id === $localRefund->mollie_refund_id);
     }
 }

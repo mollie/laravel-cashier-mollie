@@ -83,7 +83,7 @@ class UpdatePaymentMethodWithoutAddingToBalanceTest extends BaseTestCase
                     'taxPercentage' => 0,
                 ],
             ],
-        ]));
+        ]), null, 512, JSON_THROW_ON_ERROR);
 
         return $newPayment;
     }

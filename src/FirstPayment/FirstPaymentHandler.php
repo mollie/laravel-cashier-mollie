@@ -103,12 +103,10 @@ class FirstPaymentHandler
             $actions = $this->molliePayment->metadata->actions;
         }
 
-        return collect($actions)->map(function ($actionMeta) {
-            return $actionMeta->handler::createFromPayload(
-                object_to_array_recursive($actionMeta),
-                $this->owner
-            );
-        });
+        return collect($actions)->map(fn($actionMeta) => $actionMeta->handler::createFromPayload(
+            object_to_array_recursive($actionMeta),
+            $this->owner
+        ));
     }
 
     /**

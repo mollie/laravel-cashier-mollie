@@ -93,7 +93,7 @@ class UpdatePaymentMethodTest extends BaseTestCase
                     'quantity' => 1,
                 ],
             ],
-        ]));
+        ]), null, 512, JSON_THROW_ON_ERROR);
 
         return $newPayment;
     }

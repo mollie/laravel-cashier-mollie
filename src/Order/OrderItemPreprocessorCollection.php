@@ -21,9 +21,7 @@ class OrderItemPreprocessorCollection extends Collection
      */
     public static function fromArray($value)
     {
-        $preprocessors = collect($value)->map(function ($class) {
-            return app()->make($class);
-        });
+        $preprocessors = collect($value)->map(fn($class) => app()->make($class));
 
         return static::fromBaseCollection($preprocessors);
     }
@@ -34,9 +32,7 @@ class OrderItemPreprocessorCollection extends Collection
      */
     public function handle(OrderItem $item)
     {
-        $items = $this->reduce(function ($carry, Preprocessor $preprocessor) {
-            return $preprocessor->handle($carry);
-        }, $item->toCollection());
+        $items = $this->reduce(fn($carry, Preprocessor $preprocessor) => $preprocessor->handle($carry), $item->toCollection());
 
         return new OrderItemCollection($items);
     }
