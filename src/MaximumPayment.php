@@ -9,7 +9,7 @@ use Mollie\Api\Resources\Mandate;
 class MaximumPayment implements MaximumPaymentContract
 {
     /**
-     * @param \Mollie\Api\Resources\Mandate $mandate
+     * @param  \Mollie\Api\Resources\Mandate  $mandate
      * @param $currency
      * @return \Money\Money
      */

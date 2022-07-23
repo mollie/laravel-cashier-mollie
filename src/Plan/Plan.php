@@ -36,7 +36,9 @@ class Plan implements PlanContract
 
     /**
      * A user friendly description to be included in the invoice.
+     *
      * @var string
+     *
      * @example A dummy example subscription
      */
     protected $description;
@@ -52,6 +54,7 @@ class Plan implements PlanContract
      * The first payment method
      *
      * @var array
+     *
      * @example ['ideal']
      */
     protected $firstPaymentMethod;
@@ -83,7 +86,7 @@ class Plan implements PlanContract
     /**
      * Plan constructor.
      *
-     * @param string $name
+     * @param  string  $name
      */
     public function __construct(string $name)
     {
@@ -100,7 +103,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param string $name
+     * @param  string  $name
      * @return $this
      */
     public function setName(string $name)
@@ -119,7 +122,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param \Money\Money $amount
+     * @param  \Money\Money  $amount
      * @return $this
      */
     public function setAmount(Money $amount)
@@ -138,7 +141,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param string $description
+     * @param  string  $description
      * @return $this
      */
     public function setDescription(string $description)
@@ -157,7 +160,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  array $firstPaymentMethod
+     * @param  array  $firstPaymentMethod
      * @return $this
      */
     public function setFirstPaymentMethod($firstPaymentMethod)
@@ -178,7 +181,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param \Money\Money $firstPaymentAmount
+     * @param  \Money\Money  $firstPaymentAmount
      * @return $this
      */
     public function setFirstPaymentAmount(Money $firstPaymentAmount)
@@ -199,7 +202,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param string $firstPaymentDescription
+     * @param  string  $firstPaymentDescription
      * @return $this
      */
     public function setFirstPaymentDescription(string $firstPaymentDescription)
@@ -218,7 +221,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param array|string $interval
+     * @param  array|string  $interval
      * @return $this
      */
     public function setInterval($interval)
@@ -237,7 +240,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param string $redirectUrl
+     * @param  string  $redirectUrl
      * @return $this
      */
     public function setFirstPaymentRedirectUrl(string $redirectUrl)
@@ -256,7 +259,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param string $webhookUrl
+     * @param  string  $webhookUrl
      * @return PlanContract
      */
     public function setFirstPaymentWebhookUrl(string $webhookUrl)
@@ -275,7 +278,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param \Laravel\Cashier\Order\OrderItemPreprocessorCollection $preprocessors
+     * @param  \Laravel\Cashier\Order\OrderItemPreprocessorCollection  $preprocessors
      * @return \Laravel\Cashier\Plan\Contracts\Plan
      */
     public function setOrderItemPreprocessors(OrderItemPreprocessorCollection $preprocessors)

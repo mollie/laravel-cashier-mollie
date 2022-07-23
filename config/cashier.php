@@ -17,7 +17,9 @@ return [
     /**
      * The default locale passed to Mollie for configuring the checkout screen. Set to null to let Mollie handle it for
      * you.
+     *
      * @link https://docs.mollie.com/reference/v2/payments-api/create-payment#parameters
+     *
      * @example 'nl_NL'
      */
     'locale' => null,
@@ -41,6 +43,7 @@ return [
     /**
      * A first payment requires a customer to go through the Mollie checkout screen in order to create a Mandate for
      * future recurring payments.
+     *
      * @link https://docs.mollie.com/payments/recurring#payments-recurring-first-payment
      */
     'first_payment' => [
@@ -54,6 +57,7 @@ return [
         /**
          * Array of allowed Mollie payment methods for the first payment. Make sure the methods are
          * enabled in the Mollie dashboard. Set to [] to let Mollie handle this for you. Can be overridden per plan.
+         *
          * @example ['ideal', 'creditcard']
          */
         'method' => [],
@@ -86,12 +90,13 @@ return [
         /**
          * The default description for the first payment, visible on both the invoice and the customer bank records.
          */
-        'description' => 'Welcome to ' . config('app.name'),
+        'description' => 'Welcome to '.config('app.name'),
     ],
 
     /**
      * Updating the payment method requires a customer to go through the hosted Mollie checkout to add a new Mandate for
      * future recurring payments.
+     *
      * @link https://docs.mollie.com/payments/recurring#payments-recurring-first-payment
      */
     'update_payment_method' => [
@@ -124,7 +129,7 @@ return [
         /**
          * The default description for the update payment method, visible on both the invoice and the customer bank records.
          */
-        'description' => 'Update payment method for ' . config('app.name'),
+        'description' => 'Update payment method for '.config('app.name'),
     ],
 
 ];

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Laravel\Cashier\Events;
@@ -15,6 +16,7 @@ class ChargebackReceived
      * @var \Laravel\Cashier\Payment
      */
     public Payment $payment;
+
     public Money $amountChargedBack;
 
     public function __construct(Payment $payment, Money $amountChargedBack)

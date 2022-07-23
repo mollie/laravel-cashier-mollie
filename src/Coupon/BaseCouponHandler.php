@@ -19,15 +19,16 @@ abstract class BaseCouponHandler implements CouponHandler
     protected $context = [];
 
     /**
-     * @param \Laravel\Cashier\Order\OrderItemCollection $items
+     * @param  \Laravel\Cashier\Order\OrderItemCollection  $items
      * @return \Laravel\Cashier\Order\OrderItemCollection
      */
     abstract public function getDiscountOrderItems(OrderItemCollection $items);
 
     /**
-     * @param \Laravel\Cashier\Coupon\Coupon $coupon
-     * @param \Laravel\Cashier\Coupon\Contracts\AcceptsCoupons $model
+     * @param  \Laravel\Cashier\Coupon\Coupon  $coupon
+     * @param  \Laravel\Cashier\Coupon\Contracts\AcceptsCoupons  $model
      * @return bool
+     *
      * @throws \Throwable|CouponException
      */
     public function validate(Coupon $coupon, AcceptsCoupons $model)
@@ -38,8 +39,8 @@ abstract class BaseCouponHandler implements CouponHandler
     }
 
     /**
-     * @param \Laravel\Cashier\Coupon\RedeemedCoupon $redeemedCoupon
-     * @param \Laravel\Cashier\Order\OrderItemCollection $items
+     * @param  \Laravel\Cashier\Coupon\RedeemedCoupon  $redeemedCoupon
+     * @param  \Laravel\Cashier\Order\OrderItemCollection  $items
      * @return \Laravel\Cashier\Order\OrderItemCollection
      */
     public function handle(RedeemedCoupon $redeemedCoupon, OrderItemCollection $items)
@@ -50,8 +51,8 @@ abstract class BaseCouponHandler implements CouponHandler
     }
 
     /**
-     * @param \Laravel\Cashier\Coupon\RedeemedCoupon $redeemedCoupon
-     * @param \Laravel\Cashier\Order\OrderItemCollection $items
+     * @param  \Laravel\Cashier\Coupon\RedeemedCoupon  $redeemedCoupon
+     * @param  \Laravel\Cashier\Order\OrderItemCollection  $items
      * @return \Laravel\Cashier\Order\OrderItemCollection
      */
     public function apply(RedeemedCoupon $redeemedCoupon, OrderItemCollection $items)
@@ -62,8 +63,9 @@ abstract class BaseCouponHandler implements CouponHandler
     }
 
     /**
-     * @param \Laravel\Cashier\Coupon\Coupon $coupon
-     * @param \Laravel\Cashier\Coupon\Contracts\AcceptsCoupons $model
+     * @param  \Laravel\Cashier\Coupon\Coupon  $coupon
+     * @param  \Laravel\Cashier\Coupon\Contracts\AcceptsCoupons  $model
+     *
      * @throws \Throwable
      * @throws \Laravel\Cashier\Exceptions\CouponException
      */
@@ -78,7 +80,7 @@ abstract class BaseCouponHandler implements CouponHandler
     }
 
     /**
-     * @param \Laravel\Cashier\Coupon\RedeemedCoupon $redeemedCoupon
+     * @param  \Laravel\Cashier\Coupon\RedeemedCoupon  $redeemedCoupon
      * @return \Laravel\Cashier\Coupon\AppliedCoupon
      */
     public function markApplied(RedeemedCoupon $redeemedCoupon)
@@ -100,7 +102,7 @@ abstract class BaseCouponHandler implements CouponHandler
      * Create and return an un-saved OrderItem instance. If a coupon has been applied,
      * the order item will be tied to the coupon.
      *
-     * @param array $data
+     * @param  array  $data
      * @return \Illuminate\Database\Eloquent\Model|\Laravel\Cashier\Order\OrderItem
      */
     protected function makeOrderItem(array $data)
@@ -116,7 +118,7 @@ abstract class BaseCouponHandler implements CouponHandler
      * Get an item from the context using "dot" notation.
      *
      * @param $key
-     * @param null $default
+     * @param  null  $default
      * @return mixed
      */
     protected function context($key, $default = null)
@@ -125,7 +127,7 @@ abstract class BaseCouponHandler implements CouponHandler
     }
 
     /**
-     * @param array $context
+     * @param  array  $context
      * @return $this
      */
     public function withContext(array $context)

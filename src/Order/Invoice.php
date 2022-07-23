@@ -28,7 +28,9 @@ class Invoice
 
     /**
      * The currency used in this invoice.
+     *
      * @example EUR
+     *
      * @var string
      */
     protected $currency;
@@ -86,9 +88,9 @@ class Invoice
     /**
      * Invoice constructor.
      *
-     * @param string $currency
-     * @param string|null $id
-     * @param Carbon|null $date
+     * @param  string  $currency
+     * @param  string|null  $id
+     * @param  Carbon|null  $date
      */
     public function __construct($currency, $id = null, $date = null)
     {
@@ -109,7 +111,7 @@ class Invoice
     }
 
     /**
-     * @param string $id
+     * @param  string  $id
      * @return $this
      */
     public function setId($id)
@@ -128,7 +130,7 @@ class Invoice
     }
 
     /**
-     * @param \Carbon\Carbon $date
+     * @param  \Carbon\Carbon  $date
      * @return $this
      */
     public function setDate(Carbon $date)
@@ -139,7 +141,7 @@ class Invoice
     }
 
     /**
-     * @param \Laravel\Cashier\Order\Contracts\InvoicableItem $item
+     * @param  \Laravel\Cashier\Order\Contracts\InvoicableItem  $item
      * @return $this
      */
     public function addItem(InvoicableItem $item)
@@ -152,7 +154,7 @@ class Invoice
     /**
      * Add multiple InvoicableItems
      *
-     * @param \Illuminate\Support\Collection $items
+     * @param  \Illuminate\Support\Collection  $items
      * @return $this
      */
     public function addItems(Collection $items)
@@ -174,6 +176,7 @@ class Invoice
 
     /**
      * @return string
+     *
      * @example EUR
      */
     public function currency()
@@ -289,7 +292,7 @@ class Invoice
      * Get the receiver address. By default a collection of lines (strings) is returned.
      * If you provide separator, an imploded string is returned.
      *
-     * @param null $separator
+     * @param  null  $separator
      * @return \Illuminate\Support\Collection|string
      */
     public function receiverAddress($separator = null)
@@ -300,7 +303,7 @@ class Invoice
     /**
      * Set the receiver address using an array of strings.
      *
-     * @param array $lines
+     * @param  array  $lines
      * @return $this
      */
     public function setReceiverAddress(array $lines)
@@ -331,7 +334,7 @@ class Invoice
     }
 
     /**
-     * @param \Money\Money $amount
+     * @param  \Money\Money  $amount
      * @return $this
      */
     public function setStartingBalance(Money $amount)
@@ -362,7 +365,7 @@ class Invoice
     }
 
     /**
-     * @param \Money\Money $amount
+     * @param  \Money\Money  $amount
      * @return $this
      */
     public function setUsedBalance(Money $amount)
@@ -393,7 +396,7 @@ class Invoice
     }
 
     /**
-     * @param \Money\Money $amount
+     * @param  \Money\Money  $amount
      * @return $this
      */
     public function setCompletedBalance(Money $amount)
@@ -408,7 +411,7 @@ class Invoice
      * By default a collection of lines (strings) is returned.
      * If you provide separator, an imploded string is returned.
      *
-     * @param null $separator
+     * @param  null  $separator
      * @return \Illuminate\Support\Collection|string
      */
     public function extraInformation($separator = null)
@@ -419,7 +422,7 @@ class Invoice
     /**
      * Set the extra information. Useful for adding a note.
      *
-     * @param array $lines
+     * @param  array  $lines
      * @return $this
      */
     public function setExtraInformation(array $lines)
@@ -432,8 +435,8 @@ class Invoice
     /**
      * Get the View instance for the invoice.
      *
-     * @param array $data
-     * @param string $view
+     * @param  array  $data
+     * @param  string  $view
      * @return \Illuminate\Contracts\View\View
      */
     public function view(array $data = [], string $view = self::DEFAULT_VIEW)
@@ -446,9 +449,9 @@ class Invoice
     /**
      * Capture the invoice as a PDF and return the raw bytes.
      *
-     * @param array $data
-     * @param string $view
-     * @param \Dompdf\Options $options
+     * @param  array  $data
+     * @param  string  $view
+     * @param  \Dompdf\Options  $options
      * @return string
      */
     public function pdf(array $data = [], string $view = self::DEFAULT_VIEW, Options $options = null)
@@ -467,17 +470,17 @@ class Invoice
     /**
      * Create an invoice download response.
      *
-     * @param null|array $data
-     * @param string $view
-     * @param \Dompdf\Options $options
+     * @param  null|array  $data
+     * @param  string  $view
+     * @param  \Dompdf\Options  $options
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function download(array $data = [], string $view = self::DEFAULT_VIEW, Options $options = null)
     {
         $filename = implode('_', [
-                $this->id,
-                Str::snake(config('app.name', '')),
-            ]) . '.pdf';
+            $this->id,
+            Str::snake(config('app.name', '')),
+        ]).'.pdf';
 
         return new Response($this->pdf($data, $view, $options), 200, [
             'Content-Description' => 'File Transfer',
@@ -499,7 +502,7 @@ class Invoice
      * Helper method. By default a collection of lines (strings) is returned.
      * If a separator is provided an imploded string is returned.
      *
-     * @param \Illuminate\Support\Collection $collection
+     * @param  \Illuminate\Support\Collection  $collection
      * @param $separator
      * @return \Illuminate\Support\Collection|string
      */

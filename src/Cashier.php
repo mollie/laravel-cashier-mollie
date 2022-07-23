@@ -144,6 +144,7 @@ class Cashier
      * @param  string  $currency
      * @param  string|null  $symbol
      * @return void
+     *
      * @throws \Exception
      */
     public static function useCurrency($currency, $symbol = null)
@@ -180,6 +181,7 @@ class Cashier
      *
      * @param  string  $currency
      * @return string
+     *
      * @throws \Exception
      */
     protected static function guessCurrencySymbol($currency)
@@ -242,7 +244,7 @@ class Cashier
     /**
      * Format the given amount into a displayable currency.
      *
-     * @param \Money\Money $money
+     * @param  \Money\Money  $money
      * @return string
      */
     public static function formatAmount(Money $money)
@@ -357,7 +359,7 @@ class Cashier
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Model $owner
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @return null|string
      */
     public static function getLocale(Model $owner)
@@ -430,7 +432,7 @@ class Cashier
     /**
      * Get path from url.
      *
-     * @param string $url
+     * @param  string  $url
      * @return string
      */
     protected static function pathFromUrl($url)

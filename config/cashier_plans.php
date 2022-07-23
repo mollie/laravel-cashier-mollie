@@ -14,6 +14,7 @@ return [
         /**
          * A first payment requires a customer to go through the Mollie checkout screen in order to create a Mandate for
          * future recurring payments.
+         *
          * @link https://docs.mollie.com/payments/recurring#payments-recurring-first-payment
          */
         'first_payment' => config('cashier.first_payment'),
@@ -24,10 +25,10 @@ return [
          * Can be overridden per subscription plan. Make sure the preprocessors implement the PreprocessesOrderItems
          * interface.
          */
-         'order_item_preprocessors' => [
-             ProcessCoupons::class,
-             PersistOrderItems::class,
-         ],
+        'order_item_preprocessors' => [
+            ProcessCoupons::class,
+            PersistOrderItems::class,
+        ],
     ],
 
     /**
@@ -74,11 +75,11 @@ return [
              */
             'description' => 'Monthly payment',
 
-            /**
-             * The chain of subscription OrderItem preprocessors. These are called right before the Subscription's
-             * OrderItem is processed into an OrderItem. You can use this for calculating variable costs a.k.a. metered
-             * billing. Make sure the preprocessors extend the BaseOrderItemProcessor.
-             */
+        /**
+         * The chain of subscription OrderItem preprocessors. These are called right before the Subscription's
+         * OrderItem is processed into an OrderItem. You can use this for calculating variable costs a.k.a. metered
+         * billing. Make sure the preprocessors extend the BaseOrderItemProcessor.
+         */
             //'order_item_preprocessors' => [
             //    ProcessCoupons::class,
             //    PersistOrderItems::class,

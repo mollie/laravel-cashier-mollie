@@ -69,9 +69,10 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Create a new subscription builder instance.
      *
-     * @param mixed $owner
-     * @param string $name
-     * @param string $plan
+     * @param  mixed  $owner
+     * @param  string  $name
+     * @param  string  $plan
+     *
      * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
      */
     public function __construct(Model $owner, string $name, string $plan)
@@ -87,6 +88,7 @@ class MandatedSubscriptionBuilder implements Contract
      *
      * @return Subscription
      * \Laravel\Cashier\Exceptions\CouponException
+     *
      * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
      */
     public function create()
@@ -120,7 +122,7 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Prepare a not yet persisted Subscription model
      *
-     * @param null|Carbon $now
+     * @param  null|Carbon  $now
      * @return Subscription $subscription
      */
     public function makeSubscription($now = null)
@@ -190,8 +192,9 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Specify a coupon.
      *
-     * @param string $coupon
+     * @param  string  $coupon
      * @return $this|\Laravel\Cashier\SubscriptionBuilder\Contracts\SubscriptionBuilder
+     *
      * @throws \Laravel\Cashier\Exceptions\CouponNotFoundException
      */
     public function withCoupon(string $coupon)
@@ -206,7 +209,7 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Override the default next payment date. This is superseded by the trial end date.
      *
-     * @param \Carbon\Carbon $nextPaymentAt
+     * @param  \Carbon\Carbon  $nextPaymentAt
      * @return MandatedSubscriptionBuilder
      */
     public function nextPaymentAt(Carbon $nextPaymentAt)

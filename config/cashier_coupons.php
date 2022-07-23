@@ -37,7 +37,7 @@ return [
 
             /** Any context you want to pass to the handler */
             'context' => [
-                'description' => 'Welcome to ' . config('app.name'),
+                'description' => 'Welcome to '.config('app.name'),
                 'discount' => [
                     'currency' => 'EUR', // Make sure the currency matches the subscription plan it's being applied to
                     'value' => '5.00',
@@ -59,7 +59,7 @@ return [
 
             /** Any context you want to pass to the handler */
             'context' => [
-                'description' => 'Extra Bonus ' . config('app.name'),
+                'description' => 'Extra Bonus '.config('app.name'),
                 'percentage' => '10',
             ],
         ],

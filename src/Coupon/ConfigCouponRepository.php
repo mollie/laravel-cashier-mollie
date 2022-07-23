@@ -16,8 +16,8 @@ class ConfigCouponRepository implements CouponRepository
     /**
      * ConfigCouponRepository constructor.
      *
-     * @param array $defaults
-     * @param array $coupons
+     * @param  array  $defaults
+     * @param  array  $coupons
      */
     public function __construct(array $defaults, array $coupons)
     {
@@ -26,7 +26,7 @@ class ConfigCouponRepository implements CouponRepository
     }
 
     /**
-     * @param string $coupon
+     * @param  string  $coupon
      * @return Coupon|null
      */
     public function find(string $coupon)
@@ -40,7 +40,7 @@ class ConfigCouponRepository implements CouponRepository
     }
 
     /**
-     * @param string $coupon
+     * @param  string  $coupon
      * @return Coupon
      *
      * @throws CouponNotFoundException
@@ -54,7 +54,7 @@ class ConfigCouponRepository implements CouponRepository
     }
 
     /**
-     * @param string $name
+     * @param  string  $name
      * @return \Laravel\Cashier\Coupon\Coupon
      */
     protected function buildCoupon(string $name)

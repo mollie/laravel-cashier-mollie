@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Laravel\Cashier\Plan;
 
 use Illuminate\Support\Arr;
@@ -11,7 +10,6 @@ use Laravel\Cashier\Subscription;
 class AdvancedIntervalGenerator extends BaseIntervalGenerator implements IntervalGeneratorContract
 {
     /**
-     *
      * @var array
      */
     protected $configuration;
@@ -25,11 +23,10 @@ class AdvancedIntervalGenerator extends BaseIntervalGenerator implements Interva
     }
 
     /**
-     * @param \Laravel\Cashier\Subscription|null $subscription
-     *
+     * @param  \Laravel\Cashier\Subscription|null  $subscription
      * @return \Carbon\Carbon|\Carbon\Traits\Modifiers
      */
-    public function getEndOfNextSubscriptionCycle(Subscription  $subscription = null)
+    public function getEndOfNextSubscriptionCycle(Subscription $subscription = null)
     {
         $cycle_ends_at = $subscription->cycle_ends_at ?? now();
         $subscription_date = $this->startOfTheSubscription($subscription);
@@ -38,11 +35,10 @@ class AdvancedIntervalGenerator extends BaseIntervalGenerator implements Interva
             return $cycle_ends_at->addMonthsNoOverflow($this->value())->thisDayOrLastOfTheMonth($subscription_date);
         }
 
-        return $cycle_ends_at->modify('+' . $this->value() . ' '. $this->period());
+        return $cycle_ends_at->modify('+'.$this->value().' '.$this->period());
     }
 
     /**
-     *
      * @return int
      */
     protected function value()
@@ -51,7 +47,6 @@ class AdvancedIntervalGenerator extends BaseIntervalGenerator implements Interva
     }
 
     /**
-     *
      * @return string
      */
     protected function period()
@@ -60,7 +55,6 @@ class AdvancedIntervalGenerator extends BaseIntervalGenerator implements Interva
     }
 
     /**
-     *
      * @return bool
      */
     protected function isMonthly()
@@ -69,7 +63,6 @@ class AdvancedIntervalGenerator extends BaseIntervalGenerator implements Interva
     }
 
     /**
-     *
      * @return bool
      */
     protected function isMonthOverflow()

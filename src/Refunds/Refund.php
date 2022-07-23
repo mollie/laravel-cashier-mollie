@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Laravel\Cashier\Refunds;
@@ -37,6 +38,7 @@ class Refund extends Model
     protected $casts = [
         'total' => 'int',
     ];
+
     /**
      * Create a new Refund Collection instance.
      *

@@ -45,13 +45,11 @@ class MultiCurrencyCouponOrderItemPreprocessorTest extends BaseTestCase
         $this->expectException(CurrencyMismatchException::class);
         $preprocessor->handle($item->toCollection());
 
-
         $redeemedUsdCoupon = $usdCoupon->redeemFor($subscriptionUsd);
         $preprocessor = new CouponOrderItemPreprocessor();
 
         $this->assertEquals(0, Cashier::$appliedCouponModel::count());
         $this->assertEquals(1, $redeemedUsdCoupon->times_left);
-
 
         $result = $preprocessor->handle($itemUsd->toCollection());
 

@@ -9,7 +9,7 @@ use Mollie\Api\Resources\Mandate;
 class MinimumPayment implements MinimumPaymentContract
 {
     /**
-     * @param \Mollie\Api\Resources\Mandate $mandate
+     * @param  \Mollie\Api\Resources\Mandate  $mandate
      * @param $currency
      * @return \Money\Money
      */

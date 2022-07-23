@@ -207,7 +207,7 @@ class WebhookControllerTest extends BaseTestCase
                 ->andReturn($payment);
         });
 
-        $this->mock(UpdateMolliePayment::class, function (UpdateMolliePayment $mock) use ($payment, $paymentId) {
+        $this->mock(UpdateMolliePayment::class, function (UpdateMolliePayment $mock) use ($payment) {
             $payment = new MolliePayment(new MollieApiClient);
             $payment->redirectUrl = 'https://www.example.com/tr_unique_id';
 

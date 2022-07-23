@@ -47,10 +47,10 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     public function createsAFirstPaymentForSubscription()
     {
         $firstPayment = config('cashier_plans.defaults.first_payment');
-        $firstPayment["redirect_url"] = "https://foo-redirect-bar.com";
-        $firstPayment["webhook_url"] = "https://foo-webhook-bar.com";
-        config(["cashier_plans.plans.monthly-10-1.first_payment" => $firstPayment]);
-        config(["cashier.locale" => "nl_NL"]);
+        $firstPayment['redirect_url'] = 'https://foo-redirect-bar.com';
+        $firstPayment['webhook_url'] = 'https://foo-webhook-bar.com';
+        config(['cashier_plans.plans.monthly-10-1.first_payment' => $firstPayment]);
+        config(['cashier.locale' => 'nl_NL']);
 
         $this->withMockedGetMollieCustomerTwice();
 
@@ -69,21 +69,21 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         $payload = $builder->getMandatePaymentBuilder()->getMolliePayload();
 
         $this->assertEquals([
-            "sequenceType" => "first",
-            "method" => ["ideal"],
-            "customerId" => $this->user->mollie_customer_id,
-            "description" => "Test mandate payment",
-            "amount" => [
-                "value" => "0.05",
-                "currency" => "EUR",
+            'sequenceType' => 'first',
+            'method' => ['ideal'],
+            'customerId' => $this->user->mollie_customer_id,
+            'description' => 'Test mandate payment',
+            'amount' => [
+                'value' => '0.05',
+                'currency' => 'EUR',
             ],
-            "webhookUrl" => "https://foo-webhook-bar.com",
-            "redirectUrl" => "https://foo-redirect-bar.com",
-            "locale" => "nl_NL",
-            "metadata" => [
-                "owner" => [
-                    "type" => get_class($this->user),
-                    "id" => 1,
+            'webhookUrl' => 'https://foo-webhook-bar.com',
+            'redirectUrl' => 'https://foo-redirect-bar.com',
+            'locale' => 'nl_NL',
+            'metadata' => [
+                'owner' => [
+                    'type' => get_class($this->user),
+                    'id' => 1,
                 ],
             ],
         ], $payload);
@@ -149,33 +149,33 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
             'value' => '0.05',
         ];
         $molliePayment->metadata = json_decode(json_encode([
-            "owner" => [
-                "type" => get_class($this->user),
-                "id" => 1,
+            'owner' => [
+                'type' => get_class($this->user),
+                'id' => 1,
             ],
-            "actions" => [
+            'actions' => [
                 [
-                    "handler" => StartSubscription::class,
-                    "description" => "Monthly payment",
-                    "subtotal" => [
-                        "value" => "0.00",
-                        "currency" => "EUR",
+                    'handler' => StartSubscription::class,
+                    'description' => 'Monthly payment',
+                    'subtotal' => [
+                        'value' => '0.00',
+                        'currency' => 'EUR',
                     ],
-                    "taxPercentage" => 20,
-                    "plan" => "monthly-10-1",
-                    "name" => "default",
-                    "quantity" => 1,
-                    "nextPaymentAt" => now()->addDays(12)->toIso8601String(),
-                    "trialUntil" => now()->addDays(5)->toIso8601String(),
+                    'taxPercentage' => 20,
+                    'plan' => 'monthly-10-1',
+                    'name' => 'default',
+                    'quantity' => 1,
+                    'nextPaymentAt' => now()->addDays(12)->toIso8601String(),
+                    'trialUntil' => now()->addDays(5)->toIso8601String(),
                 ],
                 [
-                    "handler" => AddGenericOrderItem::class,
-                    "description" => "Test mandate payment",
-                    "subtotal" => [
-                        "value" => "0.04",
-                        "currency" => "EUR",
+                    'handler' => AddGenericOrderItem::class,
+                    'description' => 'Test mandate payment',
+                    'subtotal' => [
+                        'value' => '0.04',
+                        'currency' => 'EUR',
                     ],
-                    "taxPercentage" => 20,
+                    'taxPercentage' => 20,
                 ],
             ],
         ]));
@@ -236,8 +236,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
 
             return true;
         });
-        $this->assertSame(Order::first()->items->first()->description_extra_lines[0], "From 2019-01-01 to 2019-02-01");
-
+        $this->assertSame(Order::first()->items->first()->description_extra_lines[0], 'From 2019-01-01 to 2019-02-01');
     }
 
     /** @test */

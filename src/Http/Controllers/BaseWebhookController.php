@@ -21,9 +21,10 @@ abstract class BaseWebhookController
      * Fetch a payment from Mollie using its ID.
      * Returns null if the payment cannot be retrieved.
      *
-     * @param string $id
-     * @param array $parameters
+     * @param  string  $id
+     * @param  array  $parameters
      * @return \Mollie\Api\Resources\Payment|null
+     *
      * @throws \Mollie\Api\Exceptions\ApiException
      */
     public function getMolliePaymentById(string $id, array $parameters = [])
