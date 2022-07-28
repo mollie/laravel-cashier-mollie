@@ -10,9 +10,9 @@ class CurrencyMismatchException extends Exception
     /**
      * PlanNotFoundException constructor.
      *
-     * @param string $message
-     * @param int $code
-     * @param Throwable|null $previous
+     * @param  string  $message
+     * @param  int  $code
+     * @param  Throwable|null  $previous
      */
     public function __construct(string $message = 'Currencies do not match', int $code = 404, Throwable $previous = null)
     {

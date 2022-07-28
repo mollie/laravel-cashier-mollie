@@ -210,14 +210,13 @@ class OrderTest extends BaseTestCase
 
         $this->assertEquals(2, $order->owner_id);
         $this->assertSame(User::class, $order->owner_type);
-        $this->assertSame("EUR", $order->currency);
+        $this->assertSame('EUR', $order->currency);
         $this->assertSame(0, $order->tax);
         $this->assertSame(1000, $order->subtotal);
         $this->assertSame(1000, $order->total);
         $this->assertSame(1000, $order->total_due);
         $this->assertSame(0, $order->credit_used);
         $this->assertSame(0, $order->balance_before);
-
 
         $this->assertEquals(0, $order->balance_after);
         $this->assertMoneyEURCents(0, $order->getBalanceAfter());
@@ -242,10 +241,9 @@ class OrderTest extends BaseTestCase
         $this->assertEquals(500, $user->credit('EUR')->value);
         $this->assertMoneyEURCents(500, $user->credit('EUR')->money());
 
-
         $this->assertEquals(2, $order->owner_id);
         $this->assertSame(User::class, $order->owner_type);
-        $this->assertSame("EUR", $order->currency);
+        $this->assertSame('EUR', $order->currency);
         $this->assertSame(0, $order->tax);
         $this->assertSame(1000, $order->subtotal);
         $this->assertSame(1000, $order->total);
@@ -444,7 +442,6 @@ class OrderTest extends BaseTestCase
 
         $this->expectException(AmountExceedsMolliePaymentMethodLimit::class);
         $order->processPayment();
-
     }
 
     /** @test */
@@ -715,7 +712,6 @@ class OrderTest extends BaseTestCase
         $this->assertEquals(1, $credit->value);
         $this->assertMoneyEURCents(1, $credit->money());
 
-
         $this->assertDispatchedOrderProcessed($order);
 
         Event::assertDispatched(BalanceTurnedStale::class, function ($event) use ($credit) {
@@ -937,7 +933,7 @@ class OrderTest extends BaseTestCase
 
                 fclose($handle);
             } else {
-                $this->fail('Cannot write example invoice to ' . $filename);
+                $this->fail('Cannot write example invoice to '.$filename);
             }
         }
         $this->assertTrue(true, 'Unable to generate dummy invoice.');

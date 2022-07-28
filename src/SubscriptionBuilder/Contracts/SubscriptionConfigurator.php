@@ -9,7 +9,7 @@ interface SubscriptionConfigurator
     /**
      * Specify the number of days of the trial.
      *
-     * @param  int $trialDays
+     * @param  int  $trialDays
      * @return $this
      */
     public function trialDays(int $trialDays);
@@ -17,7 +17,7 @@ interface SubscriptionConfigurator
     /**
      * Specify the ending date of the trial.
      *
-     * @param  Carbon $trialUntil
+     * @param  Carbon  $trialUntil
      * @return $this
      */
     public function trialUntil(Carbon $trialUntil);
@@ -32,7 +32,7 @@ interface SubscriptionConfigurator
     /**
      * Override the default next payment date.
      *
-     * @param \Carbon\Carbon $nextPaymentAt
+     * @param  \Carbon\Carbon  $nextPaymentAt
      * @return $this
      */
     public function nextPaymentAt(Carbon $nextPaymentAt);
@@ -48,7 +48,7 @@ interface SubscriptionConfigurator
     /**
      * Specify a discount coupon.
      *
-     * @param string $coupon
+     * @param  string  $coupon
      * @return $this
      */
     public function withCoupon(string $coupon);

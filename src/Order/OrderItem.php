@@ -25,6 +25,7 @@ use Laravel\Cashier\Traits\HasOwner;
  * @property mixed $id
  * @property Order $order
  * @property mixed $order_id
+ *
  * @method static create(array $array)
  * @method static make(array $array)
  */
@@ -118,7 +119,7 @@ class OrderItem extends Model implements InvoicableItem
      * Scope the query to only include unprocessed order items.
      *
      * @param $query
-     * @param bool $processed
+     * @param  bool  $processed
      * @return Builder
      */
     public function scopeProcessed($query, $processed = true)
@@ -134,7 +135,7 @@ class OrderItem extends Model implements InvoicableItem
      * Scope the query to only include unprocessed order items.
      *
      * @param $query
-     * @param bool $unprocessed
+     * @param  bool  $unprocessed
      * @return Builder
      */
     public function scopeUnprocessed($query, $unprocessed = true)
@@ -182,7 +183,7 @@ class OrderItem extends Model implements InvoicableItem
      */
     public function toCollection()
     {
-        return $this->newCollection([ $this ]);
+        return $this->newCollection([$this]);
     }
 
     /**
@@ -227,7 +228,7 @@ class OrderItem extends Model implements InvoicableItem
     /**
      * Check whether the order item is processed into an order.
      *
-     * @param bool $processed
+     * @param  bool  $processed
      * @return bool
      */
     public function isProcessed($processed = true)
@@ -269,6 +270,7 @@ class OrderItem extends Model implements InvoicableItem
      * The order item tax as a percentage.
      *
      * @return float
+     *
      * @example 21.5
      */
     public function getTaxPercentage()
@@ -330,7 +332,7 @@ class OrderItem extends Model implements InvoicableItem
      * Handle a payment refund on the order item.
      * Invokes handlePaymentRefunded on the orderable model.
      *
-     * @param \Laravel\Cashier\Refunds\RefundItem $refundItem
+     * @param  \Laravel\Cashier\Refunds\RefundItem  $refundItem
      * @return $this
      */
     public function handlePaymentRefunded(RefundItem $refundItem)
@@ -349,7 +351,7 @@ class OrderItem extends Model implements InvoicableItem
      * Handle a failed payment refund on the order item.
      * Invokes handlePaymentRefundFailed on the orderable model.
      *
-     * @param \Laravel\Cashier\Refunds\RefundItem $refundItem
+     * @param  \Laravel\Cashier\Refunds\RefundItem  $refundItem
      * @return $this
      */
     public function handlePaymentRefundFailed(RefundItem $refundItem)

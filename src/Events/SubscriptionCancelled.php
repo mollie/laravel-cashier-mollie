@@ -26,8 +26,8 @@ class SubscriptionCancelled
     /**
      * Creates a new SubscriptionCancelled event.
      *
-     * @param Subscription $subscription
-     * @param string $reason
+     * @param  Subscription  $subscription
+     * @param  string  $reason
      */
     public function __construct($subscription, $reason)
     {

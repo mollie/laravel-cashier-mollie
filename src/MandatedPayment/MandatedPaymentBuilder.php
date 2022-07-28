@@ -38,11 +38,11 @@ class MandatedPaymentBuilder
     /**
      * MandatedPaymentBuilder constructor.
      *
-     * @param \Illuminate\Database\Eloquent\Model $owner
-     * @param string $description
-     * @param \Money\Money $amount
-     * @param string $webhookUrl
-     * @param array $overrides
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
+     * @param  string  $description
+     * @param  \Money\Money  $amount
+     * @param  string  $webhookUrl
+     * @param  array  $overrides
      */
     public function __construct(
         Model $owner,
@@ -59,7 +59,7 @@ class MandatedPaymentBuilder
     }
 
     /**
-     * @param array $overrides
+     * @param  array  $overrides
      * @return array
      */
     public function getPayload(array $overrides = [])
@@ -78,7 +78,7 @@ class MandatedPaymentBuilder
     }
 
     /**
-     * @param array $overrides
+     * @param  array  $overrides
      * @return \Mollie\Api\Resources\Payment
      */
     public function create(array $overrides = [])

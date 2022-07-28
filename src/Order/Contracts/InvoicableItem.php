@@ -21,6 +21,7 @@ interface InvoicableItem
 
     /**
      * @return float
+     *
      * @example 21.5
      */
     public function getTaxPercentage();

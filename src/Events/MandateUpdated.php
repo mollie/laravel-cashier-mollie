@@ -19,7 +19,7 @@ class MandateUpdated
     /**
      * MandateUpdated constructor.
      *
-     * @param \Illuminate\Database\Eloquent\Model $owner
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
      */
     public function __construct(Model $owner, Payment $payment)
     {

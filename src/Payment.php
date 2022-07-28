@@ -26,6 +26,7 @@ use Money\Money;
  * @property string first_payment_actions
  * @property string mollie_mandate_id
  * @property \Laravel\Cashier\Order\Order order
+ *
  * @method static create(array $data)
  * @method static make(array $data)
  */
@@ -49,10 +50,10 @@ class Payment extends Model
     ];
 
     /**
-     * @param MolliePayment $payment
-     * @param \Illuminate\Database\Eloquent\Model $owner
-     * @param array $actions
-     * @param array $overrides
+     * @param  MolliePayment  $payment
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
+     * @param  array  $actions
+     * @param  array  $overrides
      * @return static
      */
     public static function createFromMolliePayment(MolliePayment $payment, Model $owner, array $actions = [], array $overrides = []): self
@@ -61,10 +62,10 @@ class Payment extends Model
     }
 
     /**
-     * @param MolliePayment $payment
-     * @param \Illuminate\Database\Eloquent\Model $owner
-     * @param array $actions
-     * @param array $overrides
+     * @param  MolliePayment  $payment
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
+     * @param  array  $actions
+     * @param  array  $overrides
      * @return static
      */
     public static function makeFromMolliePayment(MolliePayment $payment, Model $owner, array $actions = [], array $overrides = []): self
@@ -109,6 +110,7 @@ class Payment extends Model
      *
      * @param $id
      * @return static
+     *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public static function findByPaymentIdOrFail($id): self
@@ -119,9 +121,9 @@ class Payment extends Model
     /**
      * Find a Payment by the Mollie payment id, or create a new Payment record from a Mollie payment if not found.
      *
-     * @param \Mollie\Api\Resources\Payment $molliePayment
-     * @param \Illuminate\Database\Eloquent\Model $owner
-     * @param array $actions
+     * @param  \Mollie\Api\Resources\Payment  $molliePayment
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
+     * @param  array  $actions
      * @return static
      */
     public static function findByMolliePaymentOrCreate(MolliePayment $molliePayment, Model $owner, array $actions = []): self

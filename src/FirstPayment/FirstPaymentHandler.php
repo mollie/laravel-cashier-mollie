@@ -24,7 +24,7 @@ class FirstPaymentHandler
     /**
      * FirstPaymentHandler constructor.
      *
-     * @param \Mollie\Api\Resources\Payment $molliePayment
+     * @param  \Mollie\Api\Resources\Payment  $molliePayment
      */
     public function __construct(MolliePayment $molliePayment)
     {

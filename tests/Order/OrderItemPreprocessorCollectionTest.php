@@ -51,7 +51,7 @@ class OrderItemPreprocessorCollectionTest extends BaseTestCase
     }
 
     /**
-     * @param \Laravel\Cashier\Order\OrderItemCollection $items
+     * @param  \Laravel\Cashier\Order\OrderItemCollection  $items
      * @return \Laravel\Cashier\Tests\Order\FakeOrderItemPreprocessor
      */
     protected function getFakePreprocessor(OrderItemCollection $items)

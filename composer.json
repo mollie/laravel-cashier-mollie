@@ -48,8 +48,7 @@
         "mockery/mockery": "^1.4",
         "orchestra/testbench": "^6.0|^7.0",
         "phpunit/phpunit": "^8.5|^9.3",
-        "vlucas/phpdotenv": "^5.2",
-        "friendsofphp/php-cs-fixer": "^3.0"
+        "vlucas/phpdotenv": "^5.2"
     },
     "autoload": {
         "files": [
@@ -77,7 +76,6 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
-        "test": "./vendor/bin/phpunit tests",
-        "format": "./vendor/bin/php-cs-fixer fix --allow-risky=yes"
+        "test": "./vendor/bin/phpunit tests"
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Laravel\Cashier\Tests\Mollie;
@@ -19,7 +20,7 @@ class UpdateMolliePaymentTest extends BaseMollieInteractionTest
         $action = $this->app->make(UpdateMolliePayment::class);
         $payment = mollie()->payments->get($this->getUpdatablePaymentId());
         $oldWebhookUrl = $payment->webhookUrl;
-        $newWebhookUrl = 'https://example.com/' .Str::uuid();
+        $newWebhookUrl = 'https://example.com/'.Str::uuid();
         $payment->webhookUrl = $newWebhookUrl;
 
         $result = $action->execute($payment);

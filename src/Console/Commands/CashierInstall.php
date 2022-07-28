@@ -46,7 +46,7 @@ class CashierInstall extends Command
         } else {
             $this->info(
                 'You can publish the Cashier invoice template so you can modify it. '
-                . 'Note that this will exclude your template copy from updates by the package maintainers.'
+                .'Note that this will exclude your template copy from updates by the package maintainers.'
             );
 
             if ($this->confirm('Publish Cashier invoice template?')) {

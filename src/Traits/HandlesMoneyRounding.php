@@ -9,9 +9,8 @@ trait HandlesMoneyRounding
     /**
      * Format the money as basic decimal
      *
-     * @param \Money\Money $total
-     * @param float $taxPercentage
-     *
+     * @param  \Money\Money  $total
+     * @param  float  $taxPercentage
      * @return int
      */
     public function roundingMode(Money $total, float $taxPercentage)

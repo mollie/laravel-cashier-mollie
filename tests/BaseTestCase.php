@@ -42,7 +42,7 @@ abstract class BaseTestCase extends TestCase
     }
 
     /**
-     * @param \Illuminate\Foundation\Application $app
+     * @param  \Illuminate\Foundation\Application  $app
      * @return array
      */
     protected function getPackageProviders($app)
@@ -52,6 +52,7 @@ abstract class BaseTestCase extends TestCase
 
     /**
      * Execute table migrations.
+     *
      * @return $this
      */
     protected function withPackageMigrations()
@@ -63,43 +64,43 @@ abstract class BaseTestCase extends TestCase
                 [
                     [
                         'class' => CreateUsersTable::class,
-                        'file_path' => __DIR__ . '/database/migrations/create_users_table.php',
+                        'file_path' => __DIR__.'/database/migrations/create_users_table.php',
                     ],
                     [
                         'class' => '\CreateSubscriptionsTable',
-                        'file_path' => $migrations_dir . '/create_subscriptions_table.php.stub',
+                        'file_path' => $migrations_dir.'/create_subscriptions_table.php.stub',
                     ],
                     [
                         'class' => '\CreateOrderItemsTable',
-                        'file_path' => $migrations_dir . '/create_order_items_table.php.stub',
+                        'file_path' => $migrations_dir.'/create_order_items_table.php.stub',
                     ],
                     [
                         'class' => '\CreateOrdersTable',
-                        'file_path' => $migrations_dir . '/create_orders_table.php.stub',
+                        'file_path' => $migrations_dir.'/create_orders_table.php.stub',
                     ],
                     [
                         'class' => '\CreateCreditsTable',
-                        'file_path' => $migrations_dir . '/create_credits_table.php.stub',
+                        'file_path' => $migrations_dir.'/create_credits_table.php.stub',
                     ],
                     [
                         'class' => '\CreateRedeemedCouponsTable',
-                        'file_path' => $migrations_dir . '/create_redeemed_coupons_table.php.stub',
+                        'file_path' => $migrations_dir.'/create_redeemed_coupons_table.php.stub',
                     ],
                     [
                         'class' => '\CreateAppliedCouponsTable',
-                        'file_path' => $migrations_dir . '/create_applied_coupons_table.php.stub',
+                        'file_path' => $migrations_dir.'/create_applied_coupons_table.php.stub',
                     ],
                     [
                         'class' => '\CreatePaymentsTable',
-                        'file_path' => $migrations_dir . '/create_payments_table.php.stub',
+                        'file_path' => $migrations_dir.'/create_payments_table.php.stub',
                     ],
                     [
                         'class' => '\CreateRefundItemsTable',
-                        'file_path' => $migrations_dir . '/create_refund_items_table.php.stub',
+                        'file_path' => $migrations_dir.'/create_refund_items_table.php.stub',
                     ],
                     [
                         'class' => '\CreateRefundsTable',
-                        'file_path' => $migrations_dir . '/create_refunds_table.php.stub',
+                        'file_path' => $migrations_dir.'/create_refunds_table.php.stub',
                     ],
                 ]
             )
@@ -111,7 +112,7 @@ abstract class BaseTestCase extends TestCase
     /**
      * Runs a collection of migrations.
      *
-     * @param Collection $migrations
+     * @param  Collection  $migrations
      */
     protected function runMigrations(Collection $migrations)
     {
@@ -121,8 +122,8 @@ abstract class BaseTestCase extends TestCase
     }
 
     /**
-     * @param string $class
-     * @param string $file_path
+     * @param  string  $class
+     * @param  string  $file_path
      */
     protected function runMigration($class, $file_path)
     {
@@ -133,9 +134,9 @@ abstract class BaseTestCase extends TestCase
     /**
      * Assert that a Carbon datetime is approximately equal to another Carbon datetime.
      *
-     * @param \Carbon\Carbon $expected
-     * @param \Carbon\Carbon $actual
-     * @param int $precision_seconds
+     * @param  \Carbon\Carbon  $expected
+     * @param  \Carbon\Carbon  $actual
+     * @param  int  $precision_seconds
      */
     protected function assertCarbon(Carbon $expected, Carbon $actual, int $precision_seconds = 5)
     {
@@ -163,7 +164,7 @@ abstract class BaseTestCase extends TestCase
     /**
      * Set the system test datetime.
      *
-     * @param Carbon|string $now
+     * @param  Carbon|string  $now
      * @return $this
      */
     protected function withTestNow($now)
@@ -318,8 +319,8 @@ abstract class BaseTestCase extends TestCase
     }
 
     /**
-     * @param bool $persist
-     * @param array $overrides
+     * @param  bool  $persist
+     * @param  array  $overrides
      * @return User
      */
     protected function getUser($persist = true, $overrides = [])
@@ -355,6 +356,7 @@ abstract class BaseTestCase extends TestCase
 
     /**
      * @return \Mollie\Api\MollieApiClient
+     *
      * @throws \Mollie\Api\Exceptions\IncompatiblePlatform
      * @throws \ReflectionException
      */
@@ -364,9 +366,9 @@ abstract class BaseTestCase extends TestCase
     }
 
     /**
-     * @param int $value
-     * @param string $currency
-     * @param \Money\Money $money
+     * @param  int  $value
+     * @param  string  $currency
+     * @param  \Money\Money  $money
      */
     protected function assertMoney(int $value, string $currency, Money $money)
     {
@@ -376,8 +378,8 @@ abstract class BaseTestCase extends TestCase
     }
 
     /**
-     * @param int $value
-     * @param \Money\Money $money
+     * @param  int  $value
+     * @param  \Money\Money  $money
      */
     protected function assertMoneyEURCents(int $value, Money $money)
     {
@@ -385,9 +387,9 @@ abstract class BaseTestCase extends TestCase
     }
 
     /**
-     * @param \Laravel\Cashier\Coupon\Coupon $coupon
-     * @param null $couponHandler
-     * @param null $context
+     * @param  \Laravel\Cashier\Coupon\Coupon  $coupon
+     * @param  null  $couponHandler
+     * @param  null  $context
      * @return CouponRepository The mocked coupon repository
      */
     protected function withMockedCouponRepository(Coupon $coupon = null, $couponHandler = null, $context = null)
@@ -420,9 +422,9 @@ abstract class BaseTestCase extends TestCase
     }
 
     /**
-     * @param \Laravel\Cashier\Coupon\Coupon $coupon
-     * @param null $couponHandler
-     * @param null $context
+     * @param  \Laravel\Cashier\Coupon\Coupon  $coupon
+     * @param  null  $couponHandler
+     * @param  null  $context
      * @return CouponRepository The mocked coupon repository
      */
     protected function withMockedUsdCouponRepository(Coupon $coupon = null, $couponHandler = null, $context = null)
