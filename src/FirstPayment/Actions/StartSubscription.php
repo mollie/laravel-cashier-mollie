@@ -43,9 +43,10 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     /**
      * Create a new subscription builder instance.
      *
-     * @param \Illuminate\Database\Eloquent\Model $owner
-     * @param string $name
-     * @param string $plan
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
+     * @param  string  $name
+     * @param  string  $plan
+     *
      * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
      */
     public function __construct(Model $owner, string $name, string $plan)
@@ -64,9 +65,10 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     }
 
     /**
-     * @param array $payload
-     * @param \Illuminate\Database\Eloquent\Model $owner
+     * @param  array  $payload
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @return static
+     *
      * @throws \Exception
      */
     public static function createFromPayload(array $payload, Model $owner)
@@ -126,7 +128,7 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
             'quantity' => ! empty($this->quantity) ? $this->quantity : null,
             'nextPaymentAt' => ! empty($this->nextPaymentAt) ? $this->nextPaymentAt->toIso8601String() : null,
             'trialDays' => $this->trialDays,
-            'trialUntil' => ! empty($this->trialUntil) ? $this->trialUntil->toIso8601String(): null,
+            'trialUntil' => ! empty($this->trialUntil) ? $this->trialUntil->toIso8601String() : null,
             'skipTrial' => $this->skipTrial,
             'coupon' => ! empty($this->coupon) ? $this->coupon->name() : null,
         ]);
@@ -157,7 +159,7 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
                     'from' => now()->format('Y-m-d'),
                     'to' => $this->plan->interval()->getEndOfNextSubscriptionCycle()->format('Y-m-d'),
                 ]),
-            ] ,
+            ],
             'currency' => $this->getCurrency(),
             'unit_price' => $this->getUnitPrice()->getAmount(),
             'tax_percentage' => $this->getTaxPercentage(),
@@ -170,6 +172,7 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
      * Another OrderItem is scheduled for the next billing cycle.
      *
      * @return \Laravel\Cashier\Order\OrderItemCollection
+     *
      * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
      * @throws \Throwable
      */
@@ -178,7 +181,6 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
         if (empty($this->nextPaymentAt) && ! $this->isTrial()) {
             $this->builder()->nextPaymentAt($this->plan->interval()->getEndOfNextSubscriptionCycle());
         }
-
 
         // Create the subscription, scheduling the next payment
         $subscription = $this->builder()->create();
@@ -203,8 +205,9 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     /**
      * Specify the number of days of the trial.
      *
-     * @param  int $trialDays
+     * @param  int  $trialDays
      * @return $this
+     *
      * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
      * @throws \Throwable
      */
@@ -220,7 +223,7 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     /**
      * Specify the ending date of the trial.
      *
-     * @param  Carbon $trialUntil
+     * @param  Carbon  $trialUntil
      * @return $this
      */
     public function trialUntil(Carbon $trialUntil)
@@ -250,8 +253,9 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     /**
      * Specify the quantity of the subscription.
      *
-     * @param int $quantity
+     * @param  int  $quantity
      * @return $this
+     *
      * @throws \Throwable|\LogicException
      */
     public function quantity(int $quantity)
@@ -274,8 +278,9 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     /**
      * Specify and validate the coupon code.
      *
-     * @param string $coupon
+     * @param  string  $coupon
      * @return $this
+     *
      * @throws \Laravel\Cashier\Exceptions\CouponNotFoundException
      * @throws \Throwable
      */
@@ -290,7 +295,7 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     /**
      * Override the default next payment date.
      *
-     * @param \Carbon\Carbon $nextPaymentAt
+     * @param  \Carbon\Carbon  $nextPaymentAt
      * @return $this
      */
     public function nextPaymentAt(Carbon $nextPaymentAt)
@@ -313,6 +318,7 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
      * Retrieve the subscription builder
      *
      * @return \Laravel\Cashier\SubscriptionBuilder\MandatedSubscriptionBuilder
+     *
      * @throws \Throwable|\Laravel\Cashier\Exceptions\PlanNotFoundException
      */
     public function builder()

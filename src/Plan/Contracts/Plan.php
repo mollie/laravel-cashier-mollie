@@ -15,7 +15,7 @@ interface Plan
     public function amount();
 
     /**
-     * @param \Money\Money $amount
+     * @param  \Money\Money  $amount
      * @return Plan
      */
     public function setAmount(Money $amount);
@@ -43,7 +43,7 @@ interface Plan
     public function firstPaymentAmount();
 
     /**
-     * @param \Money\Money $firstPaymentAmount
+     * @param  \Money\Money  $firstPaymentAmount
      * @return Plan
      */
     public function setFirstPaymentAmount(Money $firstPaymentAmount);
@@ -54,7 +54,7 @@ interface Plan
     public function firstPaymentMethod();
 
     /**
-     * @param array $firstPaymentMethod
+     * @param  array  $firstPaymentMethod
      * @return Plan
      */
     public function setFirstPaymentMethod($firstPaymentMethod);
@@ -67,7 +67,7 @@ interface Plan
     public function firstPaymentDescription();
 
     /**
-     * @param string $firstPaymentDescription
+     * @param  string  $firstPaymentDescription
      * @return Plan
      */
     public function setFirstPaymentDescription(string $firstPaymentDescription);
@@ -78,7 +78,7 @@ interface Plan
     public function firstPaymentRedirectUrl();
 
     /**
-     * @param string $redirectUrl
+     * @param  string  $redirectUrl
      * @return Plan
      */
     public function setFirstPaymentRedirectUrl(string $redirectUrl);
@@ -89,7 +89,7 @@ interface Plan
     public function firstPaymentWebhookUrl();
 
     /**
-     * @param string $webhookUrl
+     * @param  string  $webhookUrl
      * @return Plan
      */
     public function setFirstPaymentWebhookUrl(string $webhookUrl);
@@ -100,7 +100,7 @@ interface Plan
     public function orderItemPreprocessors();
 
     /**
-     * @param \Laravel\Cashier\Order\OrderItemPreprocessorCollection $preprocessors
+     * @param  \Laravel\Cashier\Order\OrderItemPreprocessorCollection  $preprocessors
      * @return \Laravel\Cashier\Plan\Contracts\Plan
      */
     public function setOrderItemPreprocessors(OrderItemPreprocessorCollection $preprocessors);

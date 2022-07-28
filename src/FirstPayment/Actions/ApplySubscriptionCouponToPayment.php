@@ -15,6 +15,7 @@ class ApplySubscriptionCouponToPayment extends BaseNullAction
 
     /**
      * The coupon's (discount) OrderItems
+     *
      * @var \Laravel\Cashier\Order\OrderItemCollection
      */
     protected $orderItems;
@@ -22,9 +23,9 @@ class ApplySubscriptionCouponToPayment extends BaseNullAction
     /**
      * ApplySubscriptionCouponToPayment constructor.
      *
-     * @param \Illuminate\Database\Eloquent\Model $owner
-     * @param \Laravel\Cashier\Coupon\Coupon $coupon
-     * @param \Laravel\Cashier\Order\OrderItemCollection $orderItems
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
+     * @param  \Laravel\Cashier\Coupon\Coupon  $coupon
+     * @param  \Laravel\Cashier\Order\OrderItemCollection  $orderItems
      */
     public function __construct(Model $owner, Coupon $coupon, OrderItemCollection $orderItems)
     {
@@ -51,7 +52,7 @@ class ApplySubscriptionCouponToPayment extends BaseNullAction
     }
 
     /**
-     * @param int $value
+     * @param  int  $value
      * @return \Money\Money
      */
     protected function toMoney($value = 0)

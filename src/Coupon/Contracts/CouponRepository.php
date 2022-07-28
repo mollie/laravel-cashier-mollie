@@ -8,13 +8,13 @@ use Laravel\Cashier\Exceptions\CouponNotFoundException;
 interface CouponRepository
 {
     /**
-     * @param string $coupon
+     * @param  string  $coupon
      * @return Coupon|null
      */
     public function find(string $coupon);
 
     /**
-     * @param string $coupon
+     * @param  string  $coupon
      * @return Coupon
      *
      * @throws CouponNotFoundException

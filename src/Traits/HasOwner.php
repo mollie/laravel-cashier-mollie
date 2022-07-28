@@ -17,9 +17,8 @@ trait HasOwner
     /**
      * Scope a query to only records for a specific owner.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param mixed $owner
-     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  mixed  $owner
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWhereOwner($query, $owner)

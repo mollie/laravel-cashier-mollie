@@ -19,7 +19,7 @@ class OrderProcessed
     /**
      * OrderProcessed constructor.
      *
-     * @param \Laravel\Cashier\Order\Order $order
+     * @param  \Laravel\Cashier\Order\Order  $order
      */
     public function __construct(Order $order)
     {

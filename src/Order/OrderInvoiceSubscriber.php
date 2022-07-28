@@ -10,7 +10,7 @@ use Laravel\Cashier\Events\OrderPaymentPaid;
 class OrderInvoiceSubscriber
 {
     /**
-     * @param FirstPaymentPaid $event
+     * @param  FirstPaymentPaid  $event
      */
     public function handleFirstPaymentPaid($event)
     {
@@ -18,7 +18,7 @@ class OrderInvoiceSubscriber
     }
 
     /**
-     * @param OrderPaymentPaid $event
+     * @param  OrderPaymentPaid  $event
      */
     public function handleOrderPaymentPaid($event)
     {
@@ -34,12 +34,12 @@ class OrderInvoiceSubscriber
     {
         $events->listen(
             OrderPaymentPaid::class,
-            self::class . '@handleOrderPaymentPaid'
+            self::class.'@handleOrderPaymentPaid'
         );
 
         $events->listen(
             FirstPaymentPaid::class,
-            self::class . '@handleFirstPaymentPaid'
+            self::class.'@handleFirstPaymentPaid'
         );
     }
 }

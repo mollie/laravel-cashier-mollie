@@ -250,9 +250,9 @@ class OrderItemCollectionTest extends BaseTestCase
     public function testTaxPercentages()
     {
         $collection = new OrderItemCollection([
-            factory(Cashier::$orderItemModel)->make(['tax_percentage' => 21.5,]),
-            factory(Cashier::$orderItemModel)->make(['tax_percentage' => 21.5,]),
-            factory(Cashier::$orderItemModel)->make(['tax_percentage' => 6,]),
+            factory(Cashier::$orderItemModel)->make(['tax_percentage' => 21.5]),
+            factory(Cashier::$orderItemModel)->make(['tax_percentage' => 21.5]),
+            factory(Cashier::$orderItemModel)->make(['tax_percentage' => 6]),
         ]);
 
         $this->assertEquals(['6', '21.5'], $collection->taxPercentages()->all());

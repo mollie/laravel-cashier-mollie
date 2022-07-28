@@ -186,7 +186,6 @@ class ManageSubscriptionTest extends BaseTestCase
         $scheduled_order_item = $subscription->scheduled_order_item;
         $this->assertEquals($subscription->cycle_ends_at, $scheduled_order_item->process_at);
 
-
         // Quantity Increment & Decrement
         Event::fake();
         $this->assertEquals(1, $subscription->quantity);

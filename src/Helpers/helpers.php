@@ -27,8 +27,8 @@ if (! function_exists('money')) {
     /**
      * Create a Money object from a Mollie Amount array.
      *
-     * @param int $value
-     * @param string $currency
+     * @param  int  $value
+     * @param  string  $currency
      * @return \Money\Money
      */
     function money(int $value, string $currency)
@@ -41,8 +41,8 @@ if (! function_exists('decimal_to_money')) {
     /**
      * Create a Money object from a decimal string / currency pair.
      *
-     * @param string $value
-     * @param string $currency
+     * @param  string  $value
+     * @param  string  $currency
      * @return \Money\Money
      */
     function decimal_to_money(string $value, string $currency)
@@ -57,7 +57,7 @@ if (! function_exists('mollie_array_to_money')) {
     /**
      * Create a Money object from a Mollie Amount array.
      *
-     * @param array $array
+     * @param  array  $array
      * @return \Money\Money
      */
     function mollie_array_to_money(array $array)
@@ -88,7 +88,7 @@ if (! function_exists('mollie_object_to_money')) {
     /**
      * Create a Money object from a Mollie Amount object.
      *
-     * @param object $object
+     * @param  object  $object
      * @return \Money\Money
      */
     function mollie_object_to_money(object $object)
@@ -102,7 +102,7 @@ if (! function_exists('money_to_decimal')) {
     /**
      * Format the money as basic decimal
      *
-     * @param \Money\Money $money
+     * @param  \Money\Money  $money
      * @return string|bool
      */
     function money_to_decimal(Money $money)

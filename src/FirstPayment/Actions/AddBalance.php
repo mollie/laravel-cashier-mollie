@@ -10,10 +10,10 @@ class AddBalance extends AddGenericOrderItem
     /**
      * AddBalance constructor.
      *
-     * @param \Illuminate\Database\Eloquent\Model $owner
-     * @param \Money\Money $subtotal
-     * @param int $quantity
-     * @param string $description
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
+     * @param  \Money\Money  $subtotal
+     * @param  int  $quantity
+     * @param  string  $description
      */
     public function __construct(Model $owner, Money $subtotal, int $quantity, string $description)
     {

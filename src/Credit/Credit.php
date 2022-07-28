@@ -16,8 +16,8 @@ class Credit extends Model
     /**
      * Add a credit amount for a specific owner.
      *
-     * @param Model $owner
-     * @param \Money\Money $amount
+     * @param  Model  $owner
+     * @param  \Money\Money  $amount
      * @return Model|\Laravel\Cashier\Credit\Credit
      */
     public static function addAmountForOwner(Model $owner, Money $amount)
@@ -45,8 +45,8 @@ class Credit extends Model
     /**
      * Use the max amount of owner's credit balance, striving to credit the target amount provided.
      *
-     * @param Model $owner
-     * @param \Money\Money $amount The target amount
+     * @param  Model  $owner
+     * @param  \Money\Money  $amount The target amount
      * @return \Money\Money The amount that was credited to the owner's balance.
      */
     public static function maxOutForOwner(Model $owner, Money $amount)

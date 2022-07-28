@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Laravel\Cashier\UpdatePaymentMethod;
 
 use Illuminate\Database\Eloquent\Model;
@@ -32,7 +31,7 @@ class UpdatePaymentMethodBuilder implements Contract
     /**
      * UpdatePaymentMethodBuilder constructor.
      *
-     * @param \Illuminate\Database\Eloquent\Model $owner
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
      */
     public function __construct(Model $owner)
     {
@@ -87,10 +86,10 @@ class UpdatePaymentMethodBuilder implements Contract
     protected function getPaymentActions()
     {
         if ($this->skipBalance) {
-            return [ $this->addGenericItemAction() ];
+            return [$this->addGenericItemAction()];
         }
 
-        return [ $this->addToBalanceAction() ];
+        return [$this->addToBalanceAction()];
     }
 
     /**
@@ -121,8 +120,8 @@ class UpdatePaymentMethodBuilder implements Contract
     }
 
     /**
-     * @param \Money\Money $total
-     * @param float $taxPercentage
+     * @param  \Money\Money  $total
+     * @param  float  $taxPercentage
      * @return \Money\Money
      */
     protected function subtotalForTotalIncludingTax(Money $total, float $taxPercentage)

@@ -31,8 +31,9 @@ class ConfigPlanRepository implements PlanRepository
     /**
      * Get a plan by its name or throw an exception.
      *
-     * @param string $name
+     * @param  string  $name
      * @return \Laravel\Cashier\Plan\Contracts\Plan
+     *
      * @throws PlanNotFoundException
      */
     public static function findOrFail(string $name)
@@ -60,9 +61,9 @@ class ConfigPlanRepository implements PlanRepository
     }
 
     /**
-     * @param string $name
-     * @param array $planConfig
-     * @param array $planDefaults
+     * @param  string  $name
+     * @param  array  $planConfig
+     * @param  array  $planDefaults
      * @return \Laravel\Cashier\Plan\Plan
      */
     public static function populatePlan(string $name, array $planConfig, array $planDefaults = [])
@@ -90,7 +91,7 @@ class ConfigPlanRepository implements PlanRepository
 
                     break;
                 default: // call $plan->setKey() if setKey method exists
-                    $method = 'set' . ucfirst($key);
+                    $method = 'set'.ucfirst($key);
                     if (method_exists($plan, $method)) {
                         $plan->$method($value);
                     }
@@ -103,8 +104,8 @@ class ConfigPlanRepository implements PlanRepository
     }
 
     /**
-     * @param array $planConfig
-     * @param array $planDefaults
+     * @param  array  $planConfig
+     * @param  array  $planDefaults
      * @return array
      */
     protected static function toPlanArray(array $planConfig, array $planDefaults = [])
@@ -117,8 +118,8 @@ class ConfigPlanRepository implements PlanRepository
             unset($result['first_payment']);
 
             foreach ($firstPaymentDefaults as $key => $value) {
-                $newKey = Str::camel('first_payment_' . $key);
-                $result[ $newKey ] = $value;
+                $newKey = Str::camel('first_payment_'.$key);
+                $result[$newKey] = $value;
             }
         }
 

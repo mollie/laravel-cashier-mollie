@@ -24,9 +24,9 @@ class Coupon
     /**
      * Coupon constructor.
      *
-     * @param string $name
-     * @param \Laravel\Cashier\Coupon\Contracts\CouponHandler $handler
-     * @param array $context
+     * @param  string  $name
+     * @param  \Laravel\Cashier\Coupon\Contracts\CouponHandler  $handler
+     * @param  array  $context
      */
     public function __construct(string $name, CouponHandler $handler, array $context = [])
     {
@@ -73,6 +73,7 @@ class Coupon
     /**
      * @param $times
      * @return \Laravel\Cashier\Coupon\Coupon
+     *
      * @throws \LogicException|\Throwable
      */
     public function withTimes($times)
@@ -85,7 +86,7 @@ class Coupon
     }
 
     /**
-     * @param \Laravel\Cashier\Coupon\Contracts\AcceptsCoupons $model
+     * @param  \Laravel\Cashier\Coupon\Contracts\AcceptsCoupons  $model
      * @return \Laravel\Cashier\Coupon\RedeemedCoupon
      */
     public function redeemFor(AcceptsCoupons $model)
@@ -96,7 +97,8 @@ class Coupon
     /**
      * Check if the coupon can be applied to the model
      *
-     * @param \Laravel\Cashier\Coupon\Contracts\AcceptsCoupons $model
+     * @param  \Laravel\Cashier\Coupon\Contracts\AcceptsCoupons  $model
+     *
      * @throws \Throwable|\Laravel\Cashier\Exceptions\CouponException
      */
     public function validateFor(AcceptsCoupons $model)

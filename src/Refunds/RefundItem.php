@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Laravel\Cashier\Refunds;
@@ -23,6 +24,7 @@ use Money\Money;
  * @property string description
  * @property array<string> description_extra_lines
  * @property OrderItem originalOrderItem
+ *
  * @method static create(array $array)
  * @method static make(array $array)
  */
@@ -53,8 +55,8 @@ class RefundItem extends Model
     protected $guarded = [];
 
     /**
-     * @param \Laravel\Cashier\Order\OrderItem $orderItem
-     * @param array $overrides
+     * @param  \Laravel\Cashier\Order\OrderItem  $orderItem
+     * @param  array  $overrides
      * @return static
      */
     public static function makeFromOrderItem(OrderItem $orderItem, array $overrides = []): self
@@ -79,7 +81,7 @@ class RefundItem extends Model
     /**
      * Create a new RefundItemCollection instance.
      *
-     * @param array $models
+     * @param  array  $models
      * @return \Laravel\Cashier\Refunds\RefundItemCollection
      */
     public function newCollection(array $models = []): RefundItemCollection
@@ -121,6 +123,7 @@ class RefundItem extends Model
      * The order item tax as a percentage.
      *
      * @return float
+     *
      * @example 21.5
      */
     public function getTaxPercentage()

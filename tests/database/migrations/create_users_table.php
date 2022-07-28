@@ -1,4 +1,5 @@
 <?php
+
 namespace Laravel\Cashier\Tests\Database\Migrations;
 
 use Illuminate\Database\Migrations\Migration;

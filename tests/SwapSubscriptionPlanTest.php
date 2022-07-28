@@ -207,11 +207,11 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     protected function getSubscriptionForUser($user)
     {
         return $user->subscriptions()->save(factory(Cashier::$subscriptionModel)->make([
-            "name" => "dummy name",
-            "plan" => "monthly-10-1",
-            "cycle_started_at" => now()->subWeeks(2),
-            "cycle_ends_at" => now()->subWeeks(2)->addMonth(),
-            "tax_percentage" => 10,
+            'name' => 'dummy name',
+            'plan' => 'monthly-10-1',
+            'cycle_started_at' => now()->subWeeks(2),
+            'cycle_ends_at' => now()->subWeeks(2)->addMonth(),
+            'tax_percentage' => 10,
         ]));
     }
 

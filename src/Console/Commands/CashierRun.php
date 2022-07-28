@@ -29,6 +29,6 @@ class CashierRun extends Command
     public function handle()
     {
         $orders = Cashier::run();
-        $this->info('Created ' . $orders->count() . ' orders.');
+        $this->info('Created '.$orders->count().' orders.');
     }
 }

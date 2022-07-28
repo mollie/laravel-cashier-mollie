@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Laravel\Cashier\Tests\UpdatePaymentMethod;
 
 use Illuminate\Support\Facades\Event;

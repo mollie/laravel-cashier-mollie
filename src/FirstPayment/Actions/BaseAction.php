@@ -32,8 +32,8 @@ abstract class BaseAction
     /**
      * Rebuild the Action from a payload.
      *
-     * @param array $payload
-     * @param \Illuminate\Database\Eloquent\Model $owner
+     * @param  array  $payload
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @return BaseAction
      */
     abstract public static function createFromPayload(array $payload, Model $owner);
@@ -90,8 +90,10 @@ abstract class BaseAction
     }
 
     /**
-     * @param float $percentage
+     * @param  float  $percentage
+     *
      * @example 21.5
+     *
      * @return $this
      */
     public function withTaxPercentage(float $percentage)

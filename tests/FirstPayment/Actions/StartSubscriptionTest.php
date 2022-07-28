@@ -339,7 +339,6 @@ class StartSubscriptionTest extends BaseTestCase
         $item = $items->first();
         $user = $user->fresh();
 
-
         $this->assertTrue($user->subscribed('default'));
         $this->assertTrue($user->onTrial());
         $this->assertInstanceOf(OrderItemCollection::class, $items);
@@ -373,7 +372,6 @@ class StartSubscriptionTest extends BaseTestCase
         $this->withMockedGetMollieCustomer();
         $this->withMockedGetMollieMandate();
         $user = $this->getMandatedUser();
-
 
         $this->assertFalse($user->subscribed('default'));
 
@@ -664,7 +662,8 @@ class StartSubscriptionTest extends BaseTestCase
     /**
      * Check if the action can be built using the payload, and then can return the same payload.
      *
-     * @param array $overrides
+     * @param  array  $overrides
+     *
      * @throws \Exception
      */
     protected function assertFromPayloadToPayload($overrides = [])

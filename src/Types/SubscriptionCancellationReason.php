@@ -13,4 +13,5 @@ class SubscriptionCancellationReason
      * The subscription is canceled because the payment has failed.
      */
     public const PAYMENT_FAILED = "payment_failed";
+
 }

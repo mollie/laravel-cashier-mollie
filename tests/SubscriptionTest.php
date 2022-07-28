@@ -164,14 +164,14 @@ class SubscriptionTest extends BaseTestCase
 
         $item_1 = $subscription->scheduledOrderItem;
         $this->assertNotNull($item_1);
-        $this->assertSame("2018-01-01 00:00:00", $item_1->process_at->toDateTimeString());
+        $this->assertSame('2018-01-01 00:00:00', $item_1->process_at->toDateTimeString());
         $this->assertSame(Cashier::$subscriptionModel, $item_1->orderable_type);
         $this->assertSame(\Laravel\Cashier\Tests\Fixtures\User::class, $item_1->owner_type);
         $this->assertSame(1, $item_1->orderable_id);
         $this->assertEquals(1, $item_1->owner_id);
-        $this->assertSame("Monthly payment", $item_1->description);
+        $this->assertSame('Monthly payment', $item_1->description);
         $this->assertSame(null, $item_1->description_extra_lines);
-        $this->assertSame("EUR", $item_1->currency);
+        $this->assertSame('EUR', $item_1->currency);
         $this->assertSame(1, $item_1->quantity);
         $this->assertSame(1000, $item_1->unit_price);
         $this->assertSame(0.0, $item_1->tax_percentage);
@@ -189,19 +189,18 @@ class SubscriptionTest extends BaseTestCase
 
         $item_2 = $subscription->scheduledOrderItem;
 
-        $this->assertSame("2018-02-01 00:00:00", $item_2->process_at->toDateTimeString());
+        $this->assertSame('2018-02-01 00:00:00', $item_2->process_at->toDateTimeString());
         $this->assertSame(Cashier::$subscriptionModel, $item_2->orderable_type);
         $this->assertSame(\Laravel\Cashier\Tests\Fixtures\User::class, $item_2->owner_type);
         $this->assertSame(1, $item_2->orderable_id);
         $this->assertEquals(1, $item_2->owner_id);
-        $this->assertSame("Monthly payment", $item_2->description);
+        $this->assertSame('Monthly payment', $item_2->description);
         $this->assertSame(null, $item_2->description_extra_lines);
-        $this->assertSame("EUR", $item_2->currency);
+        $this->assertSame('EUR', $item_2->currency);
         $this->assertSame(1, $item_2->quantity);
         $this->assertSame(1000, $item_2->unit_price);
         $this->assertSame(0.0, $item_2->tax_percentage);
         $this->assertSame(null, $item_2->order_id);
-
 
         $item_2->process();
 
@@ -215,14 +214,14 @@ class SubscriptionTest extends BaseTestCase
 
         $item_3 = $subscription->scheduledOrderItem;
 
-        $this->assertSame("2018-03-01 00:00:00", $item_3->process_at->toDateTimeString());
+        $this->assertSame('2018-03-01 00:00:00', $item_3->process_at->toDateTimeString());
         $this->assertSame(Cashier::$subscriptionModel, $item_3->orderable_type);
         $this->assertSame(\Laravel\Cashier\Tests\Fixtures\User::class, $item_3->owner_type);
         $this->assertSame(1, $item_3->orderable_id);
         $this->assertEquals(1, $item_3->owner_id);
-        $this->assertSame("Monthly payment", $item_3->description);
+        $this->assertSame('Monthly payment', $item_3->description);
         $this->assertSame(null, $item_3->description_extra_lines);
-        $this->assertSame("EUR", $item_3->currency);
+        $this->assertSame('EUR', $item_3->currency);
         $this->assertSame(1, $item_3->quantity);
         $this->assertSame(1000, $item_3->unit_price);
         $this->assertSame(0.0, $item_3->tax_percentage);
@@ -248,14 +247,14 @@ class SubscriptionTest extends BaseTestCase
 
         $item_1 = $subscription->scheduledOrderItem;
         $this->assertNotNull($item_1);
-        $this->assertSame("2019-01-29 00:00:00", $item_1->process_at->toDateTimeString());
+        $this->assertSame('2019-01-29 00:00:00', $item_1->process_at->toDateTimeString());
         $this->assertSame(Cashier::$subscriptionModel, $item_1->orderable_type);
         $this->assertSame(\Laravel\Cashier\Tests\Fixtures\User::class, $item_1->owner_type);
         $this->assertSame(1, $item_1->orderable_id);
         $this->assertEquals(1, $item_1->owner_id);
-        $this->assertSame("Monthly payment", $item_1->description);
+        $this->assertSame('Monthly payment', $item_1->description);
         $this->assertSame(null, $item_1->description_extra_lines);
-        $this->assertSame("EUR", $item_1->currency);
+        $this->assertSame('EUR', $item_1->currency);
         $this->assertSame(1, $item_1->quantity);
         $this->assertSame(1000, $item_1->unit_price);
         $this->assertSame(0.0, $item_1->tax_percentage);
@@ -273,19 +272,18 @@ class SubscriptionTest extends BaseTestCase
 
         $item_2 = $subscription->scheduledOrderItem;
 
-        $this->assertSame("2019-02-28 00:00:00", $item_2->process_at->toDateTimeString());
+        $this->assertSame('2019-02-28 00:00:00', $item_2->process_at->toDateTimeString());
         $this->assertSame(Cashier::$subscriptionModel, $item_2->orderable_type);
         $this->assertSame(\Laravel\Cashier\Tests\Fixtures\User::class, $item_2->owner_type);
         $this->assertSame(1, $item_2->orderable_id);
         $this->assertEquals(1, $item_2->owner_id);
-        $this->assertSame("Monthly payment", $item_2->description);
+        $this->assertSame('Monthly payment', $item_2->description);
         $this->assertSame(null, $item_2->description_extra_lines);
-        $this->assertSame("EUR", $item_2->currency);
+        $this->assertSame('EUR', $item_2->currency);
         $this->assertSame(1, $item_2->quantity);
         $this->assertSame(1000, $item_2->unit_price);
         $this->assertSame(0.0, $item_2->tax_percentage);
         $this->assertSame(null, $item_2->order_id);
-
 
         $item_2->process();
 
@@ -299,14 +297,14 @@ class SubscriptionTest extends BaseTestCase
 
         $item_3 = $subscription->scheduledOrderItem;
 
-        $this->assertSame("2019-03-29 00:00:00", $item_3->process_at->toDateTimeString());
+        $this->assertSame('2019-03-29 00:00:00', $item_3->process_at->toDateTimeString());
         $this->assertSame(Cashier::$subscriptionModel, $item_3->orderable_type);
         $this->assertSame(\Laravel\Cashier\Tests\Fixtures\User::class, $item_3->owner_type);
         $this->assertSame(1, $item_3->orderable_id);
         $this->assertEquals(1, $item_3->owner_id);
-        $this->assertSame("Monthly payment", $item_3->description);
+        $this->assertSame('Monthly payment', $item_3->description);
         $this->assertSame(null, $item_3->description_extra_lines);
-        $this->assertSame("EUR", $item_3->currency);
+        $this->assertSame('EUR', $item_3->currency);
         $this->assertSame(1, $item_3->quantity);
         $this->assertSame(1000, $item_3->unit_price);
         $this->assertSame(0.0, $item_3->tax_percentage);
@@ -332,14 +330,14 @@ class SubscriptionTest extends BaseTestCase
 
         $item_1 = $subscription->scheduledOrderItem;
         $this->assertNotNull($item_1);
-        $this->assertSame("2019-01-31 00:00:00", $item_1->process_at->toDateTimeString());
+        $this->assertSame('2019-01-31 00:00:00', $item_1->process_at->toDateTimeString());
         $this->assertSame(Cashier::$subscriptionModel, $item_1->orderable_type);
         $this->assertSame(\Laravel\Cashier\Tests\Fixtures\User::class, $item_1->owner_type);
         $this->assertSame(1, $item_1->orderable_id);
         $this->assertEquals(1, $item_1->owner_id);
-        $this->assertSame("Monthly payment", $item_1->description);
+        $this->assertSame('Monthly payment', $item_1->description);
         $this->assertSame(null, $item_1->description_extra_lines);
-        $this->assertSame("EUR", $item_1->currency);
+        $this->assertSame('EUR', $item_1->currency);
         $this->assertSame(1, $item_1->quantity);
         $this->assertSame(1000, $item_1->unit_price);
         $this->assertSame(0.0, $item_1->tax_percentage);
@@ -357,19 +355,18 @@ class SubscriptionTest extends BaseTestCase
 
         $item_2 = $subscription->scheduledOrderItem;
 
-        $this->assertSame("2019-02-28 00:00:00", $item_2->process_at->toDateTimeString());
+        $this->assertSame('2019-02-28 00:00:00', $item_2->process_at->toDateTimeString());
         $this->assertSame(Cashier::$subscriptionModel, $item_2->orderable_type);
         $this->assertSame(\Laravel\Cashier\Tests\Fixtures\User::class, $item_2->owner_type);
         $this->assertSame(1, $item_2->orderable_id);
         $this->assertEquals(1, $item_2->owner_id);
-        $this->assertSame("Monthly payment", $item_2->description);
+        $this->assertSame('Monthly payment', $item_2->description);
         $this->assertSame(null, $item_2->description_extra_lines);
-        $this->assertSame("EUR", $item_2->currency);
+        $this->assertSame('EUR', $item_2->currency);
         $this->assertSame(1, $item_2->quantity);
         $this->assertSame(1000, $item_2->unit_price);
         $this->assertSame(0.0, $item_2->tax_percentage);
         $this->assertSame(null, $item_2->order_id);
-
 
         $item_2->process();
 
@@ -383,14 +380,14 @@ class SubscriptionTest extends BaseTestCase
 
         $item_3 = $subscription->scheduledOrderItem;
 
-        $this->assertSame("2019-03-31 00:00:00", $item_3->process_at->toDateTimeString());
+        $this->assertSame('2019-03-31 00:00:00', $item_3->process_at->toDateTimeString());
         $this->assertSame(Cashier::$subscriptionModel, $item_3->orderable_type);
         $this->assertSame(\Laravel\Cashier\Tests\Fixtures\User::class, $item_3->owner_type);
         $this->assertSame(1, $item_3->orderable_id);
         $this->assertEquals(1, $item_3->owner_id);
-        $this->assertSame("Monthly payment", $item_3->description);
+        $this->assertSame('Monthly payment', $item_3->description);
         $this->assertSame(null, $item_3->description_extra_lines);
-        $this->assertSame("EUR", $item_3->currency);
+        $this->assertSame('EUR', $item_3->currency);
         $this->assertSame(1, $item_3->quantity);
         $this->assertSame(1000, $item_3->unit_price);
         $this->assertSame(0.0, $item_3->tax_percentage);
@@ -408,14 +405,14 @@ class SubscriptionTest extends BaseTestCase
 
         $item_4 = $subscription->scheduledOrderItem;
 
-        $this->assertSame("2019-04-30 00:00:00", $item_4->process_at->toDateTimeString());
+        $this->assertSame('2019-04-30 00:00:00', $item_4->process_at->toDateTimeString());
         $this->assertSame(Cashier::$subscriptionModel, $item_4->orderable_type);
         $this->assertSame(\Laravel\Cashier\Tests\Fixtures\User::class, $item_4->owner_type);
         $this->assertSame(1, $item_4->orderable_id);
         $this->assertEquals(1, $item_4->owner_id);
-        $this->assertSame("Monthly payment", $item_4->description);
+        $this->assertSame('Monthly payment', $item_4->description);
         $this->assertSame(null, $item_4->description_extra_lines);
-        $this->assertSame("EUR", $item_4->currency);
+        $this->assertSame('EUR', $item_4->currency);
         $this->assertSame(1, $item_4->quantity);
         $this->assertSame(1000, $item_4->unit_price);
         $this->assertSame(0.0, $item_4->tax_percentage);
@@ -452,7 +449,7 @@ class SubscriptionTest extends BaseTestCase
         $user = factory(User::class)->create();
         $subscription = $user->subscriptions()->save(
             factory(Cashier::$subscriptionModel)->make([
-            'cycle_ends_at' => now()->addWeek(), ])
+                'cycle_ends_at' => now()->addWeek(), ])
         );
 
         $this->assertFalse($subscription->onTrial());
@@ -476,7 +473,7 @@ class SubscriptionTest extends BaseTestCase
         $user = factory(User::class)->create();
         $subscription = $user->subscriptions()->save(
             factory(Cashier::$subscriptionModel)->make([
-            'cycle_ends_at' => now()->addWeek(), ])
+                'cycle_ends_at' => now()->addWeek(), ])
         );
 
         $this->assertFalse($subscription->onTrial());
