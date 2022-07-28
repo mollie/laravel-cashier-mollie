@@ -47,7 +47,7 @@ abstract class BaseTestCase extends TestCase
      */
     protected function getPackageProviders($app)
     {
-        return ['Laravel\Cashier\CashierServiceProvider'];
+        return [\Laravel\Cashier\CashierServiceProvider::class];
     }
 
     /**
@@ -156,7 +156,7 @@ abstract class BaseTestCase extends TestCase
      */
     protected function withFixtureModels()
     {
-        config(['cashier.billable_model' => 'Laravel\Cashier\Tests\Fixtures\User']);
+        config(['cashier.billable_model' => \Laravel\Cashier\Tests\Fixtures\User::class]);
 
         return $this;
     }
@@ -416,9 +416,7 @@ abstract class BaseTestCase extends TestCase
             );
         }
 
-        return $this->mock(CouponRepository::class, function ($mock) use ($coupon) {
-            return $mock->shouldReceive('findOrFail')->with($coupon->name())->andReturn($coupon);
-        });
+        return $this->mock(CouponRepository::class, fn($mock) => $mock->shouldReceive('findOrFail')->with($coupon->name())->andReturn($coupon));
     }
 
     /**
@@ -451,9 +449,7 @@ abstract class BaseTestCase extends TestCase
             );
         }
 
-        return $this->mock(CouponRepository::class, function ($mock) use ($coupon) {
-            return $mock->shouldReceive('findOrFail')->with($coupon->name())->andReturn($coupon);
-        });
+        return $this->mock(CouponRepository::class, fn($mock) => $mock->shouldReceive('findOrFail')->with($coupon->name())->andReturn($coupon));
     }
 
     /**

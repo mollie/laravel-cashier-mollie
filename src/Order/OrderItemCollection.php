@@ -27,11 +27,9 @@ class OrderItemCollection extends Collection
      */
     public function owners()
     {
-        return $this->unique(function ($item) {
-            return $item->owner_type.$item->owner_id;
-        })->map(function ($item) {
-            return $item->owner;
-        });
+
+        return $this->unique(fn($item) => $item->owner_type . $item->owner_id)->map(fn($item) => $item->owner);
+
     }
 
     /**
@@ -42,10 +40,8 @@ class OrderItemCollection extends Collection
      */
     public function whereOwner($owner)
     {
-        return $this->filter(function ($item) use ($owner) {
-            return (string) $item->owner_id === (string) $owner->getKey()
-                && $item->owner_type === $owner->getMorphClass();
-        });
+        return $this->filter(fn($item) => (string) $item->owner_id === (string) $owner->getKey()
+            && $item->owner_type === $owner->getMorphClass());
     }
 
     /**
@@ -55,11 +51,8 @@ class OrderItemCollection extends Collection
      */
     public function chunkByOwner()
     {
-        return $this->owners()->sortBy(function ($owner) {
-            return $owner->getMorphClass().'_'.$owner->getKey();
-        })->mapWithKeys(function ($owner) {
-            $key = $owner->getMorphClass().'_'.$owner->getKey();
-
+        return $this->owners()->sortBy(fn($owner) => $owner->getMorphClass() . '_' . $owner->getKey())->mapWithKeys(function ($owner) {
+            $key = $owner->getMorphClass() . '_' . $owner->getKey();
             return [$key => $this->whereOwner($owner)];
         });
     }
@@ -84,9 +77,7 @@ class OrderItemCollection extends Collection
     {
         return $this->currencies()
             ->sort()
-            ->mapWithKeys(function ($currency) {
-                return [$currency => $this->whereCurrency($currency)];
-            });
+            ->mapWithKeys(fn($currency) => [$currency => $this->whereCurrency($currency)]);
     }
 
     /**
@@ -116,9 +107,7 @@ class OrderItemCollection extends Collection
     public function preprocess()
     {
         /** @var BaseCollection $items */
-        $items = $this->flatMap(function (OrderItem $item) {
-            return $item->preprocess();
-        });
+        $items = $this->flatMap(fn(OrderItem $item) => $item->preprocess());
 
         return static::fromBaseCollection($items);
     }
@@ -165,7 +154,7 @@ class OrderItemCollection extends Collection
      */
     public function getTotal(): Money
     {
-        if (count($this->currencies()) > 1) {
+        if ((is_countable($this->currencies()) ? count($this->currencies()) : 0) > 1) {
             throw new LogicException('Calculating the total requires items to be of the same currency.');
         }
 
@@ -176,7 +165,7 @@ class OrderItemCollection extends Collection
     {
         $currencies = $this->currencies();
 
-        if (count($currencies) > 1) {
+        if ((is_countable($currencies) ? count($currencies) : 0) > 1) {
             throw new LogicException(
                 'Unable to retrieve a single currency as this collection contains multiple currencies.'
             );

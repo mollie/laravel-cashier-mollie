@@ -19,7 +19,7 @@ if (! function_exists('object_to_array_recursive')) {
             return null;
         }
 
-        return json_decode(json_encode($object, JSON_FORCE_OBJECT), true);
+        return json_decode(json_encode($object, JSON_FORCE_OBJECT), true, 512, JSON_THROW_ON_ERROR);
     }
 }
 

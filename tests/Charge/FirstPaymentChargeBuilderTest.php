@@ -20,10 +20,8 @@ class FirstPaymentChargeBuilderTest extends BaseTestCase
         $customer = new Customer(new MollieApiClient);
         $customer->id = 'cst_unique_customer_id';
 
-        $this->mock(CreateMollieCustomer::class, function ($mock) use ($customer) {
-            return $mock->shouldReceive('execute')
-                ->andReturn($customer);
-        });
+        $this->mock(CreateMollieCustomer::class, fn($mock) => $mock->shouldReceive('execute')
+            ->andReturn($customer));
     }
 
     /** @test */
@@ -68,7 +66,7 @@ class FirstPaymentChargeBuilderTest extends BaseTestCase
                     'href' => 'https://foo-redirect-bar.com',
                     'type' => 'text/html',
                 ],
-            ]));
+            ]), null, 512, JSON_THROW_ON_ERROR);
             $payment->mandateId = 'mdt_dummy_mandate_id';
 
             return $mock->shouldReceive('execute')->once()->andReturn($payment);

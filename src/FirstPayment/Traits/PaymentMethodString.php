@@ -13,9 +13,7 @@ trait PaymentMethodString
     private function castPaymentMethodString(string $method)
     {
         return collect(explode(',', $method))
-            ->map(function ($methodString) {
-                return trim($methodString);
-            })
+            ->map(fn($methodString) => trim($methodString))
             ->filter()
             ->unique()
             ->all();

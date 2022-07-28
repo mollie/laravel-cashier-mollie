@@ -10,18 +10,14 @@ class ChargeItemCollection extends Collection
 {
     public function toFirstPaymentActionCollection(): FirstPaymentActionCollection
     {
-        $result = $this->map(function (ChargeItem $item) {
-            return $item->toFirstPaymentAction();
-        });
+        $result = $this->map(fn(ChargeItem $item) => $item->toFirstPaymentAction());
 
         return new FirstPaymentActionCollection($result->all());
     }
 
     public function toOrderItemCollection(array $overrideOnEachItem = []): OrderItemCollection
     {
-        $result = $this->map(function (ChargeItem $item) use ($overrideOnEachItem) {
-            return $item->toOrderItem($overrideOnEachItem);
-        });
+        $result = $this->map(fn(ChargeItem $item) => $item->toOrderItem($overrideOnEachItem));
 
         return new OrderItemCollection($result->all());
     }

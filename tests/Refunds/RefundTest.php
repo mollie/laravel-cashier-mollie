@@ -49,9 +49,7 @@ class RefundTest extends BaseTestCase
         $this->assertEquals(-29524, $order->total_due);
         $this->assertInstanceOf(Cashier::$refundItemModel, $order->items->first()->orderable);
 
-        Event::assertDispatched(RefundProcessed::class, function (RefundProcessed $event) use ($refund) {
-            return $event->refund->is($refund);
-        });
+        Event::assertDispatched(RefundProcessed::class, fn(RefundProcessed $event) => $event->refund->is($refund));
     }
 
     /** @test */
@@ -84,8 +82,6 @@ class RefundTest extends BaseTestCase
 
         $this->assertNull($refund->order);
 
-        Event::assertDispatched(RefundFailed::class, function (RefundFailed $event) use ($refund) {
-            return $event->refund->is($refund);
-        });
+        Event::assertDispatched(RefundFailed::class, fn(RefundFailed $event) => $event->refund->is($refund));
     }
 }

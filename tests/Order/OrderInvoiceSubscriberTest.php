@@ -43,9 +43,7 @@ class OrderInvoiceSubscriberTest extends BaseTestCase
 
         (new OrderInvoiceSubscriber)->$methodName($event);
 
-        Event::assertDispatched(OrderInvoiceAvailable::class, function ($e) use ($event) {
-            return $e->order === $event->order;
-        });
+        Event::assertDispatched(OrderInvoiceAvailable::class, fn($e) => $e->order === $event->order);
     }
 
     private function order()

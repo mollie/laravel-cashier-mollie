@@ -89,7 +89,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         ], $payload);
         $localPayment = Cashier::$paymentModel::find(1);
         $this->assertEquals('Monthly payment', $localPayment->first_payment_actions[0]->description);
-        $this->assertEquals('Laravel\\Cashier\\FirstPayment\\Actions\\StartSubscription', $localPayment->first_payment_actions[0]->handler);
+        $this->assertEquals(\Laravel\Cashier\FirstPayment\Actions\StartSubscription::class, $localPayment->first_payment_actions[0]->handler);
         $this->assertEquals('EUR', $localPayment->first_payment_actions[0]->subtotal->currency);
         $this->assertEquals(0, $localPayment->first_payment_actions[0]->subtotal->value);
         $this->assertEquals(20, $localPayment->first_payment_actions[0]->taxPercentage);
@@ -100,7 +100,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         $this->assertEquals(now()->addDays(5)->toIso8601String(), $localPayment->first_payment_actions[0]->trialUntil);
 
         $this->assertEquals('Test mandate payment', $localPayment->first_payment_actions[1]->description);
-        $this->assertEquals('Laravel\\Cashier\\FirstPayment\\Actions\\AddGenericOrderItem', $localPayment->first_payment_actions[1]->handler);
+        $this->assertEquals(\Laravel\Cashier\FirstPayment\Actions\AddGenericOrderItem::class, $localPayment->first_payment_actions[1]->handler);
         $this->assertEquals('EUR', $localPayment->first_payment_actions[1]->unit_price->currency);
         $this->assertEquals(0.04, $localPayment->first_payment_actions[1]->unit_price->value);
         $this->assertEquals(20, $localPayment->first_payment_actions[1]->taxPercentage);
@@ -178,16 +178,14 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
                     'taxPercentage' => 20,
                 ],
             ],
-        ]));
+        ]), null, 512, JSON_THROW_ON_ERROR);
 
         Cashier::$paymentModel::createFromMolliePayment($molliePayment, $this->user);
 
-        $this->mock(GetMolliePayment::class, function ($mock) use ($molliePayment) {
-            return $mock->shouldReceive('execute')
-                ->with('tr_unique_payment_id', [])
-                ->once()
-                ->andReturn($molliePayment);
-        });
+        $this->mock(GetMolliePayment::class, fn($mock) => $mock->shouldReceive('execute')
+            ->with('tr_unique_payment_id', [])
+            ->once()
+            ->andReturn($molliePayment));
 
         $this->mock(GetMollieMandate::class, function ($mock) {
             $mandate = new Mandate(new MollieApiClient);
@@ -353,7 +351,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
                     'href' => 'https://foo-redirect-bar.com',
                     'type' => 'text/html',
                 ],
-            ]));
+            ]), null, 512, JSON_THROW_ON_ERROR);
             $payment->mandateId = 'mdt_dummy_mandate_id';
 
             return $mock->shouldReceive('execute')->once()->andReturn($payment);

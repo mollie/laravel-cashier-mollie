@@ -50,12 +50,8 @@ trait Billable
      */
     public function subscription($subscription = 'default')
     {
-        return $this->subscriptions->sortByDesc(function ($value) {
-            return $value->created_at->getTimestamp();
-        })
-        ->first(function ($value) use ($subscription) {
-            return $value->name === $subscription;
-        });
+        return $this->subscriptions->sortByDesc(fn($value) => $value->created_at->getTimestamp())
+        ->first(fn($value) => $value->name === $subscription);
     }
 
     /**
@@ -76,9 +72,7 @@ trait Billable
         if (! empty($this->mollie_mandate_id)) {
             $mandate = $this->mollieMandate();
             $planModel = app(PlanRepository::class)::findOrFail($plan);
-            $allowedPlanMethods = collect($planModel->firstPaymentMethod())->map(function ($allowedPlanMethod) {
-                return MandateMethod::getForFirstPaymentMethod($allowedPlanMethod);
-            })->filter()->unique();
+            $allowedPlanMethods = collect($planModel->firstPaymentMethod())->map(fn($allowedPlanMethod) => MandateMethod::getForFirstPaymentMethod($allowedPlanMethod))->filter()->unique();
             if (
                 ! empty($mandate)
                 && $mandate->isValid()
@@ -171,6 +165,7 @@ trait Billable
      */
     public function asMollieCustomer()
     {
+        $getMollieCustomer = null;
         if (empty($this->mollie_customer_id)) {
             return $this->createAsMollieCustomer();
         }
@@ -271,9 +266,7 @@ trait Billable
 
     public function hasActiveSubscriptionWithCurrency($currency)
     {
-        return $this->subscriptions->contains(function ($subscription) use ($currency) {
-            return $subscription->active() && $subscription->currency === $currency;
-        });
+        return $this->subscriptions->contains(fn($subscription) => $subscription->active() && $subscription->currency === $currency);
     }
 
     /**

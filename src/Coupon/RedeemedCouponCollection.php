@@ -11,9 +11,7 @@ class RedeemedCouponCollection extends Collection
     public function applyTo(OrderItem $item)
     {
         return $this->reduce(
-            function (OrderItemCollection $carry, RedeemedCoupon $coupon) {
-                return $coupon->applyTo($carry);
-            },
+            fn(OrderItemCollection $carry, RedeemedCoupon $coupon) => $coupon->applyTo($carry),
             $item->toCollection()
         );
     }

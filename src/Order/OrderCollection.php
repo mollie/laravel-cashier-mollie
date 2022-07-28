@@ -13,8 +13,6 @@ class OrderCollection extends EloquentCollection
      */
     public function invoices()
     {
-        return $this->map(function ($order) {
-            return $order->invoice();
-        });
+        return $this->map(fn($order) => $order->invoice());
     }
 }

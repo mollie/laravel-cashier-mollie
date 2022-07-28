@@ -131,9 +131,7 @@ class Cashier
     {
         $items = static::$orderItemModel::shouldProcess()->get();
 
-        $orders = $items->chunkByOwnerAndCurrency()->map(function ($chunk) {
-            return static::$orderModel::createFromItems($chunk)->processPayment();
-        });
+        $orders = $items->chunkByOwnerAndCurrency()->map(fn($chunk) => static::$orderModel::createFromItems($chunk)->processPayment());
 
         return $orders;
     }
@@ -249,6 +247,8 @@ class Cashier
      */
     public static function formatAmount(Money $money)
     {
+        $numberFormatter = null;
+        $moneyFormatter = null;
         if (static::$formatCurrencyUsing) {
             return call_user_func(static::$formatCurrencyUsing, $money);
         }

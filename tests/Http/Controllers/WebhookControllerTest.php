@@ -26,12 +26,10 @@ class WebhookControllerTest extends BaseTestCase
     {
         $id = 'tr_123xyz';
 
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($id) {
-            return $mock->shouldReceive('execute')
-                ->with($id, [])
-                ->once()
-                ->andReturn(new MolliePayment(new MollieApiClient));
-        });
+        $this->mock(GetMolliePayment::class, fn(GetMolliePayment $mock) => $mock->shouldReceive('execute')
+            ->with($id, [])
+            ->once()
+            ->andReturn(new MolliePayment(new MollieApiClient)));
 
         $this->assertInstanceOf(MolliePayment::class, $this->getController()->getMolliePaymentById($id));
     }
@@ -40,12 +38,10 @@ class WebhookControllerTest extends BaseTestCase
     public function MollieApiExceptionIsCatchedWhenDebugDisabled()
     {
         $wrongId = 'sub_xxxxxxxxxxx';
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($wrongId) {
-            return $mock->shouldReceive('execute')
-                ->with($wrongId, [])
-                ->once()
-                ->andThrow(new ApiException);
-        });
+        $this->mock(GetMolliePayment::class, fn(GetMolliePayment $mock) => $mock->shouldReceive('execute')
+            ->with($wrongId, [])
+            ->once()
+            ->andThrow(new ApiException));
 
         $this->assertFalse(config('app.debug'));
         $this->assertNull($this->getController()->getMolliePaymentById($wrongId));
@@ -55,12 +51,10 @@ class WebhookControllerTest extends BaseTestCase
     public function MollieApiExceptionIsThrownWhenDebugEnabled()
     {
         $wrongId = 'sub_xxxxxxxxxxx';
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($wrongId) {
-            return $mock->shouldReceive('execute')
-                ->with($wrongId, [])
-                ->once()
-                ->andThrow(new ApiException);
-        });
+        $this->mock(GetMolliePayment::class, fn(GetMolliePayment $mock) => $mock->shouldReceive('execute')
+            ->with($wrongId, [])
+            ->once()
+            ->andThrow(new ApiException));
 
         config(['app.debug' => true]);
         $this->assertTrue(config('app.debug'));
@@ -74,12 +68,10 @@ class WebhookControllerTest extends BaseTestCase
         $id = 'tr_xxxxxxxxxxxxx';
         $request = $this->getWebhookRequest($id);
 
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($id) {
-            return $mock->shouldReceive('execute')
-                ->with($id, [])
-                ->once()
-                ->andThrow(new ApiException);
-        });
+        $this->mock(GetMolliePayment::class, fn(GetMolliePayment $mock) => $mock->shouldReceive('execute')
+            ->with($id, [])
+            ->once()
+            ->andThrow(new ApiException));
 
         $response = $this->getController()->handleWebhook($request);
 
@@ -126,13 +118,11 @@ class WebhookControllerTest extends BaseTestCase
         Cashier::$paymentModel::createFromMolliePayment($payment, $user);
         $payment->status = 'failed';
 
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($payment, $paymentId) {
-            return $mock
-                ->shouldReceive('execute')
-                ->with($paymentId, [])
-                ->once()
-                ->andReturn($payment);
-        });
+        $this->mock(GetMolliePayment::class, fn(GetMolliePayment $mock) => $mock
+            ->shouldReceive('execute')
+            ->with($paymentId, [])
+            ->once()
+            ->andReturn($payment));
 
         $response = $this->makeTestResponse($this->getController()->handleWebhook($request));
 
@@ -152,9 +142,7 @@ class WebhookControllerTest extends BaseTestCase
 
         $this->assertEquals('failed', Cashier::$paymentModel::first()->mollie_payment_status);
 
-        Event::assertDispatched(OrderPaymentFailed::class, function (OrderPaymentFailed $event) use ($order) {
-            return $event->order->is($order);
-        });
+        Event::assertDispatched(OrderPaymentFailed::class, fn(OrderPaymentFailed $event) => $event->order->is($order));
 
         Event::assertDispatched(SubscriptionCancelled::class, function (SubscriptionCancelled $event) use ($subscription) {
             $this->assertTrue($event->subscription->is($subscription));
@@ -199,13 +187,11 @@ class WebhookControllerTest extends BaseTestCase
         Cashier::$paymentModel::createFromMolliePayment($payment, $user);
         $payment->status = 'paid';
 
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($payment, $paymentId) {
-            return $mock
-                ->shouldReceive('execute')
-                ->with($paymentId, [])
-                ->once()
-                ->andReturn($payment);
-        });
+        $this->mock(GetMolliePayment::class, fn(GetMolliePayment $mock) => $mock
+            ->shouldReceive('execute')
+            ->with($paymentId, [])
+            ->once()
+            ->andReturn($payment));
 
         $this->mock(UpdateMolliePayment::class, function (UpdateMolliePayment $mock) use ($payment) {
             $payment = new MolliePayment(new MollieApiClient);
@@ -224,9 +210,7 @@ class WebhookControllerTest extends BaseTestCase
 
         $this->assertEquals('paid', Cashier::$paymentModel::first()->mollie_payment_status);
 
-        Event::assertDispatched(OrderPaymentPaid::class, function (OrderPaymentPaid $event) use ($order) {
-            return $event->order->is($order);
-        });
+        Event::assertDispatched(OrderPaymentPaid::class, fn(OrderPaymentPaid $event) => $event->order->is($order));
     }
 
     /** @test **/
