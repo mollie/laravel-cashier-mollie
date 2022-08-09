@@ -376,6 +376,84 @@ class OrderTest extends BaseTestCase
     }
 
     /** @test */
+    public function createsAMolliePaymentIfMolliesMaximumIsNull()
+    {
+        Event::fake();
+
+        $this->mock(GetMollieMandate::class, function ($mock) {
+            $mandate = new Mandate(new MollieApiClient);
+            $mandate->id = 'mdt_unique_mandate_id';
+            $mandate->status = 'valid';
+            $mandate->method = 'directdebit';
+
+            return $mock->shouldReceive('execute')
+                ->with('cst_unique_customer_id', 'mdt_unique_mandate_id')
+                ->twice()
+                ->andReturn($mandate);
+        });
+
+        $this->mock(GetMollieCustomer::class, function ($mock) {
+            $customer = new Customer(new MollieApiClient);
+            $customer->id = 'cst_unique_customer_id';
+
+            return $mock->shouldReceive('execute')
+                ->with('cst_unique_customer_id')
+                ->twice()
+                ->andReturn($customer);
+        });
+
+        $this->mock(GetMollieMethodMinimumAmount::class, function ($mock) {
+            return $mock->shouldReceive('execute')
+                ->with('directdebit', 'EUR')
+                ->once()
+                ->andReturn(money(10, 'EUR'));
+        });
+
+        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) {
+            return $mock->shouldReceive('execute')
+                ->with('directdebit', 'EUR')
+                ->once()
+                ->andReturn(null);
+        });
+
+        $this->mock(CreateMolliePayment::class, function ($mock) {
+            $payment = new Payment(new MollieApiClient);
+            $payment->id = 'tr_unique_payment_id';
+            $payment->amount = (object) [
+                'currency' => 'EUR',
+                'value' => '10.00',
+            ];
+            $payment->mandateId = 'mdt_dummy_mandate_id';
+
+            return $mock->shouldReceive('execute')
+                ->once()
+                ->andReturn($payment);
+        });
+
+        $user = $this->getMandatedUser(true, [
+            'id' => 2,
+            'mollie_mandate_id' => 'mdt_unique_mandate_id',
+            'mollie_customer_id' => 'cst_unique_customer_id',
+        ]);
+
+        $order = $user->orders()->save(factory(Cashier::$orderModel)->make([
+            'total' => 1025,
+            'total_due' => 1025,
+            'currency' => 'EUR',
+        ]));
+        $this->assertFalse($order->isProcessed());
+        $this->assertFalse($user->hasCredit('EUR'));
+
+        $order->processPayment();
+
+        $this->assertTrue($order->isProcessed());
+        $this->assertNotNull($order->mollie_payment_id);
+        $this->assertEquals('open', $order->mollie_payment_status);
+
+        $this->assertDispatchedOrderProcessed($order);
+    }
+
+    /** @test */
     public function notCreatesAMolliePaymentIfTotalDueIsGreathenThanMolliesMaximum()
     {
         Event::fake();

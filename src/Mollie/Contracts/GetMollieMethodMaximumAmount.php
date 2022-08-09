@@ -8,5 +8,5 @@ use Money\Money;
 
 interface GetMollieMethodMaximumAmount
 {
-    public function execute(string $method, string $currency): Money;
+    public function execute(string $method, string $currency): ?Money;
 }

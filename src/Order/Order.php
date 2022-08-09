@@ -210,7 +210,7 @@ class Order extends Model
 
             $totalDue = money($this->total_due, $this->currency);
 
-            if ($totalDue->greaterThan($maximumPaymentAmount)) {
+            if ($maximumPaymentAmount && $totalDue->greaterThan($maximumPaymentAmount)) {
                 $this->items->each(function (OrderItem $item) {
                     $item->update(['order_id' => null]);
                 });
@@ -707,7 +707,7 @@ class Order extends Model
      *
      * @throws InvalidMandateException
      */
-    private function ensureValidMandateAndMaximumPaymentAmountWhenTotalDuePositive(): \Money\Money
+    private function ensureValidMandateAndMaximumPaymentAmountWhenTotalDuePositive(): ?\Money\Money
     {
         if ((int) $this->getTotalDue()->getAmount() > 0) {
             $mandate = $this->owner->mollieMandate();
