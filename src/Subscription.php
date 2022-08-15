@@ -285,6 +285,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
             $this->fill([
                 'ends_at' => $endsAt,
                 'cycle_ends_at' => null,
+                'next_plan' => null,
             ])->save();
 
             Event::dispatch(new SubscriptionCancelled($this, $reason));

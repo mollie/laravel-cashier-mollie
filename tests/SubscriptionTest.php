@@ -492,6 +492,28 @@ class SubscriptionTest extends BaseTestCase
     }
 
     /** @test */
+    public function cancellingASubscriptionWithNextPlanClearsNextPlan()
+    {
+        $user = factory(User::class)->create();
+        $subscription = $user->subscriptions()->save(
+            factory(Cashier::$subscriptionModel)->make([
+                'cycle_ends_at' => now()->addWeek(),
+                'next_plan' => 'monthly-10-2', ])
+        );
+
+        $this->assertFalse($subscription->cancelled());
+        $this->assertTrue($subscription->active());
+
+        $subscription->cancelNow();
+
+        $this->assertCarbon(now(), $subscription->ends_at);
+        $this->assertNull($subscription->cycle_ends_at);
+        $this->assertNull($subscription->next_plan);
+        $this->assertTrue($subscription->cancelled());
+        $this->assertFalse($subscription->active());
+    }
+
+    /** @test */
     public function resumingACancelledSubscriptionResetsCycleEndsAt()
     {
         $this->withConfiguredPlans();
