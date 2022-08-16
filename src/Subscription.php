@@ -241,12 +241,12 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
         /** @var Plan $newPlan */
         $newPlan = app(PlanRepository::class)::findOrFail($plan);
 
-        if ($this->cancelled()) {
-            $this->cycle_ends_at = $this->ends_at;
-            $this->ends_at = null;
-        }
-
         return DB::transaction(function () use ($plan, $newPlan) {
+            if ($this->cancelled()) {
+                $this->cycle_ends_at = $this->ends_at;
+                $this->ends_at = null;
+            }
+
             $this->next_plan = $plan;
 
             $this->removeScheduledOrderItem();
@@ -291,7 +291,6 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
             $this->fill([
                 'ends_at' => $endsAt,
                 'cycle_ends_at' => null,
-//                'next_plan' => null,
             ])->save();
 
             Event::dispatch(new SubscriptionCancelled($this, $reason));
