@@ -5,6 +5,7 @@ namespace Laravel\Cashier\Credit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Laravel\Cashier\Traits\HasOwner;
+use Money\Currency;
 use Money\Money;
 
 class Credit extends Model
@@ -55,13 +56,13 @@ class Credit extends Model
             $credit = static::whereOwner($owner)->whereCurrency($amount->getCurrency()->getCode())->firstOrCreate([]);
 
             if ($credit->value == 0) {
-                return money(0, $amount->getCurrency()->getCode());
+                return new Money(0, new Currency($amount->getCurrency()->getCode()));
             }
 
             $use_credit = min([$credit->value, (int) $amount->getAmount()]);
             $credit->decrement('value', $use_credit);
 
-            return money($use_credit, $amount->getCurrency()->getCode());
+            return new Money($use_credit, new Currency($amount->getCurrency()->getCode()));
         });
     }
 
@@ -72,6 +73,6 @@ class Credit extends Model
      */
     public function money()
     {
-        return money($this->value, $this->currency);
+        return new Money($this->value, new Currency($this->currency));
     }
 }

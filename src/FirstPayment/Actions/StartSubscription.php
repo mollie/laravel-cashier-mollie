@@ -10,6 +10,8 @@ use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Plan\Contracts\PlanRepository;
 use Laravel\Cashier\SubscriptionBuilder\Contracts\SubscriptionConfigurator;
 use Laravel\Cashier\SubscriptionBuilder\MandatedSubscriptionBuilder;
+use Money\Currency;
+use Money\Money;
 
 class StartSubscription extends BaseAction implements SubscriptionConfigurator
 {
@@ -215,7 +217,7 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     {
         $this->trialDays = $trialDays;
         $this->builder()->trialDays($trialDays);
-        $this->unitPrice = money(0, $this->getCurrency());
+        $this->unitPrice = new Money(0, new Currency($this->getCurrency()));
 
         return $this;
     }
@@ -230,7 +232,7 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     {
         $this->trialUntil = $trialUntil;
         $this->builder()->trialUntil($trialUntil);
-        $this->unitPrice = money(0, $this->getCurrency());
+        $this->unitPrice = new Money(0, new Currency($this->getCurrency()));
 
         return $this;
     }

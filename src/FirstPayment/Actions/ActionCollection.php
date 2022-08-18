@@ -6,6 +6,8 @@ use Illuminate\Support\Collection;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Exceptions\CurrencyMismatchException;
 use Laravel\Cashier\Order\OrderItemCollection;
+use Money\Currency;
+use Money\Money;
 
 class ActionCollection extends Collection
 {
@@ -32,7 +34,7 @@ class ActionCollection extends Collection
      */
     public function total()
     {
-        $total = money(0, $this->getCurrency());
+        $total = new Money(0, new Currency($this->getCurrency()));
 
         $this->each(function (BaseAction $item) use (&$total) {
             $total = $total->add($item->getTotal());

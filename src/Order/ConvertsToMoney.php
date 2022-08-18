@@ -2,6 +2,9 @@
 
 namespace Laravel\Cashier\Order;
 
+use Money\Currency;
+use Money\Money;
+
 trait ConvertsToMoney
 {
     /**
@@ -10,6 +13,6 @@ trait ConvertsToMoney
      */
     protected function toMoney($value = 0)
     {
-        return money(round($value), $this->getCurrency());
+        return new Money(round($value), new Currency($this->getCurrency()));
     }
 }

@@ -27,6 +27,8 @@ use LogicException;
 use Mollie\Api\Resources\Mandate;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
+use Money\Currency;
+use Money\Money;
 
 /**
  * @property int id
@@ -208,7 +210,7 @@ class Order extends Model
                 return $this->handlePaymentFailedDueToInvalidMandate();
             }
 
-            $totalDue = money($this->total_due, $this->currency);
+            $totalDue = new Money($this->total_due, new Currency($this->currency));
 
             if ($maximumPaymentAmount && $totalDue->greaterThan($maximumPaymentAmount)) {
                 $this->items->each(function (OrderItem $item) {
@@ -231,7 +233,7 @@ class Order extends Model
                     $this->mollie_payment_id = null;
 
                     // Add credit to the owner's balance
-                    $credit = Cashier::$creditModel::addAmountForOwner($owner, money(-($this->total_due), $this->currency));
+                    $credit = Cashier::$creditModel::addAmountForOwner($owner, new Money(-($this->total_due), new Currency($this->currency)));
 
                     if (! $owner->hasActiveSubscriptionWithCurrency($this->currency)) {
                         Event::dispatch(new BalanceTurnedStale($credit));
@@ -696,7 +698,7 @@ class Order extends Model
             $this->guardMandate($mandate);
             $minimumPaymentAmount = app(MinimumPayment::class)::forMollieMandate($mandate, $this->getCurrency());
         } else {
-            $minimumPaymentAmount = money(0, $this->getCurrency());
+            $minimumPaymentAmount = new Money(0, new Currency($this->getCurrency()));
         }
 
         return $minimumPaymentAmount;
@@ -715,7 +717,7 @@ class Order extends Model
 
             $maximumPaymentAmount = app(MaximumPayment::class)::forMollieMandate($mandate, $this->getCurrency());
         } else {
-            $maximumPaymentAmount = money(0, $this->getCurrency());
+            $maximumPaymentAmount = new Money(0, new Currency($this->getCurrency()));
         }
 
         return $maximumPaymentAmount;

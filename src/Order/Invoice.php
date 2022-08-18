@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Order\Contracts\InvoicableItem;
 use Laravel\Cashier\Traits\FormatsAmount;
+use Money\Currency;
 use Money\Money;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -201,7 +202,7 @@ class Invoice
      */
     public function rawSubtotal()
     {
-        $subtotal = money(0, $this->currency);
+        $subtotal = new Money(0, new Currency($this->currency));
 
         $this->items->each(function (InvoicableItem $item) use (&$subtotal) {
             $subtotal = $subtotal->add($item->getSubtotal());
@@ -227,7 +228,7 @@ class Invoice
      */
     public function rawTotal()
     {
-        $subtotal = money(0, $this->currency);
+        $subtotal = new Money(0, new Currency($this->currency));
 
         $this->items->each(function (InvoicableItem $item) use (&$subtotal) {
             $subtotal = $subtotal->add($item->getTotal());
@@ -279,9 +280,9 @@ class Invoice
             return [
                 'tax_percentage' => (float) $percentage,
                 'raw_over_subtotal' => $raw_over_subtotal,
-                'over_subtotal' => $this->formatAmount(money($raw_over_subtotal, $this->currency)),
+                'over_subtotal' => $this->formatAmount(new Money($raw_over_subtotal, new Currency($this->currency))),
                 'raw_total' => $raw_total,
-                'total' => $this->formatAmount(money($raw_total, $this->currency)),
+                'total' => $this->formatAmount(new Money($raw_total, new Currency($this->currency))),
             ];
         };
 
@@ -330,7 +331,7 @@ class Invoice
      */
     public function rawStartingBalance()
     {
-        return $this->startingBalance ?: money(0, $this->currency);
+        return $this->startingBalance ?: new Money(0, new Currency($this->currency));
     }
 
     /**
@@ -361,7 +362,7 @@ class Invoice
      */
     public function rawUsedBalance()
     {
-        return $this->usedBalance ?: money(0, $this->currency);
+        return $this->usedBalance ?: new Money(0, new Currency($this->currency));
     }
 
     /**
@@ -392,7 +393,7 @@ class Invoice
      */
     public function rawCompletedBalance()
     {
-        return $this->completedBalance ?: money(0, $this->currency);
+        return $this->completedBalance ?: new Money(0, new Currency($this->currency));
     }
 
     /**

@@ -5,6 +5,8 @@ namespace Laravel\Cashier\FirstPayment\Actions;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Coupon\Coupon;
 use Laravel\Cashier\Order\OrderItemCollection;
+use Money\Currency;
+use Money\Money;
 
 class ApplySubscriptionCouponToPayment extends BaseNullAction
 {
@@ -57,6 +59,6 @@ class ApplySubscriptionCouponToPayment extends BaseNullAction
      */
     protected function toMoney($value = 0)
     {
-        return money($value, $this->getCurrency());
+        return new Money($value, new Currency($this->getCurrency()));
     }
 }

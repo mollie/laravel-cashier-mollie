@@ -12,6 +12,8 @@ use Laravel\Cashier\Refunds\Refund;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Resources\Refund as MollieRefund;
 use Mollie\Api\Types\RefundStatus;
+use Money\Currency;
+use Money\Money;
 use Symfony\Component\HttpFoundation\Response;
 
 class AftercareWebhookController extends BaseWebhookController
@@ -80,7 +82,7 @@ class AftercareWebhookController extends BaseWebhookController
             // Update the locally known refunded amount
             $amountRefunded = $molliePayment->amountRefunded
                 ? mollie_object_to_money($molliePayment->amountRefunded)
-                : money(0, $molliePayment->amount->currency);
+                : new Money(0, new Currency($molliePayment->amount->currency));
 
             $localPayment = Cashier::$paymentModel::findByPaymentId($molliePayment->id);
             $localPayment->update(['amount_refunded' => (int) $amountRefunded->getAmount()]);
