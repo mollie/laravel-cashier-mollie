@@ -11,5 +11,7 @@ interface ChargeBuilder
 
     public function setItems(ChargeItemCollection $items): self;
 
+    public function setRedirectUrl(string $redirectUrl): self;
+
     public function create();
 }

@@ -41,6 +41,13 @@ class MandatedChargeBuilder implements Contract
         return $this;
     }
 
+    public function setRedirectUrl(string $redirectUrl): self
+    {
+        // The redirectUrl does not apply to mandated payments.
+
+        return $this;
+    }
+
     public function paymentDescription(string $description): self
     {
         $this->paymentDescription = $description;
