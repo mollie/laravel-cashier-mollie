@@ -22,7 +22,7 @@ class PercentageDiscountHandler extends BaseCouponHandler
         /** @var OrderItem $firstItem */
         $firstItem = $items->first();
 
-        $unitPrice = $this->unitPrice($firstItem->getTotal());
+        $unitPrice = $this->unitPrice($this->baseAmount($firstItem));
 
         return $this->makeOrderItem([
             'process_at' => now(),
@@ -79,5 +79,16 @@ class PercentageDiscountHandler extends BaseCouponHandler
         $noTax = $this->context('no_tax', true);
 
         return $noTax ? 0 : $firstItem->getTaxPercentage();
+    }
+
+    /**
+     * @param  \Laravel\Cashier\Order\OrderItem  $firstItem
+     * @return \Money\Money
+     */
+    protected function baseAmount(OrderItem $firstItem)
+    {
+        $discountOnSubTotal = $this->context('discount_on_subtotal', false);
+
+        return $discountOnSubTotal ? $firstItem->getSubTotal() : $firstItem->getTotal();
     }
 }
