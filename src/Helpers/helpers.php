@@ -27,11 +27,11 @@ if (! function_exists('money')) {
     /**
      * Create a Money object from a Mollie Amount array.
      *
-     * @param  int  $value
+     * @param  int|string  $value
      * @param  string  $currency
      * @return \Money\Money
      */
-    function money(int $value, string $currency)
+    function money($value, string $currency)
     {
         return new Money($value, new Currency($currency));
     }
