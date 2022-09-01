@@ -27,12 +27,12 @@ $shippingCosts = RefundItem::make([
     'description' => 'Shipping costs',
     'currency' => 'EUR',
     'quantity' => 1,
-    'unit_price' => '6.67',
+    'unit_price' => 667, // EUR 6.67
     'tax_percentage' => 21,
 ]);
 
 $order->newRefund()
-    ->addItem(RefundItem::MakeFromOrderItem($order->items->first()))
+    ->addItem(RefundItem::makeFromOrderItem($order->items->first()))
     ->addItem($shippingCosts)
     ->create();
 ```

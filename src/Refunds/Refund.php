@@ -90,7 +90,12 @@ class Refund extends Model
             $this->save();
 
             $refundItems->each(function (RefundItem $refundItem) {
-                $refundItem->originalOrderItem->handlePaymentRefunded($refundItem);
+                $originalOrderItem = $refundItem->originalOrderItem;
+
+                if( $originalOrderItem && method_exists($originalOrderItem, 'handlePaymentRefunded') )
+                {
+                    $originalOrderItem->handlePaymentRefunded($refundItem);
+                }
             });
 
             $this->originalOrder->increment('amount_refunded', (int) $refundItems->getTotal()->getAmount());
