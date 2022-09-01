@@ -11,6 +11,12 @@ work similar to the subscription features:
    payment. This will result in a new mandate.
 3. Once the payment has been received in your Mollie account, Cashier Mollie will generate an Order.
 
+::: tip Supported payment methods
+Exclusively designed for recurring and subscription billing, this package supports Mollie's recurring payment methods
+only, including checkout payment methods `applepay`, `bancontact` , `belfius`, `creditcard`, `eps`, `giropay`, `ideal`,
+`kbc`, `mybank`, `paypal`, `sofort` and the resulting mandated methods.
+:::
+
 ```php
 use App\Models\User;
 
