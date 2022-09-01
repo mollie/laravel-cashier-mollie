@@ -92,7 +92,7 @@ class Refund extends Model
             $refundItems->each(function (RefundItem $refundItem) {
                 $originalOrderItem = $refundItem->originalOrderItem;
 
-                if( $originalOrderItem && method_exists($originalOrderItem, 'handlePaymentRefunded'))
+                if( $originalOrderItem && method_exists($originalOrderItem, 'handlePaymentRefunded') )
                 {
                     $originalOrderItem->handlePaymentRefunded($refundItem);
                 }
