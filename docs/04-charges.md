@@ -1,4 +1,4 @@
-# One-time charges
+# Charges
 
 If you would like to make a one-time charge against a customer, you may use the `charge` method on a billable model
 instance.
