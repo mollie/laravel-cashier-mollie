@@ -57,12 +57,10 @@ class CashierServiceProvider extends ServiceProvider
         $this->app->register(MollieServiceProvider::class);
         $this->registerMollieInteractions($this->app);
         $this->app->bind(PlanRepository::class, ConfigPlanRepository::class);
-        $this->app->singleton(CouponRepository::class, function () {
-            return new ConfigCouponRepository(
-                config('cashier_coupons.defaults'),
-                config('cashier_coupons.coupons')
-            );
-        });
+        $this->app->singleton(CouponRepository::class, fn() => new ConfigCouponRepository(
+            config('cashier_coupons.defaults'),
+            config('cashier_coupons.coupons')
+        ));
         $this->app->bind(MinimumPaymentContract::class, MinimumPayment::class);
         $this->app->bind(MaximumPaymentContract::class, MaximumPayment::class);
 

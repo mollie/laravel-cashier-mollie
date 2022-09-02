@@ -73,24 +73,18 @@ class RefundsBuilderTest extends BaseTestCase
         $this->assertCount(2, $refundItems);
 
         /** @var RefundItem $itemA */
-        $itemA = $refundItems->first(function (RefundItem $item) {
-            return (int) $item->quantity === 1;
-        });
+        $itemA = $refundItems->first(fn(RefundItem $item) => (int) $item->quantity === 1);
 
         $this->assertEquals($itemA->unit_price, 1000);
         $this->assertEquals($itemA->tax_percentage, 10);
         $this->assertEquals($itemA->currency, 'EUR');
 
         /** @var RefundItem $itemB */
-        $itemB = $refundItems->first(function (RefundItem $item) {
-            return (int) $item->quantity === 2;
-        });
+        $itemB = $refundItems->first(fn(RefundItem $item) => (int) $item->quantity === 2);
         $this->assertEquals($itemB->unit_price, 500);
         $this->assertEquals($itemB->tax_percentage, 10);
         $this->assertEquals($itemB->currency, 'EUR');
 
-        Event::assertDispatched(RefundInitiated::class, function (RefundInitiated $event) use ($refund) {
-            return $event->refund->is($refund);
-        });
+        Event::assertDispatched(RefundInitiated::class, fn(RefundInitiated $event) => $event->refund->is($refund));
     }
 }

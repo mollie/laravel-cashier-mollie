@@ -113,7 +113,7 @@ class FirstPaymentSubscriptionBuilderApplyCorrectTaxTest extends BaseTestCase
                     'href' => 'https://foo-redirect-bar.com',
                     'type' => 'text/html',
                 ],
-            ]));
+            ]), null, 512, JSON_THROW_ON_ERROR);
             $payment->mandateId = 'mdt_dummy_mandate_id';
 
             return $mock->shouldReceive('execute')->once()->andReturn($payment);

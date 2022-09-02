@@ -619,7 +619,7 @@ class StartSubscriptionTest extends BaseTestCase
             'coupon' => 'test-coupon',
         ], $user);
 
-        $action->withCoupon('test-coupon', true)
+        $action->withCoupon('test-coupon')
                ->trialDays(5);
 
         // Returns the OrderItem ready for processing right away.

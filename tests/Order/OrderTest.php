@@ -65,19 +65,15 @@ class OrderTest extends BaseTestCase
                 ->andReturn($customer);
         });
 
-        $this->mock(GetMollieMethodMinimumAmount::class, function ($mock) {
-            return $mock->shouldReceive('execute')
-                ->with('directdebit', 'EUR')
-                ->once()
-                ->andReturn(money(10, 'EUR'));
-        });
+        $this->mock(GetMollieMethodMinimumAmount::class, fn($mock) => $mock->shouldReceive('execute')
+            ->with('directdebit', 'EUR')
+            ->once()
+            ->andReturn(money(10, 'EUR')));
 
-        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) {
-            return $mock->shouldReceive('execute')
-                ->with('directdebit', 'EUR')
-                ->once()
-                ->andReturn(money(30000, 'EUR'));
-        });
+        $this->mock(GetMollieMethodMaximumAmount::class, fn($mock) => $mock->shouldReceive('execute')
+            ->with('directdebit', 'EUR')
+            ->once()
+            ->andReturn(money(30000, 'EUR')));
 
         $this->mock(CreateMolliePayment::class, function ($mock) {
             $payment = new Payment(new MollieApiClient);
@@ -128,9 +124,7 @@ class OrderTest extends BaseTestCase
         $this->assertEquals('2018-0000-0001', $order->number);
         $this->assertNull($order->mollie_payment_id);
 
-        Event::assertDispatched(OrderCreated::class, function ($e) use ($order) {
-            return $e->order->is($order);
-        });
+        Event::assertDispatched(OrderCreated::class, fn($e) => $e->order->is($order));
 
         $order->processPayment();
 
@@ -334,19 +328,15 @@ class OrderTest extends BaseTestCase
                 ->andReturn($customer);
         });
 
-        $this->mock(GetMollieMethodMinimumAmount::class, function ($mock) {
-            return $mock->shouldReceive('execute')
-                ->with('directdebit', 'EUR')
-                ->once()
-                ->andReturn(money(10, 'EUR'));
-        });
+        $this->mock(GetMollieMethodMinimumAmount::class, fn($mock) => $mock->shouldReceive('execute')
+            ->with('directdebit', 'EUR')
+            ->once()
+            ->andReturn(money(10, 'EUR')));
 
-        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) {
-            return $mock->shouldReceive('execute')
-                ->with('directdebit', 'EUR')
-                ->once()
-                ->andReturn(money(30000, 'EUR'));
-        });
+        $this->mock(GetMollieMethodMaximumAmount::class, fn($mock) => $mock->shouldReceive('execute')
+            ->with('directdebit', 'EUR')
+            ->once()
+            ->andReturn(money(30000, 'EUR')));
 
         $this->mock(CreateMolliePayment::class, function ($mock) {
             $payment = new Payment(new MollieApiClient);
@@ -490,19 +480,15 @@ class OrderTest extends BaseTestCase
                 ->andReturn($customer);
         });
 
-        $this->mock(GetMollieMethodMinimumAmount::class, function ($mock) {
-            return $mock->shouldReceive('execute')
-                ->with('directdebit', 'EUR')
-                ->once()
-                ->andReturn(money(1, 'EUR'));
-        });
+        $this->mock(GetMollieMethodMinimumAmount::class, fn($mock) => $mock->shouldReceive('execute')
+            ->with('directdebit', 'EUR')
+            ->once()
+            ->andReturn(money(1, 'EUR')));
 
-        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) {
-            return $mock->shouldReceive('execute')
-                ->with('directdebit', 'EUR')
-                ->once()
-                ->andReturn(money(10, 'EUR'));
-        });
+        $this->mock(GetMollieMethodMaximumAmount::class, fn($mock) => $mock->shouldReceive('execute')
+            ->with('directdebit', 'EUR')
+            ->once()
+            ->andReturn(money(10, 'EUR')));
 
         $user = $this->getMandatedUser(true, [
             'id' => 2,
@@ -569,9 +555,7 @@ class OrderTest extends BaseTestCase
         $this->assertNull($order->mollie_payment_id);
         $this->assertEquals('failed', $order->mollie_payment_status);
 
-        Event::assertDispatched(OrderPaymentFailedDueToInvalidMandate::class, function ($event) use ($order) {
-            return $order->is($event->order);
-        });
+        Event::assertDispatched(OrderPaymentFailedDueToInvalidMandate::class, fn($event) => $order->is($event->order));
     }
 
     /** @test */
@@ -599,19 +583,15 @@ class OrderTest extends BaseTestCase
                 ->andReturn($customer);
         });
 
-        $this->mock(GetMollieMethodMinimumAmount::class, function ($mock) {
-            return $mock->shouldReceive('execute')
-                ->with('directdebit', 'EUR')
-                ->once()
-                ->andReturn(money(10, 'EUR'));
-        });
+        $this->mock(GetMollieMethodMinimumAmount::class, fn($mock) => $mock->shouldReceive('execute')
+            ->with('directdebit', 'EUR')
+            ->once()
+            ->andReturn(money(10, 'EUR')));
 
-        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) {
-            return $mock->shouldReceive('execute')
-                ->with('directdebit', 'EUR')
-                ->once()
-                ->andReturn(money(30000, 'EUR'));
-        });
+        $this->mock(GetMollieMethodMaximumAmount::class, fn($mock) => $mock->shouldReceive('execute')
+            ->with('directdebit', 'EUR')
+            ->once()
+            ->andReturn(money(30000, 'EUR')));
 
         $this->mock(CreateMolliePayment::class, function ($mock) {
             $payment = new Payment(new MollieApiClient);
@@ -687,19 +667,15 @@ class OrderTest extends BaseTestCase
                 ->andReturn($customer);
         });
 
-        $this->mock(GetMollieMethodMinimumAmount::class, function ($mock) {
-            return $mock->shouldReceive('execute')
-                ->with('directdebit', 'EUR')
-                ->once()
-                ->andReturn(money(100, 'EUR'));
-        });
+        $this->mock(GetMollieMethodMinimumAmount::class, fn($mock) => $mock->shouldReceive('execute')
+            ->with('directdebit', 'EUR')
+            ->once()
+            ->andReturn(money(100, 'EUR')));
 
-        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) {
-            return $mock->shouldReceive('execute')
-                ->with('directdebit', 'EUR')
-                ->once()
-                ->andReturn(money(30000, 'EUR'));
-        });
+        $this->mock(GetMollieMethodMaximumAmount::class, fn($mock) => $mock->shouldReceive('execute')
+            ->with('directdebit', 'EUR')
+            ->once()
+            ->andReturn(money(30000, 'EUR')));
 
         $user = $this->getMandatedUser(true, [
             'id' => 2,
@@ -792,9 +768,7 @@ class OrderTest extends BaseTestCase
 
         $this->assertDispatchedOrderProcessed($order);
 
-        Event::assertDispatched(BalanceTurnedStale::class, function ($event) use ($credit) {
-            return $credit->is($event->credit);
-        });
+        Event::assertDispatched(BalanceTurnedStale::class, fn($event) => $credit->is($event->credit));
     }
 
     /**
@@ -834,9 +808,7 @@ class OrderTest extends BaseTestCase
         $this->assertEquals('2018-0000-0001', $order->number);
         $this->assertNull($order->mollie_payment_id);
 
-        Event::assertDispatched(OrderCreated::class, function ($e) use ($order) {
-            return $e->order->is($order);
-        });
+        Event::assertDispatched(OrderCreated::class, fn($e) => $e->order->is($order));
 
         $order->processPayment();
 
@@ -888,9 +860,7 @@ class OrderTest extends BaseTestCase
         $this->assertEquals('2018-0000-0001', $order->number);
         $this->assertNull($order->mollie_payment_id);
 
-        Event::assertDispatched(OrderCreated::class, function ($e) use ($order) {
-            return $e->order->is($order);
-        });
+        Event::assertDispatched(OrderCreated::class, fn($e) => $e->order->is($order));
 
         $order->processPayment();
 
@@ -1034,8 +1004,6 @@ class OrderTest extends BaseTestCase
 
     protected function assertDispatchedOrderProcessed(Order $order)
     {
-        Event::assertDispatched(OrderProcessed::class, function ($event) use ($order) {
-            return $order->is($event->order);
-        });
+        Event::assertDispatched(OrderProcessed::class, fn($event) => $order->is($event->order));
     }
 }

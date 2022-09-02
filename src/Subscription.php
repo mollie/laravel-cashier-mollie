@@ -723,9 +723,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
         $appliedCoupons = $this->appliedCoupons()->with('orderItems')->get();
 
         $appliedCouponOrderItems = $appliedCoupons->reduce(function (OrderItemCollection $carry, AppliedCoupon $coupon) use ($orderId) {
-            $items = $coupon->orderItems->filter(function (OrderItem $item) use ($orderId) {
-                return $item->order_id === $orderId;
-            });
+            $items = $coupon->orderItems->filter(fn(OrderItem $item) => $item->order_id === $orderId);
 
             return $carry->concat($items->toArray());
         }, new OrderItemCollection);

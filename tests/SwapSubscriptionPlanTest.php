@@ -100,9 +100,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
         $this->assertEquals('Twice as expensive monthly subscription', $processed_item->description);
         $this->assertTrue($processed_item->isProcessed());
 
-        Event::assertDispatched(SubscriptionPlanSwapped::class, function (SubscriptionPlanSwapped $event) use ($subscription) {
-            return $subscription->is($event->subscription);
-        });
+        Event::assertDispatched(SubscriptionPlanSwapped::class, fn(SubscriptionPlanSwapped $event) => $subscription->is($event->subscription));
 
         $newly_scheduled_order_item->process();
 
@@ -205,9 +203,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
         $this->assertCarbon($cycle_should_have_started_at, $subscription->cycle_started_at);
         $this->assertCarbon($cycle_should_end_at, $subscription->cycle_ends_at);
 
-        Event::assertDispatched(SubscriptionPlanSwapped::class, function (SubscriptionPlanSwapped $event) use ($subscription) {
-            return $subscription->is($event->subscription);
-        });
+        Event::assertDispatched(SubscriptionPlanSwapped::class, fn(SubscriptionPlanSwapped $event) => $subscription->is($event->subscription));
     }
 
     protected function getUserWithZeroBalance()
@@ -271,16 +267,12 @@ class SwapSubscriptionPlanTest extends BaseTestCase
 
     protected function withMockedGetMollieMethodMinimumAmount($times = 1): void
     {
-        $this->mock(GetMollieMethodMinimumAmount::class, function ($mock) use ($times) {
-            return $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(money(100, 'EUR'));
-        });
+        $this->mock(GetMollieMethodMinimumAmount::class, fn($mock) => $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(money(100, 'EUR')));
     }
 
     protected function withMockedGetMollieMethodMaximumAmount($times = 1): void
     {
-        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) use ($times) {
-            return $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(money(30000, 'EUR'));
-        });
+        $this->mock(GetMollieMethodMaximumAmount::class, fn($mock) => $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(money(30000, 'EUR')));
     }
 
     protected function withMockedCreateMolliePayment($times = 1): void
