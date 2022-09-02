@@ -7,6 +7,8 @@ use Laravel\Cashier\FirstPayment\Actions\AddGenericOrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
+use Money\Currency;
+use Money\Money;
 
 class AddGenericOrderItemTest extends BaseTestCase
 {
@@ -17,7 +19,7 @@ class AddGenericOrderItemTest extends BaseTestCase
 
         $action = new AddGenericOrderItem(
             $this->getMandatedUser(true, ['tax_percentage' => 20]),
-            money(5, 'EUR'),
+            new Money(5, new Currency('EUR')),
             1,
             'Adding a test order item'
         );
@@ -82,7 +84,7 @@ class AddGenericOrderItemTest extends BaseTestCase
 
         $action = new AddGenericOrderItem(
             $user,
-            money(5, 'EUR'),
+            new Money(5, new Currency('EUR')),
             1,
             'Adding a test order item'
         );

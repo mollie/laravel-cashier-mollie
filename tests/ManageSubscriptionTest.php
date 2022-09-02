@@ -18,6 +18,8 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Mandate;
 use Mollie\Api\Resources\Payment;
+use Money\Currency;
+use Money\Money;
 
 class ManageSubscriptionTest extends BaseTestCase
 {
@@ -341,14 +343,14 @@ class ManageSubscriptionTest extends BaseTestCase
     protected function withMockedGetMollieMethodMinimumAmount($times = 1): void
     {
         $this->mock(GetMollieMethodMinimumAmount::class, function ($mock) use ($times) {
-            return $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(money(100, 'EUR'));
+            return $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(new Money(100, new Currency('EUR')));
         });
     }
 
     protected function withMockedGetMollieMethodMaximumAmount($times = 1): void
     {
         $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) use ($times) {
-            return $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(money(30000, 'EUR'));
+            return $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(new Money(30000, new Currency('EUR')));
         });
     }
 

@@ -10,6 +10,8 @@ use Laravel\Cashier\Tests\Fixtures\User;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Payment as MolliePayment;
+use Money\Currency;
+use Money\Money;
 
 class FirstPaymentChargeBuilderTest extends BaseTestCase
 {
@@ -35,12 +37,12 @@ class FirstPaymentChargeBuilderTest extends BaseTestCase
         $this->assertEquals(0, $owner->orders()->count());
 
         $item = new \Laravel\Cashier\Charge\ChargeItemBuilder($owner);
-        $item->unitPrice(money(100, 'EUR'));
+        $item->unitPrice(new Money(100, new Currency('EUR')));
         $item->description('Test Item');
         $chargeItem = $item->make();
 
         $item2 = new \Laravel\Cashier\Charge\ChargeItemBuilder($owner);
-        $item2->unitPrice(money(200, 'EUR'));
+        $item2->unitPrice(new Money(200, new Currency('EUR')));
         $item2->description('Test Item 2');
         $chargeItem2 = $item2->make();
 

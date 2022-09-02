@@ -7,6 +7,8 @@ use Laravel\Cashier\FirstPayment\Actions\AddBalance;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
+use Money\Currency;
+use Money\Money;
 
 class AddBalanceTest extends BaseTestCase
 {
@@ -16,7 +18,7 @@ class AddBalanceTest extends BaseTestCase
         $this->withPackageMigrations();
         $action = new AddBalance(
             $this->getMandatedUser(),
-            money(1000, 'EUR'),
+            new Money(1000, new Currency('EUR')),
             1,
             'Adding some test balance'
         );
@@ -64,7 +66,7 @@ class AddBalanceTest extends BaseTestCase
 
         $action = new AddBalance(
             $user,
-            money(1000, 'EUR'),
+            new Money(1000, new Currency('EUR')),
             1,
             'Adding some test balance'
         );
