@@ -11,7 +11,7 @@ class CashierInstall extends Command
      *
      * @var string
      */
-    protected $signature = 'cashier:install 
+    protected $signature = 'cashier:install
                             {--T|template : include publishing the invoice template}';
 
     /**
@@ -30,7 +30,7 @@ class CashierInstall extends Command
     {
         if (app()->environment('production')) {
             $this->alert('Running in production mode.');
-            if ($this->confirm('Proceed installing Cashier?')) {
+            if (!$this->confirm('Proceed installing Cashier?')) {
                 return;
             }
         }
