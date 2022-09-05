@@ -239,14 +239,20 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public function swapNextCycle(string $plan)
     {
-        $new_plan = app(PlanRepository::class)::findOrFail($plan);
+        /** @var Plan $newPlan */
+        $newPlan = app(PlanRepository::class)::findOrFail($plan);
 
-        return DB::transaction(function () use ($plan, $new_plan) {
+        return DB::transaction(function () use ($plan, $newPlan) {
+            if ($this->cancelled()) {
+                $this->cycle_ends_at = $this->ends_at;
+                $this->ends_at = null;
+            }
+
             $this->next_plan = $plan;
 
             $this->removeScheduledOrderItem();
 
-            $this->scheduleNewOrderItemAt($this->cycle_ends_at, [], true, $new_plan);
+            $this->scheduleNewOrderItemAt($this->cycle_ends_at, [], true, $newPlan);
 
             $this->save();
 

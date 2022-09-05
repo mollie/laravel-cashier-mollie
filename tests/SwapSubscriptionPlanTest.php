@@ -139,6 +139,24 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     }
 
     /** @test */
+    public function swappingACancelledSubscriptionAtNextCycleResumesIt()
+    {
+        $subscription = $this->getUser()->subscriptions()->save(
+            factory(Cashier::$subscriptionModel)->make([
+                'ends_at' => now()->addWeek(),
+                'plan' => 'monthly-20-1',
+            ])
+        );
+        $subscription->cancel();
+
+        $this->assertTrue($subscription->cancelled());
+
+        $subscription->swapNextCycle('weekly-20-1');
+
+        $this->assertFalse($subscription->cancelled());
+    }
+
+    /** @test */
     public function canSwapNextCycle()
     {
         $user = $this->getUserWithZeroBalance();

@@ -31,7 +31,7 @@ class FirstPaymentChargeBuilder implements Contract
         return $this;
     }
 
-    public function setRedirectUrl(string $redirectUrl)
+    public function setRedirectUrl(string $redirectUrl): self
     {
         $this->redirectUrl = url($redirectUrl);
 

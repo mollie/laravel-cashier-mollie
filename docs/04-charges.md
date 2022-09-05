@@ -1,4 +1,4 @@
-# One-time charges
+# Charges
 
 If you would like to make a one-time charge against a customer, you may use the `charge` method on a billable model
 instance.
@@ -10,6 +10,12 @@ work similar to the subscription features:
 2. The customer either gets billed using an existing mandate, or gets redirected to Mollie's checkout to perform a first
    payment. This will result in a new mandate.
 3. Once the payment has been received in your Mollie account, Cashier Mollie will generate an Order.
+
+::: tip Supported payment methods
+Exclusively designed for recurring and subscription billing, this package supports Mollie's recurring payment methods
+only, including checkout payment methods `applepay`, `bancontact` , `belfius`, `creditcard`, `eps`, `giropay`, `ideal`,
+`kbc`, `mybank`, `paypal`, `sofort` and the resulting mandated methods.
+:::
 
 ```php
 use App\Models\User;
