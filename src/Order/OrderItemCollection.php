@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
 use Laravel\Cashier\Cashier;
 use LogicException;
+use Money\Currency;
 use Money\Money;
 
 class OrderItemCollection extends Collection
@@ -169,7 +170,7 @@ class OrderItemCollection extends Collection
             throw new LogicException('Calculating the total requires items to be of the same currency.');
         }
 
-        return money($this->sum('total'), $this->currency());
+        return new Money($this->sum('total'), new Currency($this->currency()));
     }
 
     public function currency(): string

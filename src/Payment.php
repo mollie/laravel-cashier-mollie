@@ -9,6 +9,7 @@ use Laravel\Cashier\Order\ConvertsToMoney;
 use Laravel\Cashier\Traits\HasOwner;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
+use Money\Currency;
 use Money\Money;
 
 /**
@@ -72,11 +73,11 @@ class Payment extends Model
     {
         $amountChargedBack = $payment->amountChargedBack
             ? mollie_object_to_money($payment->amountChargedBack)
-            : money(0, $payment->amount->currency);
+            : new Money(0, new Currency($payment->amount->currency));
 
         $amountRefunded = $payment->amountRefunded
             ? mollie_object_to_money($payment->amountRefunded)
-            : money(0, $payment->amount->currency);
+            : new Money(0, new Currency($payment->amount->currency));
 
         $localActions = ! empty($actions) ? $actions : $payment->metadata->actions ?? null;
 

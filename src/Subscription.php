@@ -24,6 +24,7 @@ use Laravel\Cashier\Refunds\RefundItem;
 use Laravel\Cashier\Traits\HasOwner;
 use Laravel\Cashier\Types\SubscriptionCancellationReason;
 use LogicException;
+use Money\Currency;
 use Money\Money;
 
 /**
@@ -698,7 +699,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     protected function reimbursableAmount()
     {
-        $zeroAmount = \money('0.00', $this->currency);
+        $zeroAmount = new Money('0.00', new Currency($this->currency));
 
         // Determine base amount eligible to reimburse
         $latestProcessedOrderItem = $this->latestProcessedOrderItem();

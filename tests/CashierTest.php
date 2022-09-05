@@ -32,6 +32,8 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Mandate;
 use Mollie\Api\Resources\Payment;
+use Money\Currency;
+use Money\Money;
 
 class CashierTest extends BaseTestCase
 {
@@ -302,8 +304,8 @@ class CashierTest extends BaseTestCase
     /** @test */
     public function testFormatAmount()
     {
-        $this->assertEquals('1.000,00 €', Cashier::formatAmount(money(100000, 'EUR')));
-        $this->assertEquals('-9.123,45 €', Cashier::formatAmount(money(-912345, 'EUR')));
+        $this->assertEquals('1.000,00 €', Cashier::formatAmount(new Money(100000, new Currency('EUR'))));
+        $this->assertEquals('-9.123,45 €', Cashier::formatAmount(new Money(-912345, new Currency('EUR'))));
     }
 
     /**
@@ -415,14 +417,14 @@ class CashierTest extends BaseTestCase
     protected function withMockedGetMollieMethodMinimumAmount($times = 1): void
     {
         $this->mock(GetMollieMethodMinimumAmount::class, function ($mock) use ($times) {
-            return $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(money(100, 'EUR'));
+            return $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(new Money(100, new Currency('EUR')));
         });
     }
 
     protected function withMockedGetMollieMethodMaximumAmount($times = 1): void
     {
         $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) use ($times) {
-            return $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(money(30000, 'EUR'));
+            return $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(new Money(30000, new Currency('EUR')));
         });
     }
 

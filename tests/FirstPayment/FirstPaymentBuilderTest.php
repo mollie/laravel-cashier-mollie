@@ -15,6 +15,8 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\SequenceType;
+use Money\Currency;
+use Money\Money;
 
 class FirstPaymentBuilderTest extends BaseTestCase
 {
@@ -46,13 +48,13 @@ class FirstPaymentBuilderTest extends BaseTestCase
         $builder->inOrderTo([
             new AddBalance(
                 $owner,
-                money(500, 'EUR'),
+                new Money(500, new Currency('EUR')),
                 1,
                 'Test add balance 1'
             ),
             new AddBalance(
                 $owner,
-                money(500, 'EUR'),
+                new Money(500, new Currency('EUR')),
                 1,
                 'Test add balance 2'
             ),
@@ -99,13 +101,13 @@ class FirstPaymentBuilderTest extends BaseTestCase
         $builder->inOrderTo([
             new AddBalance(
                 $owner,
-                money(500, 'EUR'),
+                new Money(500, new Currency('EUR')),
                 1,
                 'Test add balance 1'
             ),
             new AddBalance(
                 $owner,
-                money(500, 'EUR'),
+                new Money(500, new Currency('EUR')),
                 1,
                 'Test add balance 2'
             ),
@@ -187,7 +189,7 @@ class FirstPaymentBuilderTest extends BaseTestCase
         });
 
         $payment = $builder->inOrderTo([
-            new AddGenericOrderItem($owner, money(100, 'EUR'), 1, 'Parse redirectUrl test'),
+            new AddGenericOrderItem($owner, new Money(100, new Currency('EUR')), 1, 'Parse redirectUrl test'),
         ])->create();
 
         $this->assertEquals('https://www.example.com/tr_unique_id', $payment->redirectUrl);
@@ -208,13 +210,13 @@ class FirstPaymentBuilderTest extends BaseTestCase
         $builder->inOrderTo([
             new AddBalance(
                 $owner,
-                money(500, 'EUR'),
+                new Money(500, new Currency('EUR')),
                 1,
                 'Test add balance 1'
             ),
             new AddBalance(
                 $owner,
-                money(500, 'EUR'),
+                new Money(500, new Currency('EUR')),
                 1,
                 'Test add balance 2'
             ),

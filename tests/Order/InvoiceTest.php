@@ -7,6 +7,8 @@ use Illuminate\Support\Collection;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\Invoice;
 use Laravel\Cashier\Tests\BaseTestCase;
+use Money\Currency;
+use Money\Money;
 
 class InvoiceTest extends BaseTestCase
 {
@@ -130,7 +132,7 @@ class InvoiceTest extends BaseTestCase
         $this->assertMoneyEURCents(0, $invoice->rawStartingBalance());
         $this->assertEquals('0,00 €', $invoice->startingBalance());
 
-        $invoice = $invoice->setStartingBalance(money(1525, 'EUR'));
+        $invoice = $invoice->setStartingBalance(new Money(1525, new Currency('EUR')));
         $this->assertTrue($invoice->hasStartingBalance());
         $this->assertMoneyEURCents(1525, $invoice->rawStartingBalance());
         $this->assertEquals('15,25 €', $invoice->startingBalance());
@@ -143,7 +145,7 @@ class InvoiceTest extends BaseTestCase
         $this->assertMoneyEURCents(0, $invoice->rawCompletedBalance());
         $this->assertEquals('0,00 €', $invoice->completedBalance());
 
-        $invoice = $invoice->setCompletedBalance(money(1525, 'EUR'));
+        $invoice = $invoice->setCompletedBalance(new Money(1525, new Currency('EUR')));
         $this->assertMoneyEURCents(1525, $invoice->rawCompletedBalance());
         $this->assertEquals('15,25 €', $invoice->completedBalance());
     }
@@ -155,7 +157,7 @@ class InvoiceTest extends BaseTestCase
         $this->assertMoneyEURCents(0, $invoice->rawUsedBalance());
         $this->assertEquals('0,00 €', $invoice->usedBalance());
 
-        $invoice = $invoice->setUsedBalance(money(1525, 'EUR'));
+        $invoice = $invoice->setUsedBalance(new Money(1525, new Currency('EUR')));
         $this->assertMoneyEURCents(1525, $invoice->rawUsedBalance());
         $this->assertEquals('15,25 €', $invoice->usedBalance());
     }

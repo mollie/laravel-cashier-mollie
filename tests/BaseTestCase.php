@@ -14,6 +14,7 @@ use Laravel\Cashier\Tests\Fixtures\User;
 use Mockery;
 use Mollie\Api\MollieApiClient;
 use Mollie\Laravel\Wrappers\MollieApiWrapper;
+use Money\Currency;
 use Money\Money;
 use Orchestra\Testbench\TestCase;
 
@@ -374,7 +375,7 @@ abstract class BaseTestCase extends TestCase
     {
         $this->assertEquals($currency, $money->getCurrency()->getCode());
         $this->assertEquals($money->getAmount(), $value);
-        $this->assertTrue(money($value, $currency)->equals($money));
+        $this->assertTrue((new Money($value, new Currency($currency)))->equals($money));
     }
 
     /**

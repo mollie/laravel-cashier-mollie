@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
+use Money\Currency;
 use Money\Money;
 
 class RefundItemCollection extends Collection
@@ -23,7 +24,8 @@ class RefundItemCollection extends Collection
 
     public function getTotal(): Money
     {
-        return money($this->sum('total'), $this->getCurrency());
+        return new Money($this->sum('total'), new Currency($this->getCurrency()));
+
     }
 
     public function getCurrency(): string

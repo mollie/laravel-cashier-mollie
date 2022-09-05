@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Tests\Helpers;
 
+use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
 
@@ -10,7 +11,7 @@ class HelpersTest extends TestCase
     /** @test */
     public function testMoney()
     {
-        $money = money(1234, 'EUR');
+        $money = new Money(1234, new Currency('EUR'));
 
         $this->assertInstanceOf(Money::class, $money);
         $this->assertTrue(Money::EUR(1234)->equals($money));
