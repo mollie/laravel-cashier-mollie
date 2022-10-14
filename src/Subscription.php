@@ -577,6 +577,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
         if ($subscription->ends_at !== null) {
             $subscription->update([
                 'ends_at' => null,
+                'cycle_ends_at' => $subscription->plan()->interval()->getEndOfNextSubscriptionCycle($subscription)
             ]);
         }
     }
