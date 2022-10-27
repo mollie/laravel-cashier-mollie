@@ -123,17 +123,26 @@ class FirstPaymentBuilder
     public function create()
     {
         $payload = $this->getMolliePayload();
+        $untouchedRedirectUrl = $payload['redirectUrl'];
+        $payload['redirectUrl'] = str_replace(
+            '{payment_id}',
+            '---payment_id---', // In order to pass Mollie validation
+            $payload['redirectUrl']
+        );
 
         /** @var CreateMolliePayment $createMolliePayment */
         $createMolliePayment = app()->make(CreateMolliePayment::class);
         $this->molliePayment = $createMolliePayment->execute($payload);
 
-        $redirectUrl = $payload['redirectUrl'];
-
         // Parse and update redirectUrl
-        if (Str::contains($redirectUrl, '{payment_id}')) {
-            $redirectUrl = Str::replaceArray('{payment_id}', [$this->molliePayment->id], $redirectUrl);
-            $this->molliePayment->redirectUrl = $redirectUrl;
+        if (Str::contains($untouchedRedirectUrl, '{payment_id}')) {
+
+
+            $this->molliePayment->redirectUrl = str_replace(
+                '{payment_id}',
+                $this->molliePayment->id,
+                $untouchedRedirectUrl
+            );
 
             /** @var UpdateMolliePayment $updateMolliePayment */
             $updateMolliePayment = app()->make(UpdateMolliePayment::class);
