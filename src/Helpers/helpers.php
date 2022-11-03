@@ -23,6 +23,20 @@ if (! function_exists('object_to_array_recursive')) {
     }
 }
 
+if (! function_exists('money')) {
+    /**
+     * Create a Money object from a Mollie Amount array.
+     *
+     * @param  int|string  $value
+     * @param  string  $currency
+     * @return \Money\Money
+     */
+    function money($value, string $currency)
+    {
+        return new Money($value, new Currency($currency));
+    }
+}
+
 if (! function_exists('decimal_to_money')) {
     /**
      * Create a Money object from a decimal string / currency pair.
