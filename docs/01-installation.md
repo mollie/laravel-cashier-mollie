@@ -63,10 +63,11 @@ Once you have pulled in the package:
         /**
         * Get the receiver information for the invoice.
         * Typically includes the name and some sort of (E-mail/physical) address.
+        * The $order argument contains information about the order
         *
         * @return array An array of strings
         */
-        public function getInvoiceInformation()
+        public function getInvoiceInformation( $order )
         {
             return [$this->name, $this->email];
         }

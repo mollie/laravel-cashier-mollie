@@ -323,7 +323,7 @@ class Order extends Model
             ->setCompletedBalance($this->getBalanceAfter())
             ->setUsedBalance($this->getCreditUsed());
 
-        $invoice->setReceiverAddress($this->owner->getInvoiceInformation());
+        $invoice->setReceiverAddress($this->owner->getInvoiceInformation( $this ));
 
         $extra_information = null;
         $owner = $this->owner;
