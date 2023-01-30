@@ -153,7 +153,8 @@ class WebhookControllerTest extends BaseTestCase
         $this->assertEquals('failed', Cashier::$paymentModel::first()->mollie_payment_status);
 
         Event::assertDispatched(OrderPaymentFailed::class, function (OrderPaymentFailed $event) use ($order) {
-            return $event->order->is($order);
+            return $event->order->is($order)
+                && $event->payment->is($order->payments->first());
         });
 
         Event::assertDispatched(SubscriptionCancelled::class, function (SubscriptionCancelled $event) use ($subscription) {
@@ -225,7 +226,8 @@ class WebhookControllerTest extends BaseTestCase
         $this->assertEquals('paid', Cashier::$paymentModel::first()->mollie_payment_status);
 
         Event::assertDispatched(OrderPaymentPaid::class, function (OrderPaymentPaid $event) use ($order) {
-            return $event->order->is($order);
+            return $event->order->is($order)
+                && $event->payment->is($order->payments->first());
         });
     }
 

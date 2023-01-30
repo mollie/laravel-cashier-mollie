@@ -188,7 +188,7 @@ class Order extends Model
      */
     public function processPayment()
     {
-        $this->update(['mollie_payment_id' => 'temp_'.Str::uuid()]);
+        $this->update(['mollie_payment_id' => 'temp_' . Str::uuid()]);
 
         DB::transaction(function () {
             $owner = $this->owner;
@@ -233,9 +233,9 @@ class Order extends Model
                     $this->mollie_payment_id = null;
 
                     // Add credit to the owner's balance
-                    $credit = Cashier::$creditModel::addAmountForOwner($owner, new Money(-($this->total_due), new Currency($this->currency)));
+                    $credit = Cashier::$creditModel::addAmountForOwner($owner, new Money(- ($this->total_due), new Currency($this->currency)));
 
-                    if (! $owner->hasActiveSubscriptionWithCurrency($this->currency)) {
+                    if (!$owner->hasActiveSubscriptionWithCurrency($this->currency)) {
                         Event::dispatch(new BalanceTurnedStale($credit));
                     }
 
@@ -246,7 +246,7 @@ class Order extends Model
                     // Create Mollie payment
                     $payment = (new MandatedPaymentBuilder(
                         $owner,
-                        'Order '.$this->number,
+                        'Order ' . $this->number,
                         $totalDue,
                         url(config('cashier.webhook_url')),
                         [
@@ -331,10 +331,10 @@ class Order extends Model
         if (method_exists($owner, 'getExtraBillingInformation')) {
             $extra_information = $owner->getExtraBillingInformation();
 
-            if (! empty($extra_information)) {
+            if (!empty($extra_information)) {
                 $extra_information = explode("\n", $extra_information);
 
-                if (is_array($extra_information) && ! empty($extra_information)) {
+                if (is_array($extra_information) && !empty($extra_information)) {
                     $invoice->setExtraInformation($extra_information);
                 }
             }
@@ -350,7 +350,7 @@ class Order extends Model
      */
     public function isProcessed()
     {
-        return ! empty($this->processed_at);
+        return !empty($this->processed_at);
     }
 
     /**
@@ -378,7 +378,7 @@ class Order extends Model
      */
     public function scopeUnprocessed($query, $unprocessed = true)
     {
-        return $query->processed(! $unprocessed);
+        return $query->processed(!$unprocessed);
     }
 
     /**
@@ -467,9 +467,11 @@ class Order extends Model
             $localPayment = Cashier::$paymentModel::findByMolliePaymentOrCreate($molliePayment, $this->owner);
             $localPayment->update([
                 'mollie_payment_status' => 'failed',
+                'order_id' => $this->id,
             ]);
 
-            Event::dispatch(new OrderPaymentFailed($this));
+
+            Event::dispatch(new OrderPaymentFailed($this, $localPayment));
 
             $this->items->each(function (OrderItem $item) {
                 $item->handlePaymentFailed();
@@ -535,7 +537,7 @@ class Order extends Model
                 'order_id' => $this->id,
             ]);
 
-            Event::dispatch(new OrderPaymentPaid($this));
+            Event::dispatch(new OrderPaymentPaid($this, $localPayment));
 
             $this->items->each(function (OrderItem $item) {
                 $item->handlePaymentPaid();
@@ -672,8 +674,8 @@ class Order extends Model
      */
     protected function guardMandate(?Mandate $mandate)
     {
-        if (empty($mandate) || ! $mandate->isValid()) {
-            throw new InvalidMandateException('Cannot process payment without valid mandate for order id '.$this->id);
+        if (empty($mandate) || !$mandate->isValid()) {
+            throw new InvalidMandateException('Cannot process payment without valid mandate for order id ' . $this->id);
         }
     }
 
@@ -743,7 +745,7 @@ class Order extends Model
             throw new OrderRetryRequiresStatusFailedException();
         }
 
-        if (! $this->owner->validMollieMandate()) {
+        if (!$this->owner->validMollieMandate()) {
             throw new InvalidMandateException();
         }
 
