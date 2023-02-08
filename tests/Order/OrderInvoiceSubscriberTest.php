@@ -8,6 +8,7 @@ use Laravel\Cashier\Events\FirstPaymentPaid;
 use Laravel\Cashier\Events\OrderInvoiceAvailable;
 use Laravel\Cashier\Events\OrderPaymentPaid;
 use Laravel\Cashier\Order\OrderInvoiceSubscriber;
+use Laravel\Cashier\Payment as CashierPayment;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Mollie\Api\Resources\Payment;
 
@@ -32,7 +33,7 @@ class OrderInvoiceSubscriberTest extends BaseTestCase
     public function itHandlesTheOrderPaymentPaidEvent()
     {
         $this->assertItHandlesEvent(
-            new OrderPaymentPaid($this->order()),
+            new OrderPaymentPaid($this->order(), $this->mock(Cashier::$paymentModel)),
             'handleOrderPaymentPaid'
         );
     }

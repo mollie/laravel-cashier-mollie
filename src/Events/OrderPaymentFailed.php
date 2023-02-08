@@ -16,12 +16,20 @@ class OrderPaymentFailed
     public $order;
 
     /**
+     * The paid payment.
+     *
+     * @var \Laravel\Cashier\Payment
+     */
+    public $payment;
+
+    /**
      * Creates a new OrderPaymentFailed event.
      *
      * @param $order
      */
-    public function __construct($order)
+    public function __construct($order, $payment)
     {
         $this->order = $order;
+        $this->payment = $payment;
     }
 }
