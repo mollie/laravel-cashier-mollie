@@ -286,18 +286,18 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public function cancelAt(Carbon $endsAt, $reason = SubscriptionCancellationReason::UNKNOWN)
     {
-        return DB::transaction(function () use ($reason, $endsAt) {
+        DB::transaction(function () use ($endsAt) {
             $this->removeScheduledOrderItem();
 
             $this->fill([
                 'ends_at' => $endsAt,
                 'cycle_ends_at' => null,
             ])->save();
-
-            Event::dispatch(new SubscriptionCancelled($this, $reason));
-
-            return $this;
         });
+
+        Event::dispatch(new SubscriptionCancelled($this, $reason));
+
+        return $this;
     }
 
     /**

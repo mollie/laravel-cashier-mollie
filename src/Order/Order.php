@@ -104,7 +104,7 @@ class Order extends Model
      */
     public static function createFromItems(OrderItemCollection $items, $overrides = [], $process_items = true)
     {
-        return DB::transaction(function () use ($items, $overrides, $process_items) {
+        $order = DB::transaction(function () use ($items, $overrides, $process_items) {
             if ($process_items) {
                 $items = $items->preprocess();
             }
@@ -141,10 +141,12 @@ class Order extends Model
                 }
             });
 
-            Event::dispatch(new OrderCreated($order));
-
             return $order;
         });
+
+        Event::dispatch(new OrderCreated($order));
+
+        return $order;
     }
 
     /**
@@ -451,7 +453,7 @@ class Order extends Model
      */
     public function handlePaymentFailed(MolliePayment $molliePayment)
     {
-        return DB::transaction(function () use ($molliePayment) {
+        $localPayment = DB::transaction(function () use ($molliePayment) {
             if ($this->creditApplied()) {
                 $this->owner->addCredit($this->getCreditUsed());
             }
@@ -470,17 +472,18 @@ class Order extends Model
                 'order_id' => $this->id,
             ]);
 
-
-            Event::dispatch(new OrderPaymentFailed($this, $localPayment));
-
             $this->items->each(function (OrderItem $item) {
                 $item->handlePaymentFailed();
             });
 
             $this->owner->validateMollieMandate();
 
-            return $this;
+            return $localPayment;
         });
+
+        Event::dispatch(new OrderPaymentFailed($this, $localPayment));
+
+        return $this;
     }
 
     /**
@@ -492,7 +495,7 @@ class Order extends Model
      */
     public function handlePaymentFailedDueToInvalidMandate()
     {
-        return DB::transaction(function () {
+        DB::transaction(function () {
             if ($this->creditApplied()) {
                 $this->owner->addCredit($this->getCreditUsed());
             }
@@ -505,16 +508,17 @@ class Order extends Model
                 'processed_at' => now(),
             ]);
 
-            Event::dispatch(new OrderPaymentFailedDueToInvalidMandate($this));
 
             $this->items->each(function (OrderItem $item) {
                 $item->handlePaymentFailed();
             });
 
             $this->owner->clearMollieMandate();
-
-            return $this;
         });
+
+        Event::dispatch(new OrderPaymentFailedDueToInvalidMandate($this));
+
+        return $this;
     }
 
     /**
@@ -526,7 +530,7 @@ class Order extends Model
      */
     public function handlePaymentPaid(MolliePayment $molliePayment)
     {
-        return DB::transaction(function () use ($molliePayment) {
+        $localPayment = DB::transaction(function () use ($molliePayment) {
             $this->update(['mollie_payment_status' => 'paid']);
 
             // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
@@ -537,14 +541,16 @@ class Order extends Model
                 'order_id' => $this->id,
             ]);
 
-            Event::dispatch(new OrderPaymentPaid($this, $localPayment));
-
             $this->items->each(function (OrderItem $item) {
                 $item->handlePaymentPaid();
             });
 
-            return $this;
+            return $localPayment;
         });
+
+        Event::dispatch(new OrderPaymentPaid($this, $localPayment));
+
+        return $this;
     }
 
     /**
