@@ -46,15 +46,7 @@ class OrderItem extends Model implements InvoicableItem
         'unit_price' => 'int',
         'tax_percentage' => 'float',
         'orderable_id' => 'int',
-    ];
-
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    protected $dates = [
-        'process_at',
+        'process_at' => 'datetime',
     ];
 
     protected $guarded = [];

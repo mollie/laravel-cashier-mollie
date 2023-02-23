@@ -50,23 +50,23 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     use HasOwner;
 
     /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'trial_ends_at' => 'datetime',
+        'cycle_started_at' => 'datetime',
+        'cycle_ends_at' => 'datetime',
+        'ends_at' => 'datetime',
+    ];
+
+    /**
      * The attributes that are not mass assignable.
      *
      * @var array
      */
     protected $guarded = [];
-
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    protected $dates = [
-        'trial_ends_at',
-        'cycle_started_at',
-        'cycle_ends_at',
-        'ends_at',
-    ];
 
     /**
      * The event map for the model.
