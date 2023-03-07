@@ -71,9 +71,17 @@ class Order extends Model
         'balance_before' => 'int',
         'credit_used' => 'int',
         'total_due' => 'int',
-        'processed_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+    ];
+
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = [
+        'processed_at',
+        'created_at',
+        'updated_at',
     ];
 
     protected $guarded = [];
