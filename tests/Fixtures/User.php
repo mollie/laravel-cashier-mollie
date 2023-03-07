@@ -10,9 +10,7 @@ class User extends Model implements ProvidesInvoiceInformation
 {
     use Billable;
 
-    protected $casts = [
-        'trial_ends_at' => 'datetime'
-    ];
+    protected $dates = ['trial_ends_at'];
 
     /**
      * The attributes that are not mass assignable.
