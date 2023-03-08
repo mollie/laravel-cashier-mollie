@@ -34,8 +34,8 @@
     "ext-json": "*",
     "ext-intl": "*",
     "dompdf/dompdf": "^2.0",
-    "illuminate/database": "^8.0|^9.0|^10",
-    "illuminate/support": "^8.0|^9.0|^10",
+    "illuminate/database": "^9.0|^10",
+    "illuminate/support": "^9.0|^10",
     "mollie/laravel-mollie": "^2.22",
     "mollie/mollie-api-php": "^2.27",
     "moneyphp/money": "^4.1",
@@ -44,7 +44,7 @@
   "require-dev": {
     "guzzlehttp/guzzle": "^7.0",
     "mockery/mockery": "^1.4",
-    "orchestra/testbench": "^6.23|^7.0|^8.0",
+    "orchestra/testbench": "^7.0|^8.0",
     "phpunit/phpunit": "^9.5"
   },
   "autoload": {

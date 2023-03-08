@@ -14,11 +14,9 @@ jobs:
             fail-fast: true
             matrix:
                 php: [8.0, 8.1, 8.2]
-                laravel: [^8.0, ^9.0, ^10.0]
+                laravel: [^9.0, ^10.0]
                 dependency-version: [ prefer-stable ]
                 include:
-                  - laravel: ^8.0
-                    testbench: ^6.23
                   - laravel: ^9.0
                     testbench: ^7.0
                   - laravel: ^10.0
