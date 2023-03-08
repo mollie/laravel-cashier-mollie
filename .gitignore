@@ -4,6 +4,7 @@ vendor
 coverage
 phpunit.xml
 .phpunit.result.cache
+.phpunit.cache
 .idea
 .phpstorm.meta.php
 .php-cs-fixer.cache
