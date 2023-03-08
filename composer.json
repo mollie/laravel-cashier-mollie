@@ -44,7 +44,6 @@
   "require-dev": {
     "guzzle/http": "^3.9",
     "guzzlehttp/guzzle": "^7.0",
-    "laravel/legacy-factories": "^1.0",
     "mockery/mockery": "^1.4",
     "orchestra/testbench": "^7.0|^8.0",
     "phpunit/phpunit": "^9.3|^10.0",

@@ -10,6 +10,7 @@ use Laravel\Cashier\Events\OrderPaymentPaid;
 use Laravel\Cashier\Order\OrderInvoiceSubscriber;
 use Laravel\Cashier\Payment as CashierPayment;
 use Laravel\Cashier\Tests\BaseTestCase;
+use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
 use Mollie\Api\Resources\Payment;
 
 class OrderInvoiceSubscriberTest extends BaseTestCase
@@ -51,6 +52,6 @@ class OrderInvoiceSubscriberTest extends BaseTestCase
 
     private function order()
     {
-        return factory(Cashier::$orderModel)->make();
+        return OrderFactory::new()->make();
     }
 }

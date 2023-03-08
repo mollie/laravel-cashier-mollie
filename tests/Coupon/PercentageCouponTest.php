@@ -9,6 +9,8 @@ use Laravel\Cashier\Coupon\CouponOrderItemPreprocessor;
 use Laravel\Cashier\Coupon\PercentageDiscountHandler;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\BaseTestCase;
+use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
+use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 
 class PercentageCouponTest extends BaseTestCase
 {
@@ -37,8 +39,8 @@ class PercentageCouponTest extends BaseTestCase
         $this->withMockedCouponRepository($coupon, $couponHandler, $context);
 
         /** @var Subscription $subscription */
-        $subscription = factory(Cashier::$subscriptionModel)->create();
-        $item = factory(Cashier::$orderItemModel)->make();
+        $subscription = SubscriptionFactory::new()->create();
+        $item = OrderItemFactory::new()->make();
         $subscription->orderItems()->save($item);
 
         /** @var \Laravel\Cashier\Coupon\Coupon $coupon */

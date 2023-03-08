@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\OrderNumberGenerator;
 use Laravel\Cashier\Tests\BaseTestCase;
+use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
 
 class OrderNumberGeneratorTest extends BaseTestCase
 {
@@ -41,7 +42,7 @@ class OrderNumberGeneratorTest extends BaseTestCase
 
         $this->assertTrue(Str::endsWith($this->generator->generate(), '16'));
 
-        factory(Cashier::$orderModel, 3)->create();
+        OrderFactory::new()->times(3)->create();
         $this->assertTrue(Str::endsWith($this->generator->generate(), '19'));
     }
 

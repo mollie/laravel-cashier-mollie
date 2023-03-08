@@ -3,8 +3,9 @@
 namespace Laravel\Cashier\Tests;
 
 use Illuminate\Support\Facades\Event;
-use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\RedeemedCouponCollection;
+use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
+use Laravel\Cashier\Tests\Database\Factories\RedeemedCouponFactory;
 use Laravel\Cashier\Events\MandateClearedFromBillable;
 use Laravel\Cashier\Exceptions\MandateIsNotYetFinalizedException;
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
@@ -25,7 +26,7 @@ class BillableTest extends BaseTestCase
     public function testTaxPercentage()
     {
         $this->withPackageMigrations();
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
             'tax_percentage' => 21.5,
         ]);
 
@@ -95,7 +96,7 @@ class BillableTest extends BaseTestCase
     {
         $this->withPackageMigrations();
 
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
 
         $redeemedCoupons = $user->redeemedCoupons;
         $this->assertInstanceOf(RedeemedCouponCollection::class, $redeemedCoupons);
@@ -141,7 +142,7 @@ class BillableTest extends BaseTestCase
         ]);
 
         $subscription = $user->newSubscription('default', 'monthly-10-1')->create();
-        $subscription->redeemedCoupons()->saveMany(factory(Cashier::$redeemedCouponModel, 2)->make());
+        $subscription->redeemedCoupons()->saveMany(RedeemedCouponFactory::times(2)->make());
         $this->assertEquals(2, $subscription->redeemedCoupons()->active()->count());
         $this->assertEquals(0, $subscription->appliedCoupons()->count());
 
@@ -177,7 +178,7 @@ class BillableTest extends BaseTestCase
     {
         $this->withPackageMigrations();
         $user = $this->getUser();
-        factory(Cashier::$orderModel, 2)->create([
+        OrderFactory::times(2)->create([
             'owner_id' => $user->id,
             'owner_type' => $user->getMorphClass(),
         ])->first()->update(['number' => 'find_invoice_test_1']);
@@ -204,7 +205,7 @@ class BillableTest extends BaseTestCase
     {
         $this->withPackageMigrations();
         $userA = $this->getUser();
-        factory(Cashier::$orderModel)->create([
+        OrderFactory::new()->create([
             'number' => 'foo-bar',
             'owner_id' => $userA->id,
         ]);
@@ -221,7 +222,7 @@ class BillableTest extends BaseTestCase
     {
         $this->withPackageMigrations();
         $user = $this->getUser();
-        factory(Cashier::$orderModel, 2)->create([
+        OrderFactory::times(2)->create([
             'owner_id' => $user->id,
             'owner_type' => $user->getMorphClass(),
         ])->first()->update(['number' => 'find_invoice_test_1']);
@@ -248,7 +249,7 @@ class BillableTest extends BaseTestCase
     {
         $this->withPackageMigrations();
         $userA = $this->getUser();
-        factory(Cashier::$orderModel)->create([
+        OrderFactory::new()->create([
             'number' => 'foo-bar',
             'owner_id' => $userA->id,
         ]);
@@ -267,11 +268,11 @@ class BillableTest extends BaseTestCase
         $user = $this->getUser();
 
         $user->orders()->saveMany([
-            factory(Cashier::$orderModel)->make([
+            OrderFactory::new()->make([
                 'id' => 1,
                 'number' => '2018-0000-0001',
             ]),
-            factory(Cashier::$orderModel)->make([
+            OrderFactory::new()->make([
                 'id' => 2,
                 'number' => '2018-0000-0002',
             ]),
@@ -290,11 +291,11 @@ class BillableTest extends BaseTestCase
         $user = $this->getUser();
 
         $user->orders()->saveMany([
-            factory(Cashier::$orderModel)->make([
+            OrderFactory::new()->make([
                 'id' => 1,
                 'number' => '2018-0000-0001',
             ]),
-            factory(Cashier::$orderModel)->make([
+            OrderFactory::new()->make([
                 'id' => 2,
                 'number' => '2018-0000-0002',
             ]),

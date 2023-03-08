@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\Invoice;
 use Laravel\Cashier\Tests\BaseTestCase;
+use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Money\Currency;
 use Money\Money;
 
@@ -15,21 +16,21 @@ class InvoiceTest extends BaseTestCase
     /** @test */
     public function canAddItemsToInvoice()
     {
-        $itemA = factory(Cashier::$orderItemModel)->make([
+        $itemA = OrderItemFactory::new()->make([
             'unit_price' => 1000,
             'quantity' => 2,
             'tax_percentage' => 21.5,
             'currency' => 'EUR',
         ]);
 
-        $itemB = factory(Cashier::$orderItemModel)->make([
+        $itemB = OrderItemFactory::new()->make([
             'unit_price' => 1000,
             'quantity' => 2,
             'tax_percentage' => 21.5,
             'currency' => 'EUR',
         ]);
 
-        $itemC = factory(Cashier::$orderItemModel)->make([
+        $itemC = OrderItemFactory::new()->make([
             'unit_price' => 1000,
             'quantity' => 2,
             'tax_percentage' => 9.5,
@@ -165,7 +166,7 @@ class InvoiceTest extends BaseTestCase
     /** @test */
     public function canGetAsView()
     {
-        $items = factory(Cashier::$orderItemModel, 2)->make();
+        $items = OrderItemFactory::new()->times(2)->make();
 
         $invoice = new Invoice('EUR');
         $invoice = $invoice->addItems($items);
@@ -184,7 +185,7 @@ class InvoiceTest extends BaseTestCase
     /** @test */
     public function canGetAsPdf()
     {
-        $items = factory(Cashier::$orderItemModel, 2)->make();
+        $items = OrderItemFactory::new()->times(2)->make();
 
         $invoice = new Invoice('EUR');
         $invoice = $invoice->addItems($items);
@@ -198,7 +199,7 @@ class InvoiceTest extends BaseTestCase
     public function canGetAsDownloadResponse()
     {
         Carbon::setTestNow(Carbon::parse('2018-12-31'));
-        $items = factory(Cashier::$orderItemModel, 2)->make();
+        $items = OrderItemFactory::new()->times(2)->make();
         config(['app.name' => 'FooBar']);
 
         $invoice = new Invoice('EUR');

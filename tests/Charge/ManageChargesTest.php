@@ -23,7 +23,7 @@ class ManageChargesTest extends BaseTestCase
     /** @test */
     public function usingMandatedChargeBuilderWhenValidMandate()
     {
-        $owner = factory(User::class)->create();
+        $owner = User::factory()->create();
 
         $this->assertInstanceOf(FirstPaymentChargeBuilder::class, $owner->newCharge());
     }

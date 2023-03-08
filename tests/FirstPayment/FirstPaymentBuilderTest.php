@@ -36,7 +36,7 @@ class FirstPaymentBuilderTest extends BaseTestCase
     /** @test */
     public function canBuildPayload()
     {
-        $owner = factory(User::class)->create();
+        $owner = User::factory()->create();
         $this->assertEquals(0, $owner->orderItems()->count());
         $this->assertEquals(0, $owner->orders()->count());
 
@@ -89,7 +89,7 @@ class FirstPaymentBuilderTest extends BaseTestCase
     /** @test */
     public function createsMolliePayment()
     {
-        $owner = factory(User::class)->create();
+        $owner = User::factory()->create();
         $this->assertEquals(0, $owner->orderItems()->count());
         $this->assertEquals(0, $owner->orders()->count());
 
@@ -146,7 +146,7 @@ class FirstPaymentBuilderTest extends BaseTestCase
     /** @test */
     public function parsesRedirectUrlPaymentIdUponPaymentCreation()
     {
-        $owner = factory(User::class)->create();
+        $owner = User::factory()->create();
 
         $builder = new FirstPaymentBuilder($owner, [
             'redirectUrl' => 'https://www.example.com/{payment_id}',
@@ -198,7 +198,7 @@ class FirstPaymentBuilderTest extends BaseTestCase
     /** @test */
     public function storesLocalPaymentRecord()
     {
-        $owner = factory(User::class)->create();
+        $owner = User::factory()->create();
         $this->assertEquals(0, $owner->orderItems()->count());
         $this->assertEquals(0, $owner->orders()->count());
 

@@ -32,7 +32,7 @@ class FirstPaymentChargeBuilderTest extends BaseTestCase
     public function redirectToCheckoutResponse()
     {
         $this->withMockedCreateMolliePayment();
-        $owner = factory(User::class)->create();
+        $owner = User::factory()->create();
         $this->assertEquals(0, $owner->orderItems()->count());
         $this->assertEquals(0, $owner->orders()->count());
 

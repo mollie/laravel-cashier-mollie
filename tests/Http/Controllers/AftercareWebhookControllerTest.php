@@ -14,6 +14,7 @@ use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Refunds\RefundItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
+use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
@@ -81,9 +82,9 @@ class AftercareWebhookControllerTest extends BaseTestCase
         $molliePaymentId = 'tr_123xyz';
         $mollieRefundId = 're_456abc';
 
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
 
-        $subscription = $user->subscriptions()->save(factory(Cashier::$subscriptionModel)->make([
+        $subscription = $user->subscriptions()->save(SubscriptionFactory::new()->make([
             'plan' => 'monthly-10-1',
         ]));
 
