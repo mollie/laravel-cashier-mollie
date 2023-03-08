@@ -23,7 +23,7 @@ jobs:
                     testbench: ^8.0
                 exclude:
                   - php: 8.0
-                    laravel: 10
+                    laravel: ^10
 
         name: P${{ matrix.php }} - L${{ matrix.laravel }}
 
