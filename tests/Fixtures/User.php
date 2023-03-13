@@ -2,15 +2,20 @@
 
 namespace Laravel\Cashier\Tests\Fixtures;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Billable;
 use Laravel\Cashier\Order\Contracts\ProvidesInvoiceInformation;
+use Laravel\Cashier\Tests\Database\Factories\UserFactory;
 
 class User extends Model implements ProvidesInvoiceInformation
 {
     use Billable;
+    use HasFactory;
 
-    protected $dates = ['trial_ends_at'];
+    protected $casts = [
+        'trial_ends_at' => 'datetime',
+    ];
 
     /**
      * The attributes that are not mass assignable.
@@ -39,5 +44,15 @@ class User extends Model implements ProvidesInvoiceInformation
     public function getExtraBillingInformation()
     {
         return $this->extra_billing_information;
+    }
+
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory<static>
+     */
+    protected static function newFactory()
+    {
+        return UserFactory::new();
     }
 }

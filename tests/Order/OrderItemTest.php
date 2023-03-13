@@ -5,6 +5,7 @@ namespace Laravel\Cashier\Tests\Order;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
+use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 
 class OrderItemTest extends BaseTestCase
 {
@@ -67,10 +68,10 @@ class OrderItemTest extends BaseTestCase
     {
         $this->withPackageMigrations();
 
-        factory(Cashier::$orderItemModel, 3)->create([
+        OrderItemFactory::new()->times(3)->create([
             'order_id' => null,
         ]);
-        factory(Cashier::$orderItemModel, 2)->create([
+        OrderItemFactory::new()->times(2)->create([
             'order_id' => 1,
         ]);
 
@@ -83,10 +84,10 @@ class OrderItemTest extends BaseTestCase
     {
         $this->withPackageMigrations();
 
-        factory(Cashier::$orderItemModel, 3)->create([
+        OrderItemFactory::new()->times(3)->create([
             'order_id' => null,
         ]);
-        factory(Cashier::$orderItemModel, 2)->create([
+        OrderItemFactory::new()->times(2)->create([
             'order_id' => 1,
         ]);
 
@@ -99,15 +100,15 @@ class OrderItemTest extends BaseTestCase
     {
         $this->withPackageMigrations();
 
-        factory(Cashier::$orderItemModel, 2)->create([
+        OrderItemFactory::new()->times(2)->create([
             'order_id' => 1,
             'process_at' => now()->subHour(),
         ]);
-        factory(Cashier::$orderItemModel, 2)->create([
+        OrderItemFactory::new()->times(2)->create([
             'order_id' => null,
             'process_at' => now()->addDay(),
         ]);
-        factory(Cashier::$orderItemModel, 3)->create([
+        OrderItemFactory::new()->times(3)->create([
             'order_id' => null,
             'process_at' => now()->subHour(),
         ]);
@@ -119,10 +120,10 @@ class OrderItemTest extends BaseTestCase
     {
         $this->withPackageMigrations();
 
-        factory(Cashier::$orderItemModel, 2)->create([
+        OrderItemFactory::new()->times(2)->create([
             'process_at' => now()->subHour(),
         ]);
-        factory(Cashier::$orderItemModel, 3)->create([
+        OrderItemFactory::new()->times(3)->create([
             'process_at' => now()->addMinutes(5),
         ]);
 
@@ -131,14 +132,14 @@ class OrderItemTest extends BaseTestCase
 
     public function testNewCollection()
     {
-        $collection = factory(Cashier::$orderItemModel, 2)->make();
+        $collection = OrderItemFactory::new()->times(2)->make();
         $this->assertInstanceOf(OrderItemCollection::class, $collection);
     }
 
     public function testIsProcessed()
     {
-        $unprocessedItem = factory(Cashier::$orderItemModel)->make(['order_id' => null]);
-        $processedItem = factory(Cashier::$orderItemModel)->make(['order_id' => 1]);
+        $unprocessedItem = OrderItemFactory::new()->make(['order_id' => null]);
+        $processedItem = OrderItemFactory::new()->make(['order_id' => 1]);
 
         $this->assertFalse($unprocessedItem->isProcessed());
         $this->assertTrue($unprocessedItem->isProcessed(false));

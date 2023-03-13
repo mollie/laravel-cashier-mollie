@@ -13,6 +13,8 @@ use Laravel\Cashier\Mollie\GetMollieMethodMaximumAmount;
 use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Subscription;
+use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
+use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Mandate;
@@ -45,7 +47,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
 
         $user = $this->getUserWithZeroBalance();
         $subscription = $this->getSubscriptionForUser($user);
-        $alreadyPaidOrderItem = factory(Cashier::$orderItemModel)->create([
+        $alreadyPaidOrderItem = OrderItemFactory::new()->create([
             'owner_id' => $user->id,
             'order_id' => 1,
             'unit_price' => 1000,
@@ -124,7 +126,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     public function swappingACancelledSubscriptionResumesIt()
     {
         $subscription = $this->getUser()->subscriptions()->save(
-            factory(Cashier::$subscriptionModel)->make([
+            SubscriptionFactory::new()->make([
                 'ends_at' => now()->addWeek(),
                 'plan' => 'monthly-20-1',
             ])
@@ -142,7 +144,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     public function swappingACancelledSubscriptionAtNextCycleResumesIt()
     {
         $subscription = $this->getUser()->subscriptions()->save(
-            factory(Cashier::$subscriptionModel)->make([
+            SubscriptionFactory::new()->make([
                 'ends_at' => now()->addWeek(),
                 'plan' => 'monthly-20-1',
             ])
@@ -230,7 +232,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
      */
     protected function getSubscriptionForUser($user)
     {
-        return $user->subscriptions()->save(factory(Cashier::$subscriptionModel)->make([
+        return $user->subscriptions()->save(SubscriptionFactory::new()->make([
             'name' => 'dummy name',
             'plan' => 'monthly-10-1',
             'cycle_started_at' => now()->subWeeks(2),

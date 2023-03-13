@@ -9,6 +9,8 @@ use Laravel\Cashier\Events\SubscriptionResumed;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Mollie\GetMollieCustomer;
 use Laravel\Cashier\Subscription;
+use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
+use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
 use LogicException;
 use Mollie\Api\MollieApiClient;
@@ -26,10 +28,10 @@ class SubscriptionTest extends BaseTestCase
     /** @test */
     public function canAccessOwner()
     {
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
 
         $subscription = $user->subscriptions()->save(
-            factory(Cashier::$subscriptionModel)->make()
+            SubscriptionFactory::new()->make()
         );
 
         $this->assertTrue($user->is($subscription->owner));
@@ -38,10 +40,10 @@ class SubscriptionTest extends BaseTestCase
     /** @test */
     public function canAccessOrderItems()
     {
-        $subscription = factory(Cashier::$subscriptionModel)->create();
+        $subscription = SubscriptionFactory::new()->create();
 
         $items = $subscription->orderItems()->save(
-            factory(Cashier::$orderItemModel)->make()
+            OrderItemFactory::new()->make()
         );
 
         $this->assertNotNull($items);
@@ -64,7 +66,7 @@ class SubscriptionTest extends BaseTestCase
             ],
         ]]);
 
-        $subscription = factory(Cashier::$subscriptionModel)->create([
+        $subscription = SubscriptionFactory::new()->create([
             'scheduled_order_item_id' => 'should_be_empty',
         ]);
 
@@ -76,7 +78,7 @@ class SubscriptionTest extends BaseTestCase
     {
         $this->expectException(LogicException::class);
 
-        $subscription = factory(Cashier::$subscriptionModel)->create();
+        $subscription = SubscriptionFactory::new()->create();
 
         $this->assertFalse($subscription->cancelled());
 
@@ -92,7 +94,7 @@ class SubscriptionTest extends BaseTestCase
     {
         $this->expectException(LogicException::class);
 
-        $subscription = factory(Cashier::$subscriptionModel)->create([
+        $subscription = SubscriptionFactory::new()->create([
             'ends_at' => now()->subMonth(),
         ]);
 
@@ -110,17 +112,17 @@ class SubscriptionTest extends BaseTestCase
     public function getCycleProgressTest()
     {
         $now = now();
-        $completed_subscription = factory(Cashier::$subscriptionModel)->make([
+        $completed_subscription = SubscriptionFactory::new()->make([
             'cycle_started_at' => $now->copy()->subMonth(),
             'cycle_ends_at' => $now->copy()->subDay(),
         ]);
 
-        $progressing_subscription = factory(Cashier::$subscriptionModel)->make([
+        $progressing_subscription = SubscriptionFactory::new()->make([
             'cycle_started_at' => $now->copy()->subDays(3),
             'cycle_ends_at' => $now->copy()->addDays(3),
         ]);
 
-        $unstarted_subscription = factory(Cashier::$subscriptionModel)->make([
+        $unstarted_subscription = SubscriptionFactory::new()->make([
             'cycle_started_at' => $now->copy()->addDays(3),
             'cycle_ends_at' => $now->copy()->addMonth(),
         ]);
@@ -133,10 +135,10 @@ class SubscriptionTest extends BaseTestCase
     /** @test */
     public function testSyncTaxPercentage()
     {
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $this->assertEquals(0, $user->taxPercentage());
 
-        $subscription = factory(Cashier::$subscriptionModel)->create([
+        $subscription = SubscriptionFactory::new()->create([
             'tax_percentage' => 21.5,
         ]);
 
@@ -153,7 +155,7 @@ class SubscriptionTest extends BaseTestCase
         $this->withMockedGetMollieCustomer('cst_unique_customer_id', 2);
         $this->withMockedGetMollieMandate();
 
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
             'mollie_customer_id' => 'cst_unique_customer_id',
         ]);
@@ -236,7 +238,7 @@ class SubscriptionTest extends BaseTestCase
         $this->withMockedGetMollieCustomer('cst_unique_customer_id', 2);
         $this->withMockedGetMollieMandate();
 
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
             'mollie_customer_id' => 'cst_unique_customer_id',
         ]);
@@ -319,7 +321,7 @@ class SubscriptionTest extends BaseTestCase
         $this->withMockedGetMollieCustomer('cst_unique_customer_id', 2);
         $this->withMockedGetMollieMandate();
 
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
             'mollie_customer_id' => 'cst_unique_customer_id',
         ]);
@@ -423,8 +425,8 @@ class SubscriptionTest extends BaseTestCase
     public function cancelWorks()
     {
         $cycle_ends_at = now()->addWeek();
-        $user = factory(User::class)->create();
-        $subscription = $user->subscriptions()->save(factory(Cashier::$subscriptionModel)->make([
+        $user = User::factory()->create();
+        $subscription = $user->subscriptions()->save(SubscriptionFactory::new()->make([
             'cycle_ends_at' => $cycle_ends_at,
         ]));
 
@@ -446,10 +448,11 @@ class SubscriptionTest extends BaseTestCase
     /** @test */
     public function cancelAtWorks()
     {
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $subscription = $user->subscriptions()->save(
-            factory(Cashier::$subscriptionModel)->make([
-                'cycle_ends_at' => now()->addWeek(), ])
+            SubscriptionFactory::new()->make([
+                'cycle_ends_at' => now()->addWeek(),
+            ])
         );
 
         $this->assertFalse($subscription->onTrial());
@@ -470,10 +473,11 @@ class SubscriptionTest extends BaseTestCase
     /** @test */
     public function cancelNowWorks()
     {
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $subscription = $user->subscriptions()->save(
-            factory(Cashier::$subscriptionModel)->make([
-                'cycle_ends_at' => now()->addWeek(), ])
+            SubscriptionFactory::new()->make([
+                'cycle_ends_at' => now()->addWeek(),
+            ])
         );
 
         $this->assertFalse($subscription->onTrial());
@@ -495,10 +499,10 @@ class SubscriptionTest extends BaseTestCase
     public function resumingACancelledSubscriptionResetsCycleEndsAt()
     {
         $this->withConfiguredPlans();
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
 
         /** @var Subscription $subscription */
-        $subscription = $user->subscriptions()->save(factory(Cashier::$subscriptionModel)->make([
+        $subscription = $user->subscriptions()->save(SubscriptionFactory::new()->make([
             'ends_at' => now()->addWeek(),
         ]));
 

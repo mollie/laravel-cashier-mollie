@@ -12,6 +12,7 @@ use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Refunds\RefundBuilder;
 use Laravel\Cashier\Refunds\RefundItem;
 use Laravel\Cashier\Tests\BaseTestCase;
+use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Refund as MollieRefund;
 use Mollie\Api\Types\RefundStatus as MollieRefundStatus;
@@ -44,12 +45,12 @@ class RefundsBuilderTest extends BaseTestCase
         $user = $this->getUser();
 
         $orderItems = $user->orderItems()->createMany([
-            factory(Cashier::$orderItemModel)->make([
+            OrderItemFactory::new()->make([
                 'unit_price' => 1000,
                 'tax_percentage' => 10,
                 'quantity' => 1,
             ])->toArray(),
-            factory(Cashier::$orderItemModel)->make([
+            OrderItemFactory::new()->make([
                 'unit_price' => 500,
                 'tax_percentage' => 10,
                 'quantity' => 2,

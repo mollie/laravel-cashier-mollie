@@ -18,6 +18,8 @@ use Laravel\Cashier\Payment as CashierPayment;
 use Laravel\Cashier\Refunds\Refund as CashierRefund;
 use Laravel\Cashier\Refunds\RefundItem as CashierRefundItem;
 use Laravel\Cashier\Subscription as CashierSubscription;
+use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
+use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Tests\Fixtures\AppliedCoupon as FixtureAppliedCoupon;
 use Laravel\Cashier\Tests\Fixtures\Credit as FixtureCredit;
 use Laravel\Cashier\Tests\Fixtures\Order as FixtureOrder;
@@ -111,8 +113,8 @@ class CashierTest extends BaseTestCase
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
         ]);
 
-        $user->orderItems()->save(factory(Cashier::$orderItemModel)->states('unlinked', 'processed')->make());
-        $user->orderItems()->save(factory(Cashier::$orderItemModel)->states('unlinked', 'unprocessed')->make());
+        $user->orderItems()->save(OrderItemFactory::new()->unlinked()->processed()->make());
+        $user->orderItems()->save(OrderItemFactory::new()->unlinked()->unprocessed()->make());
 
         $this->assertEquals(0, $user->orders()->count());
         $this->assertOrderItemCounts($user, 1, 1);
@@ -156,11 +158,11 @@ class CashierTest extends BaseTestCase
             'mollie_mandate_id' => 'mdt_unique_mandate_id_2',
         ]);
 
-        $subscription1 = $user1->subscriptions()->save(factory(Cashier::$subscriptionModel)->make());
-        $subscription2 = $user2->subscriptions()->save(factory(Cashier::$subscriptionModel)->make());
+        $subscription1 = $user1->subscriptions()->save(SubscriptionFactory::new()->make());
+        $subscription2 = $user2->subscriptions()->save(SubscriptionFactory::new()->make());
 
         $subscription1->orderItems()->save(
-            factory(Cashier::$orderItemModel)->states(['unprocessed', 'EUR'])->make([
+            OrderItemFactory::new()->unprocessed()->EUR()->make([
                 'owner_id' => 1,
                 'owner_type' => User::class,
                 'process_at' => now()->addHour(),
@@ -168,7 +170,7 @@ class CashierTest extends BaseTestCase
         );
 
         $subscription1->orderItems()->saveMany(
-            factory(Cashier::$orderItemModel, 2)->states(['unprocessed', 'EUR'])->make([
+            OrderItemFactory::new()->times(2)->unprocessed()->EUR()->make([
                 'owner_id' => 1,
                 'owner_type' => User::class,
                 'process_at' => now()->subHour(),
@@ -176,11 +178,11 @@ class CashierTest extends BaseTestCase
         ); // should process these two
 
         $subscription1->orderItems()->save(
-            factory(Cashier::$orderItemModel)->states('processed')->make()
+            OrderItemFactory::new()->processed()->make()
         ); // should NOT process this (already processed)
 
         $subscription2->orderItems()->save(
-            factory(Cashier::$orderItemModel)->states('unprocessed')->make([
+            OrderItemFactory::new()->unprocessed()->make([
                 'owner_id' => 2,
                 'owner_type' => User::class,
                 'process_at' => now()->subHours(2),

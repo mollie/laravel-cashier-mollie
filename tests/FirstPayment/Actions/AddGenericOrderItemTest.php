@@ -48,7 +48,7 @@ class AddGenericOrderItemTest extends BaseTestCase
             ],
             'taxPercentage' => 20,
             'description' => 'Adding a test order item',
-        ], factory(User::class)->make());
+        ], User::factory()->make());
 
         $this->assertInstanceOf(AddGenericOrderItem::class, $action);
         $this->assertMoneyEURCents(5, $action->getSubtotal());
@@ -66,7 +66,7 @@ class AddGenericOrderItemTest extends BaseTestCase
                 'currency' => 'EUR',
             ],
             'description' => 'Adding a test order item',
-        ], factory(User::class)->make(['taxPercentage' => 0]));
+        ], User::factory()->make(['taxPercentage' => 0]));
 
         $this->assertInstanceOf(AddGenericOrderItem::class, $action);
         $this->assertMoneyEURCents(5, $action->getSubtotal());
@@ -79,7 +79,7 @@ class AddGenericOrderItemTest extends BaseTestCase
     public function canExecute()
     {
         $this->withPackageMigrations();
-        $user = factory(User::class)->create(['tax_percentage' => 20]);
+        $user = User::factory()->create(['tax_percentage' => 20]);
         $this->assertFalse($user->hasCredit());
 
         $action = new AddGenericOrderItem(
