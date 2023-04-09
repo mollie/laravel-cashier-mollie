@@ -87,6 +87,14 @@ class Order extends Model
     }
 
     /**
+     * Defines the metadata that should be stored on the Mollie Payment
+     */
+    public function getMetadata(): array
+    {
+        return [];
+    }
+
+    /**
      * Creates an order from a collection of OrderItems
      *
      * @param  \Laravel\Cashier\Order\OrderItemCollection  $items
@@ -246,7 +254,7 @@ class Order extends Model
                         [
                             'metadata' => array_merge([
                                 'temporary_mollie_payment_id' => $this->mollie_payment_id,
-                            ], $this->getMetaData()),
+                            ], $this->getMetadata()),
                         ]
                     ))->create();
 
@@ -675,11 +683,6 @@ class Order extends Model
         if (empty($mandate) || !$mandate->isValid()) {
             throw new InvalidMandateException('Cannot process payment without valid mandate for order id ' . $this->id);
         }
-    }
-
-    protected function getMetaData(): array
-    {
-        return [];
     }
 
     /**

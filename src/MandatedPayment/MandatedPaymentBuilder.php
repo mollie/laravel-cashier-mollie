@@ -64,9 +64,9 @@ class MandatedPaymentBuilder
      */
     public function getPayload(array $overrides = [])
     {
-        $overrides = array_merge_recursive($this->overrides, $overrides);
+        $overrides = array_merge($this->overrides, $overrides);
 
-        return array_filter(array_merge_recursive([
+        return array_filter(array_merge([
             'sequenceType' => SequenceType::SEQUENCETYPE_RECURRING,
             'mandateId' => $this->owner->mollieMandateId(),
             'customerId' => $this->owner->mollieCustomerId(),
