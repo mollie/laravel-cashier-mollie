@@ -87,6 +87,14 @@ class Order extends Model
     }
 
     /**
+     * Defines the metadata that should be stored on the Mollie Payment
+     */
+    public function getMetadata(): array
+    {
+        return [];
+    }
+
+    /**
      * Creates an order from a collection of OrderItems
      *
      * @param  \Laravel\Cashier\Order\OrderItemCollection  $items
@@ -244,9 +252,9 @@ class Order extends Model
                         $totalDue,
                         url(config('cashier.webhook_url')),
                         [
-                            'metadata' => [
+                            'metadata' => array_merge([
                                 'temporary_mollie_payment_id' => $this->mollie_payment_id,
-                            ],
+                            ], $this->getMetadata()),
                         ]
                     ))->create();
 

@@ -65,6 +65,8 @@ class FirstPaymentBuilder
      */
     protected $molliePayment;
 
+    protected array $metadata = [];
+
     /**
      * FirstPaymentBuilder constructor.
      *
@@ -94,6 +96,13 @@ class FirstPaymentBuilder
         return $this;
     }
 
+    public function withMetadata(array $metadata): static
+    {
+        $this->metadata = $metadata;
+
+        return $this;
+    }
+
     /**
      * Build the Mollie Payment Payload
      *
@@ -110,12 +119,12 @@ class FirstPaymentBuilder
             'amount' => money_to_mollie_array($this->actions->total()),
             'webhookUrl' => $this->webhookUrl,
             'redirectUrl' => $this->redirectUrl,
-            'metadata' => [
+            'metadata' => array_merge([
                 'owner' => [
                     'type' => $this->owner->getMorphClass(),
                     'id' => $this->owner->getKey(),
                 ],
-            ],
+            ], $this->metadata),
         ], $this->options));
     }
 

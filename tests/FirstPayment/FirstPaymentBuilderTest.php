@@ -45,6 +45,10 @@ class FirstPaymentBuilderTest extends BaseTestCase
             'redirectUrl' => 'https://www.example.com',
         ]);
 
+        $builder->withMetadata([
+            'extra-field' => 'Test extra',
+        ]);
+
         $builder->inOrderTo([
             new AddBalance(
                 $owner,
@@ -77,6 +81,7 @@ class FirstPaymentBuilderTest extends BaseTestCase
                     'type' => get_class($owner),
                     'id' => $owner->getKey(),
                 ],
+                'extra-field' => 'Test extra',
             ],
         ];
 

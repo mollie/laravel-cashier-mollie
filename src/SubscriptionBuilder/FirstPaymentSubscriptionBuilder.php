@@ -55,6 +55,8 @@ class FirstPaymentSubscriptionBuilder implements Contract
      */
     protected $isTrial = false;
 
+    protected array $metadata = [];
+
     /**
      * Create a new subscription builder instance.
      *
@@ -134,6 +136,13 @@ class FirstPaymentSubscriptionBuilder implements Contract
     public function trialDays(int $trialDays)
     {
         return $this->trialUntil(Carbon::now()->addDays($trialDays));
+    }
+
+    public function withMetadata(array $metadata): static
+    {
+        $this->metadata = $metadata;
+
+        return $this;
     }
 
     /**
@@ -252,6 +261,7 @@ class FirstPaymentSubscriptionBuilder implements Contract
         $this->firstPaymentBuilder->setRedirectUrl($this->plan->firstPaymentRedirectUrl());
         $this->firstPaymentBuilder->setWebhookUrl($this->plan->firstPaymentWebhookUrl());
         $this->firstPaymentBuilder->setDescription($this->plan->firstPaymentDescription());
+        $this->firstPaymentBuilder->withMetadata($this->metadata);
 
         return $this->firstPaymentBuilder;
     }
