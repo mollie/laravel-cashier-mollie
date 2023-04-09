@@ -43,6 +43,9 @@ class FirstPaymentBuilderTest extends BaseTestCase
         $builder = new FirstPaymentBuilder($owner, [
             'description' => 'Test mandate payment',
             'redirectUrl' => 'https://www.example.com',
+            'metadata' => [
+                'extra-field' => 'Test extra',
+            ]
         ]);
 
         $builder->inOrderTo([
@@ -77,6 +80,7 @@ class FirstPaymentBuilderTest extends BaseTestCase
                     'type' => get_class($owner),
                     'id' => $owner->getKey(),
                 ],
+                'extra-field' => 'Test extra',
             ],
         ];
 

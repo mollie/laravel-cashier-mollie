@@ -101,7 +101,7 @@ class FirstPaymentBuilder
      */
     public function getMolliePayload()
     {
-        return array_filter(array_merge([
+        return array_filter(array_merge_recursive([
             'sequenceType' => SequenceType::SEQUENCETYPE_FIRST,
             'method' => $this->method,
             'customerId' => $this->owner->asMollieCustomer()->id,

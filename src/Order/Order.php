@@ -244,9 +244,9 @@ class Order extends Model
                         $totalDue,
                         url(config('cashier.webhook_url')),
                         [
-                            'metadata' => [
+                            'metadata' => array_merge([
                                 'temporary_mollie_payment_id' => $this->mollie_payment_id,
-                            ],
+                            ], $this->getMetaData()),
                         ]
                     ))->create();
 
@@ -675,6 +675,11 @@ class Order extends Model
         if (empty($mandate) || !$mandate->isValid()) {
             throw new InvalidMandateException('Cannot process payment without valid mandate for order id ' . $this->id);
         }
+    }
+
+    protected function getMetaData(): array
+    {
+        return [];
     }
 
     /**
