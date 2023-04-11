@@ -119,7 +119,10 @@ class FirstPaymentSubscriptionBuilder implements Contract
             $actions[] = new ApplySubscriptionCouponToPayment($this->owner, $coupon, $actions->processedOrderItems());
         }
 
-        $this->firstPaymentBuilder->inOrderTo($actions->toArray())->create();
+        $this->firstPaymentBuilder
+            ->withMetadata($this->metadata)
+            ->inOrderTo($actions->toArray())
+            ->create();
 
         return $this->redirectToCheckout();
     }
@@ -261,7 +264,6 @@ class FirstPaymentSubscriptionBuilder implements Contract
         $this->firstPaymentBuilder->setRedirectUrl($this->plan->firstPaymentRedirectUrl());
         $this->firstPaymentBuilder->setWebhookUrl($this->plan->firstPaymentWebhookUrl());
         $this->firstPaymentBuilder->setDescription($this->plan->firstPaymentDescription());
-        $this->firstPaymentBuilder->withMetadata($this->metadata);
 
         return $this->firstPaymentBuilder;
     }
