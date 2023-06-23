@@ -794,7 +794,9 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
             // Apply new subscription settings
             call_user_func($applyNewSettings);
 
-            if ($this->onTrial()) {
+            $onTrial = $this->onTrial();
+
+            if ($onTrial) {
 
                 // Reschedule next cycle's OrderItem using the new subscription settings
                 $orderItems[] = $this->scheduleNewOrderItemAt($this->trial_ends_at);
@@ -810,7 +812,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
 
             $this->save();
 
-            if ($invoiceNow) {
+            if (! $onTrial && $invoiceNow) {
                 $order = Cashier::$orderModel::createFromItems($orderItems);
                 $order->processPayment();
             }
