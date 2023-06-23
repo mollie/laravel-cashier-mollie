@@ -9,6 +9,8 @@ use Laravel\Cashier\Exceptions\CurrencyMismatchException;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\BaseTestCase;
+use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
+use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 
 class MultiCurrencyCouponOrderItemPreprocessorTest extends BaseTestCase
 {
@@ -24,13 +26,13 @@ class MultiCurrencyCouponOrderItemPreprocessorTest extends BaseTestCase
         $this->withMockedUsdCouponRepository();
 
         /** @var Subscription $subscription */
-        $subscription = factory(Cashier::$subscriptionModel)->create();
-        $item = factory(Cashier::$orderItemModel)->make();
+        $subscription = SubscriptionFactory::new()->create();
+        $item = OrderItemFactory::new()->make();
         $subscription->orderItems()->save($item);
 
         /** @var Subscription $subscriptionUsd */
-        $subscriptionUsd = factory(Cashier::$subscriptionModel)->create();
-        $itemUsd = factory(Cashier::$orderItemModel)->make(['currency' => 'USD']);
+        $subscriptionUsd = SubscriptionFactory::new()->create();
+        $itemUsd = OrderItemFactory::new()->USD()->make();
         $subscriptionUsd->orderItems()->save($itemUsd);
 
         /** @var \Laravel\Cashier\Coupon\Coupon $coupon */

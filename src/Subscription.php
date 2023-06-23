@@ -61,11 +61,11 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      *
      * @var array
      */
-    protected $dates = [
-        'trial_ends_at',
-        'cycle_started_at',
-        'cycle_ends_at',
-        'ends_at',
+    protected $casts = [
+        'trial_ends_at' => 'datetime',
+        'cycle_started_at' => 'datetime',
+        'cycle_ends_at' => 'datetime',
+        'ends_at' => 'datetime',
     ];
 
     /**
@@ -104,7 +104,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public function ended()
     {
-        return $this->cancelled() && ! $this->onGracePeriod();
+        return $this->cancelled() && !$this->onGracePeriod();
     }
 
     /**
@@ -134,7 +134,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public function recurring()
     {
-        return ! $this->onTrial() && ! $this->cancelled();
+        return !$this->onTrial() && !$this->cancelled();
     }
 
     /**
@@ -144,7 +144,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public function cancelled()
     {
-        return ! is_null($this->ends_at);
+        return !is_null($this->ends_at);
     }
 
     /**
@@ -286,18 +286,18 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public function cancelAt(Carbon $endsAt, $reason = SubscriptionCancellationReason::UNKNOWN)
     {
-        return DB::transaction(function () use ($reason, $endsAt) {
+        DB::transaction(function () use ($endsAt) {
             $this->removeScheduledOrderItem();
 
             $this->fill([
                 'ends_at' => $endsAt,
                 'cycle_ends_at' => null,
             ])->save();
-
-            Event::dispatch(new SubscriptionCancelled($this, $reason));
-
-            return $this;
         });
+
+        Event::dispatch(new SubscriptionCancelled($this, $reason));
+
+        return $this;
     }
 
     /**
@@ -346,11 +346,11 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public function resume()
     {
-        if (! $this->cancelled()) {
+        if (!$this->cancelled()) {
             throw new LogicException('Unable to resume a subscription that is not cancelled.');
         }
 
-        if (! $this->onGracePeriod()) {
+        if (!$this->onGracePeriod()) {
             throw new LogicException('Unable to resume a subscription that is not within grace period.');
         }
 
@@ -468,7 +468,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
         $plan_swapped = false;
         $previousPlan = null;
 
-        if (! empty($subscription->next_plan)) {
+        if (!empty($subscription->next_plan)) {
             $plan_swapped = true;
             $previousPlan = $subscription->plan;
             $subscription->plan = $subscription->next_plan;
@@ -704,7 +704,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
 
         // Determine base amount eligible to reimburse
         $latestProcessedOrderItem = $this->latestProcessedOrderItem();
-        if (! $latestProcessedOrderItem) {
+        if (!$latestProcessedOrderItem) {
             return $zeroAmount;
         }
 

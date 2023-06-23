@@ -47,7 +47,7 @@ class AddBalanceTest extends BaseTestCase
             ],
             'taxPercentage' => 0,
             'description' => 'Adding some test balance',
-        ], factory(User::class)->make());
+        ], User::factory()->make());
 
         $this->assertInstanceOf(AddBalance::class, $action);
 
@@ -61,7 +61,7 @@ class AddBalanceTest extends BaseTestCase
     public function canExecute()
     {
         $this->withPackageMigrations();
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $this->assertFalse($user->hasCredit());
 
         $action = new AddBalance(

@@ -23,7 +23,7 @@ class FirstPaymentHandlerTest extends BaseTestCase
 
         $molliePayment = $this->getMandatePaymentStub();
 
-        $owner = factory(User::class)->create([
+        $owner = User::factory()->create([
             'id' => $molliePayment->metadata->owner->id,
             'mollie_customer_id' => 'cst_unique_customer_id',
         ]);

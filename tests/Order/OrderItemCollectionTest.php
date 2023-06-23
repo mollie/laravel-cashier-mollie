@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
+use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
 
 class OrderItemCollectionTest extends BaseTestCase
@@ -14,9 +15,9 @@ class OrderItemCollectionTest extends BaseTestCase
     public function testCurrencies()
     {
         $collection = new OrderItemCollection([
-            factory(Cashier::$orderItemModel)->states('USD')->make(),
-            factory(Cashier::$orderItemModel)->states('USD')->make(),
-            factory(Cashier::$orderItemModel)->states('EUR')->make(),
+            OrderItemFactory::new()->USD()->make(),
+            OrderItemFactory::new()->USD()->make(),
+            OrderItemFactory::new()->EUR()->make(),
         ]);
 
         $this->assertEquals(collect(['USD', 'EUR']), $collection->currencies());
@@ -26,8 +27,8 @@ class OrderItemCollectionTest extends BaseTestCase
     public function testCurrency()
     {
         $collection = new OrderItemCollection([
-            factory(Cashier::$orderItemModel)->states('USD')->make(),
-            factory(Cashier::$orderItemModel)->states('USD')->make(),
+            OrderItemFactory::new()->USD()->make(),
+            OrderItemFactory::new()->USD()->make(),
         ]);
 
         $this->assertEquals('USD', $collection->currency());
@@ -37,8 +38,8 @@ class OrderItemCollectionTest extends BaseTestCase
     public function testCurrencyThrowsExceptionWhenMultipleCurrenciesAreUsed()
     {
         $collection = new OrderItemCollection([
-            factory(Cashier::$orderItemModel)->states('USD')->make(),
-            factory(Cashier::$orderItemModel)->states('EUR')->make(),
+            OrderItemFactory::new()->USD()->make(),
+            OrderItemFactory::new()->EUR()->make(),
         ]);
 
         $this->assertEquals(collect(['USD', 'EUR']), $collection->currencies());
@@ -51,12 +52,12 @@ class OrderItemCollectionTest extends BaseTestCase
     public function canGetTotal()
     {
         $collection = new OrderItemCollection([
-            factory(Cashier::$orderItemModel)->states('EUR')->make([
+            OrderItemFactory::new()->EUR()->make([
                 'unit_price' => 12150,
                 'quantity' => 1,
                 'tax_percentage' => 10.0,
             ]),
-            factory(Cashier::$orderItemModel)->states('EUR')->make([
+            OrderItemFactory::new()->EUR()->make([
                 'unit_price' => 12150,
                 'quantity' => 2,
                 'tax_percentage' => 10.0,
@@ -70,8 +71,8 @@ class OrderItemCollectionTest extends BaseTestCase
     public function cannotGetTotalForMultipleCurrencies()
     {
         $collection = new OrderItemCollection([
-            factory(Cashier::$orderItemModel)->states('USD')->make(),
-            factory(Cashier::$orderItemModel)->states('EUR')->make(),
+            OrderItemFactory::new()->USD()->make(),
+            OrderItemFactory::new()->EUR()->make(),
         ]);
 
         $this->expectException(\LogicException::class);
@@ -84,8 +85,8 @@ class OrderItemCollectionTest extends BaseTestCase
     {
         $this->withPackageMigrations();
 
-        factory(User::class, 3)->create()->each(function ($owner) {
-            $owner->orderItems()->saveMany(factory(Cashier::$orderItemModel, 2)->make());
+        User::factory(3)->create()->each(function ($owner) {
+            $owner->orderItems()->saveMany(OrderItemFactory::new()->times(2)->make());
         });
 
         $owners = Cashier::$orderItemModel::all()->owners();
@@ -99,15 +100,15 @@ class OrderItemCollectionTest extends BaseTestCase
     /** @test */
     public function testWhereOwners()
     {
-        $item1 = factory(Cashier::$orderItemModel)->make([
+        $item1 = OrderItemFactory::new()->make([
             'owner_id' => 1,
             'owner_type' => User::class,
         ]);
-        $item2 = factory(Cashier::$orderItemModel)->make([
+        $item2 = OrderItemFactory::new()->make([
             'owner_id' => 2,
             'owner_type' => User::class,
         ]);
-        $item3 = factory(Cashier::$orderItemModel)->make([
+        $item3 = OrderItemFactory::new()->make([
             'owner_id' => 2,
             'owner_type' => User::class,
         ]);
@@ -136,9 +137,9 @@ class OrderItemCollectionTest extends BaseTestCase
     /** @test */
     public function testWhereCurrency()
     {
-        $item1 = factory(Cashier::$orderItemModel)->states('EUR')->make();
-        $item2 = factory(Cashier::$orderItemModel)->states('USD')->make();
-        $item3 = factory(Cashier::$orderItemModel)->states('USD')->make();
+        $item1 = OrderItemFactory::new()->EUR()->make();
+        $item2 = OrderItemFactory::new()->USD()->make();
+        $item3 = OrderItemFactory::new()->USD()->make();
 
         $collection = new OrderItemCollection([$item1, $item2, $item3]);
 
@@ -161,19 +162,19 @@ class OrderItemCollectionTest extends BaseTestCase
     {
         $this->withPackageMigrations();
 
-        factory(User::class)->create(['id' => 1]);
-        factory(User::class)->create(['id' => 2]);
+        User::factory()->create(['id' => 1]);
+        User::factory()->create(['id' => 2]);
 
         $collection = new OrderItemCollection([
-            factory(Cashier::$orderItemModel)->make([
+            OrderItemFactory::new()->make([
                 'owner_id' => 1,
                 'owner_type' => User::class,
             ]),
-            factory(Cashier::$orderItemModel)->make([
+            OrderItemFactory::new()->make([
                 'owner_id' => 2,
                 'owner_type' => User::class,
             ]),
-            factory(Cashier::$orderItemModel)->make([
+            OrderItemFactory::new()->make([
                 'owner_id' => 2,
                 'owner_type' => User::class,
             ]),
@@ -198,9 +199,9 @@ class OrderItemCollectionTest extends BaseTestCase
     public function testChunkByCurrency()
     {
         $collection = new OrderItemCollection([
-            factory(Cashier::$orderItemModel)->states('USD')->make(),
-            factory(Cashier::$orderItemModel)->states('USD')->make(),
-            factory(Cashier::$orderItemModel)->states('EUR')->make(),
+            OrderItemFactory::new()->USD()->make(),
+            OrderItemFactory::new()->USD()->make(),
+            OrderItemFactory::new()->EUR()->make(),
         ]);
 
         $result = $collection->chunkByCurrency();
@@ -216,19 +217,19 @@ class OrderItemCollectionTest extends BaseTestCase
     {
         $this->withPackageMigrations();
 
-        factory(User::class)->create(['id' => 1]);
-        factory(User::class)->create(['id' => 2]);
+        User::factory()->create(['id' => 1]);
+        User::factory()->create(['id' => 2]);
 
         $collection = new OrderItemCollection([
-            factory(Cashier::$orderItemModel)->states('USD')->make([
+            OrderItemFactory::new()->USD()->make([
                 'owner_id' => 1,
                 'owner_type' => User::class,
             ]),
-            factory(Cashier::$orderItemModel)->states('USD')->make([
+            OrderItemFactory::new()->USD()->make([
                 'owner_id' => 2,
                 'owner_type' => User::class,
             ]),
-            factory(Cashier::$orderItemModel)->states('EUR')->make([
+            OrderItemFactory::new()->EUR()->make([
                 'owner_id' => 2,
                 'owner_type' => User::class,
             ]),
@@ -250,9 +251,9 @@ class OrderItemCollectionTest extends BaseTestCase
     public function testTaxPercentages()
     {
         $collection = new OrderItemCollection([
-            factory(Cashier::$orderItemModel)->make(['tax_percentage' => 21.5]),
-            factory(Cashier::$orderItemModel)->make(['tax_percentage' => 21.5]),
-            factory(Cashier::$orderItemModel)->make(['tax_percentage' => 6]),
+            OrderItemFactory::new()->make(['tax_percentage' => 21.5]),
+            OrderItemFactory::new()->make(['tax_percentage' => 21.5]),
+            OrderItemFactory::new()->make(['tax_percentage' => 6]),
         ]);
 
         $this->assertEquals(['6', '21.5'], $collection->taxPercentages()->all());

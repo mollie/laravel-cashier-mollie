@@ -11,7 +11,7 @@ class HelpersTest extends TestCase
     /** @test */
     public function testMoney()
     {
-        $money = new Money(1234, new Currency('EUR'));
+        $money = money(1234, 'EUR');
 
         $this->assertInstanceOf(Money::class, $money);
         $this->assertTrue(Money::EUR(1234)->equals($money));

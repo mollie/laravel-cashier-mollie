@@ -7,6 +7,7 @@ use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\FirstPayment\Actions\ApplySubscriptionCouponToPayment as Action;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
+use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
 
 class ApplySubscriptionCouponToPaymentTest extends BaseTestCase
@@ -25,8 +26,8 @@ class ApplySubscriptionCouponToPaymentTest extends BaseTestCase
 
         $this->withMockedCouponRepository();
         $this->coupon = app()->make(CouponRepository::class)->findOrFail('test-coupon');
-        $this->owner = factory(User::class)->make();
-        $orderItems = factory(Cashier::$orderItemModel)->make([
+        $this->owner = User::factory()->make();
+        $orderItems = OrderItemFactory::new()->make([
             'unit_price' => 10000,
             'currency' => 'EUR',
         ])->toCollection();
@@ -50,7 +51,7 @@ class ApplySubscriptionCouponToPaymentTest extends BaseTestCase
     /** @test */
     public function testCreateFromPayloadReturnsNull()
     {
-        $this->assertNull(Action::createFromPayload(['foo' => 'bar'], factory(User::class)->make()));
+        $this->assertNull(Action::createFromPayload(['foo' => 'bar'], User::factory()->make()));
     }
 
     /** @test */

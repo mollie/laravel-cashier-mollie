@@ -9,7 +9,7 @@ subscription:
 ```php
 use App\Models\User;
 
-$user = App\User::find(1);
+$user = User::find(1);
 
 // Make sure to configure the 'premium' plan in config/cashier_plans.php
 $result = $user->newSubscription('main', 'premium')->create();

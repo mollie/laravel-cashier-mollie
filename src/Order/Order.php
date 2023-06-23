@@ -71,17 +71,9 @@ class Order extends Model
         'balance_before' => 'int',
         'credit_used' => 'int',
         'total_due' => 'int',
-    ];
-
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    protected $dates = [
-        'processed_at',
-        'created_at',
-        'updated_at',
+        'processed_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     protected $guarded = [];
@@ -104,7 +96,7 @@ class Order extends Model
      */
     public static function createFromItems(OrderItemCollection $items, $overrides = [], $process_items = true)
     {
-        return DB::transaction(function () use ($items, $overrides, $process_items) {
+        $order = DB::transaction(function () use ($items, $overrides, $process_items) {
             if ($process_items) {
                 $items = $items->preprocess();
             }
@@ -141,10 +133,12 @@ class Order extends Model
                 }
             });
 
-            Event::dispatch(new OrderCreated($order));
-
             return $order;
         });
+
+        Event::dispatch(new OrderCreated($order));
+
+        return $order;
     }
 
     /**
@@ -188,7 +182,7 @@ class Order extends Model
      */
     public function processPayment()
     {
-        $this->update(['mollie_payment_id' => 'temp_'.Str::uuid()]);
+        $this->update(['mollie_payment_id' => 'temp_' . Str::uuid()]);
 
         DB::transaction(function () {
             $owner = $this->owner;
@@ -233,9 +227,9 @@ class Order extends Model
                     $this->mollie_payment_id = null;
 
                     // Add credit to the owner's balance
-                    $credit = Cashier::$creditModel::addAmountForOwner($owner, new Money(-($this->total_due), new Currency($this->currency)));
+                    $credit = Cashier::$creditModel::addAmountForOwner($owner, new Money(- ($this->total_due), new Currency($this->currency)));
 
-                    if (! $owner->hasActiveSubscriptionWithCurrency($this->currency)) {
+                    if (!$owner->hasActiveSubscriptionWithCurrency($this->currency)) {
                         Event::dispatch(new BalanceTurnedStale($credit));
                     }
 
@@ -246,7 +240,7 @@ class Order extends Model
                     // Create Mollie payment
                     $payment = (new MandatedPaymentBuilder(
                         $owner,
-                        'Order '.$this->number,
+                        'Order ' . $this->number,
                         $totalDue,
                         url(config('cashier.webhook_url')),
                         [
@@ -331,10 +325,10 @@ class Order extends Model
         if (method_exists($owner, 'getExtraBillingInformation')) {
             $extra_information = $owner->getExtraBillingInformation();
 
-            if (! empty($extra_information)) {
+            if (!empty($extra_information)) {
                 $extra_information = explode("\n", $extra_information);
 
-                if (is_array($extra_information) && ! empty($extra_information)) {
+                if (is_array($extra_information) && !empty($extra_information)) {
                     $invoice->setExtraInformation($extra_information);
                 }
             }
@@ -350,7 +344,7 @@ class Order extends Model
      */
     public function isProcessed()
     {
-        return ! empty($this->processed_at);
+        return !empty($this->processed_at);
     }
 
     /**
@@ -378,7 +372,7 @@ class Order extends Model
      */
     public function scopeUnprocessed($query, $unprocessed = true)
     {
-        return $query->processed(! $unprocessed);
+        return $query->processed(!$unprocessed);
     }
 
     /**
@@ -451,7 +445,7 @@ class Order extends Model
      */
     public function handlePaymentFailed(MolliePayment $molliePayment)
     {
-        return DB::transaction(function () use ($molliePayment) {
+        $localPayment = DB::transaction(function () use ($molliePayment) {
             if ($this->creditApplied()) {
                 $this->owner->addCredit($this->getCreditUsed());
             }
@@ -467,9 +461,8 @@ class Order extends Model
             $localPayment = Cashier::$paymentModel::findByMolliePaymentOrCreate($molliePayment, $this->owner);
             $localPayment->update([
                 'mollie_payment_status' => 'failed',
+                'order_id' => $this->id,
             ]);
-
-            Event::dispatch(new OrderPaymentFailed($this));
 
             $this->items->each(function (OrderItem $item) {
                 $item->handlePaymentFailed();
@@ -477,8 +470,12 @@ class Order extends Model
 
             $this->owner->validateMollieMandate();
 
-            return $this;
+            return $localPayment;
         });
+
+        Event::dispatch(new OrderPaymentFailed($this, $localPayment));
+
+        return $this;
     }
 
     /**
@@ -490,7 +487,7 @@ class Order extends Model
      */
     public function handlePaymentFailedDueToInvalidMandate()
     {
-        return DB::transaction(function () {
+        DB::transaction(function () {
             if ($this->creditApplied()) {
                 $this->owner->addCredit($this->getCreditUsed());
             }
@@ -503,16 +500,17 @@ class Order extends Model
                 'processed_at' => now(),
             ]);
 
-            Event::dispatch(new OrderPaymentFailedDueToInvalidMandate($this));
 
             $this->items->each(function (OrderItem $item) {
                 $item->handlePaymentFailed();
             });
 
             $this->owner->clearMollieMandate();
-
-            return $this;
         });
+
+        Event::dispatch(new OrderPaymentFailedDueToInvalidMandate($this));
+
+        return $this;
     }
 
     /**
@@ -524,7 +522,7 @@ class Order extends Model
      */
     public function handlePaymentPaid(MolliePayment $molliePayment)
     {
-        return DB::transaction(function () use ($molliePayment) {
+        $localPayment = DB::transaction(function () use ($molliePayment) {
             $this->update(['mollie_payment_status' => 'paid']);
 
             // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
@@ -535,14 +533,16 @@ class Order extends Model
                 'order_id' => $this->id,
             ]);
 
-            Event::dispatch(new OrderPaymentPaid($this));
-
             $this->items->each(function (OrderItem $item) {
                 $item->handlePaymentPaid();
             });
 
-            return $this;
+            return $localPayment;
         });
+
+        Event::dispatch(new OrderPaymentPaid($this, $localPayment));
+
+        return $this;
     }
 
     /**
@@ -672,8 +672,8 @@ class Order extends Model
      */
     protected function guardMandate(?Mandate $mandate)
     {
-        if (empty($mandate) || ! $mandate->isValid()) {
-            throw new InvalidMandateException('Cannot process payment without valid mandate for order id '.$this->id);
+        if (empty($mandate) || !$mandate->isValid()) {
+            throw new InvalidMandateException('Cannot process payment without valid mandate for order id ' . $this->id);
         }
     }
 
@@ -743,7 +743,7 @@ class Order extends Model
             throw new OrderRetryRequiresStatusFailedException();
         }
 
-        if (! $this->owner->validMollieMandate()) {
+        if (!$this->owner->validMollieMandate()) {
             throw new InvalidMandateException();
         }
 

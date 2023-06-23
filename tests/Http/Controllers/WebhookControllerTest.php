@@ -13,6 +13,8 @@ use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
+use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
+use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Laravel\Cashier\Types\SubscriptionCancellationReason;
 use Mollie\Api\Exceptions\ApiException;
@@ -94,8 +96,8 @@ class WebhookControllerTest extends BaseTestCase
         $this->withTestNow('2019-01-01');
         Event::fake();
 
-        $user = factory(User::class)->create();
-        $subscription = $user->subscriptions()->save(factory(Cashier::$subscriptionModel)->make([
+        $user = User::factory()->create();
+        $subscription = $user->subscriptions()->save(SubscriptionFactory::new()->make([
             'plan' => 'monthly-10-1',
         ]));
         $item = $subscription->scheduleNewOrderItemAt(now());
@@ -153,7 +155,8 @@ class WebhookControllerTest extends BaseTestCase
         $this->assertEquals('failed', Cashier::$paymentModel::first()->mollie_payment_status);
 
         Event::assertDispatched(OrderPaymentFailed::class, function (OrderPaymentFailed $event) use ($order) {
-            return $event->order->is($order);
+            return $event->order->is($order)
+                && $event->payment->is($order->payments->first());
         });
 
         Event::assertDispatched(SubscriptionCancelled::class, function (SubscriptionCancelled $event) use ($subscription) {
@@ -171,8 +174,8 @@ class WebhookControllerTest extends BaseTestCase
         $this->withConfiguredPlans();
         Event::fake();
 
-        $user = factory(User::class)->create();
-        $subscription = $user->subscriptions()->save(factory(Cashier::$subscriptionModel)->make([
+        $user = User::factory()->create();
+        $subscription = $user->subscriptions()->save(SubscriptionFactory::new()->make([
             'plan' => 'monthly-10-1',
         ]));
         $item = $subscription->scheduleNewOrderItemAt(now());
@@ -225,7 +228,8 @@ class WebhookControllerTest extends BaseTestCase
         $this->assertEquals('paid', Cashier::$paymentModel::first()->mollie_payment_status);
 
         Event::assertDispatched(OrderPaymentPaid::class, function (OrderPaymentPaid $event) use ($order) {
-            return $event->order->is($order);
+            return $event->order->is($order)
+                && $event->payment->is($order->payments->first());
         });
     }
 
@@ -237,7 +241,7 @@ class WebhookControllerTest extends BaseTestCase
 
         $paymentId = 'tr_payment_paid_id';
 
-        factory(Cashier::$orderModel)->create([
+        OrderFactory::new()->create([
             'mollie_payment_id' => $paymentId,
             'mollie_payment_status' => 'paid',
         ]);

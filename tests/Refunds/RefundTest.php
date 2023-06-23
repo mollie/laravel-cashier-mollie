@@ -11,6 +11,8 @@ use Laravel\Cashier\Events\RefundProcessed;
 use Laravel\Cashier\Refunds\Refund;
 use Laravel\Cashier\Refunds\RefundItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
+use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
+use Laravel\Cashier\Tests\Database\Factories\RefundFactory;
 use Mollie\Api\Types\RefundStatus as MollieRefundStatus;
 
 class RefundTest extends BaseTestCase
@@ -22,12 +24,12 @@ class RefundTest extends BaseTestCase
         $this->withPackageMigrations();
 
         $user = $this->getCustomerUser();
-        $originalOrderItems = factory(Cashier::$orderItemModel, 2)->create();
+        $originalOrderItems = OrderItemFactory::new()->times(2)->create();
         $originalOrder = Cashier::$orderModel::createProcessedFromItems($originalOrderItems);
         $this->assertMoneyEURCents(0, $originalOrder->getAmountRefunded());
 
         /** @var Refund $refund */
-        $refund = factory(Cashier::$refundModel)->create([
+        $refund = RefundFactory::new()->create([
             'total' => 29524,
             'currency' => 'EUR',
         ]);
@@ -61,12 +63,12 @@ class RefundTest extends BaseTestCase
         $this->withPackageMigrations();
 
         $user = $this->getCustomerUser();
-        $originalOrderItems = factory(Cashier::$orderItemModel, 2)->create();
+        $originalOrderItems = OrderItemFactory::new()->times(2)->create();
         $originalOrder = Cashier::$orderModel::createProcessedFromItems($originalOrderItems);
         $this->assertMoneyEURCents(0, $originalOrder->getAmountRefunded());
 
         /** @var Refund $refund */
-        $refund = factory(Cashier::$refundModel)->create([
+        $refund = RefundFactory::new()->create([
             'total' => 29524,
             'currency' => 'EUR',
         ]);

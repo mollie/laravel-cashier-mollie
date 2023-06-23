@@ -30,13 +30,12 @@ abstract class BaseTestCase extends TestCase
         parent::setUp();
 
         $this->withFixtureModels();
-        $this->withFactories(__DIR__.'/database/factories');
 
         config(['cashier.webhook_url' => 'https://www.example.com/webhook']);
         config(['cashier.aftercare_webhook_url' => 'https://www.example.com/aftercare-webhook']);
         config(['cashier.first_payment.webhook_url' => 'https://www.example.com/mandate-webhook']);
 
-        if (! $this->interactWithMollieAPI) {
+        if (!$this->interactWithMollieAPI) {
             // Disable the Mollie API
             $this->mock(MollieApiWrapper::class, null);
         }
@@ -58,50 +57,50 @@ abstract class BaseTestCase extends TestCase
      */
     protected function withPackageMigrations()
     {
-        $migrations_dir = __DIR__.'/../database/migrations';
+        $migrations_dir = __DIR__ . '/../database/migrations';
 
         $this->runMigrations(
             collect(
                 [
                     [
                         'class' => CreateUsersTable::class,
-                        'file_path' => __DIR__.'/database/migrations/create_users_table.php',
+                        'file_path' => __DIR__ . '/Database/Migrations/create_users_table.php',
                     ],
                     [
                         'class' => '\CreateSubscriptionsTable',
-                        'file_path' => $migrations_dir.'/create_subscriptions_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_subscriptions_table.php.stub',
                     ],
                     [
                         'class' => '\CreateOrderItemsTable',
-                        'file_path' => $migrations_dir.'/create_order_items_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_order_items_table.php.stub',
                     ],
                     [
                         'class' => '\CreateOrdersTable',
-                        'file_path' => $migrations_dir.'/create_orders_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_orders_table.php.stub',
                     ],
                     [
                         'class' => '\CreateCreditsTable',
-                        'file_path' => $migrations_dir.'/create_credits_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_credits_table.php.stub',
                     ],
                     [
                         'class' => '\CreateRedeemedCouponsTable',
-                        'file_path' => $migrations_dir.'/create_redeemed_coupons_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_redeemed_coupons_table.php.stub',
                     ],
                     [
                         'class' => '\CreateAppliedCouponsTable',
-                        'file_path' => $migrations_dir.'/create_applied_coupons_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_applied_coupons_table.php.stub',
                     ],
                     [
                         'class' => '\CreatePaymentsTable',
-                        'file_path' => $migrations_dir.'/create_payments_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_payments_table.php.stub',
                     ],
                     [
                         'class' => '\CreateRefundItemsTable',
-                        'file_path' => $migrations_dir.'/create_refund_items_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_refund_items_table.php.stub',
                     ],
                     [
                         'class' => '\CreateRefundsTable',
-                        'file_path' => $migrations_dir.'/create_refunds_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_refunds_table.php.stub',
                     ],
                 ]
             )
@@ -326,7 +325,7 @@ abstract class BaseTestCase extends TestCase
      */
     protected function getUser($persist = true, $overrides = [])
     {
-        $user = factory(User::class)->make($overrides);
+        $user = User::factory()->make($overrides);
 
         if ($persist) {
             $user->save();

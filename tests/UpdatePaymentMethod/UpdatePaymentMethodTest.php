@@ -19,7 +19,7 @@ class UpdatePaymentMethodTest extends BaseTestCase
     {
         $this->withPackageMigrations();
 
-        $owner = factory(User::class)->create([
+        $owner = User::factory()->create([
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
         ]);
 

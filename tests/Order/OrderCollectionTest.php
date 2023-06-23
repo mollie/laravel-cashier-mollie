@@ -2,9 +2,9 @@
 
 namespace Laravel\Cashier\Tests\Order;
 
-use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\Invoice;
 use Laravel\Cashier\Tests\BaseTestCase;
+use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
 
 class OrderCollectionTest extends BaseTestCase
@@ -13,8 +13,8 @@ class OrderCollectionTest extends BaseTestCase
     public function canGetInvoices()
     {
         $this->withPackageMigrations();
-        $user = factory(User::class)->create();
-        $orders = $user->orders()->saveMany(factory(Cashier::$orderModel, 2)->make());
+        $user = User::factory()->create();
+        $orders = $user->orders()->saveMany(OrderFactory::new()->times(2)->make());
 
         $invoices = $orders->invoices();
 
