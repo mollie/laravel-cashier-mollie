@@ -64,7 +64,7 @@ abstract class BaseTestCase extends TestCase
                 [
                     [
                         'class' => CreateUsersTable::class,
-                        'file_path' => __DIR__ . '/database/migrations/create_users_table.php',
+                        'file_path' => __DIR__ . '/Database/Migrations/create_users_table.php',
                     ],
                     [
                         'class' => '\CreateSubscriptionsTable',

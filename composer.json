@@ -45,7 +45,7 @@
     "guzzlehttp/guzzle": "^7.0",
     "mockery/mockery": "^1.4",
     "orchestra/testbench": "^7.0|^8.0",
-    "phpunit/phpunit": "^9.3|^10.0"
+    "phpunit/phpunit": "^9.5"
   },
   "autoload": {
     "files": [
@@ -70,7 +70,7 @@
   "config": {
     "sort-packages": true
   },
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "prefer-stable": true,
   "scripts": {
     "test": "./vendor/bin/phpunit tests"
