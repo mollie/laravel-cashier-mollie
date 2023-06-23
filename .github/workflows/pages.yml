@@ -2,9 +2,9 @@ name: Build and Deploy GitHub Page
 on:
     push:
     pull_request:
-#        branches: [main]
-        paths:
-            - 'docs/**'
+    schedule:
+        - cron: '0 0 * * *'
+
 jobs:
     build-and-deploy:
         runs-on: ubuntu-latest
