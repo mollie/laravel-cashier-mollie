@@ -162,7 +162,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     public function swappingOnTrialDoesNotCreateAnOrderEvenWhenInvoiceNowIsTrue()
     {
         $subscription = $this->getUser()->subscriptions()->save(
-            factory(Cashier::$subscriptionModel)->make([
+            SubscriptionFactory::new()->make([
                 'trial_ends_at' => now()->addWeek(),
                 'plan' => 'monthly-20-1',
             ])
