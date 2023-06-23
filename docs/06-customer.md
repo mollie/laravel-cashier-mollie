@@ -22,8 +22,8 @@ By default, the amount paid will be added to the customer's balance. If you want
 $response = $user->updatePaymentMethod()
     ->skipBalance()
     ->create();
-    
-return $response; 
+
+return $response;
 ```
 
 ## Customer balance
@@ -40,7 +40,7 @@ __Use these with care:__
 
 ```php
 $credit = $user->credit('EUR');
-$user->addCredit(money(10, 'EUR')); // add €10.00
+$user->addCredit(money(1000, 'EUR')); // add €10.00
 $user->hasCredit('EUR');
 ```
 
@@ -65,7 +65,7 @@ class User extends Model
      * @example 'nl_NL'
      */
     public function getLocale() {
-        return $this->locale; 
+        return $this->locale;
     }
 }
 ```
