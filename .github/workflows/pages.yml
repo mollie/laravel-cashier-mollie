@@ -1,6 +1,7 @@
 name: Build and Deploy GitHub Page
 on:
     push:
+    pull_request:
 #        branches: [main]
         paths:
             - 'docs/**'
