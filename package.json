@@ -8,8 +8,8 @@
     "build": "vuepress build docs",
     "serve": "npm run dev"
   },
-  "repository": "git@github.com:ciungulete/cashiermollie.com.git",
-  "author": "Andrei Ciungulete <andrei.ciungulete@andali.ro>",
+  "repository": "git@github.com:mollie/laravel-cashier-mollie.git",
+  "author": "Sander van Hooft<sander@sandorian.com>",
   "license": "MIT",
   "dependencies": {
     "global": "^4.3.2",
