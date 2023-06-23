@@ -1,7 +1,7 @@
 name: Build and Deploy GitHub Page
 on:
     push:
-        branches: [main]
+#        branches: [main]
         paths:
             - 'docs/**'
 jobs:
@@ -25,3 +25,4 @@ jobs:
                   branch: gh-pages # The branch the action should deploy to.
                   folder: docs/.vuepress/dist # The folder the action should deploy.
                   clean: true # Automatically remove deleted files from the deploy branch
+                  dry-run: true
