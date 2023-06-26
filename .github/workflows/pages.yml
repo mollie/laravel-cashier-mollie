@@ -22,7 +22,6 @@ jobs:
             - name: Install and Build 🔧
               run: |
                   npm install
-#                  export NODE_OPTIONS=--openssl-legacy-provider
                   npm run build
 #
 #            - name: Deploy 🚀
