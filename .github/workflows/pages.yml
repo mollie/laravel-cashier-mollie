@@ -16,11 +16,11 @@ jobs:
 
             - uses: actions/setup-node@v3
               with:
-                node-version: 20
+                node-version: 18.12.1
 
             - name: Install and Build 🔧
               run: |
-                  npm install
+                  npm install -
                   npm run build
 
 #            - name: Deploy 🚀
