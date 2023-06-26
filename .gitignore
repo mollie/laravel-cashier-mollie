@@ -2,7 +2,6 @@ build
 composer.lock
 coverage
 node_modules
-package-lock.json
 phpunit.xml
 vendor
 .phpunit.result.cache
