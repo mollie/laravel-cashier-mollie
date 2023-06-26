@@ -1,8 +1,10 @@
 build
 composer.lock
-vendor
 coverage
+node_modules
+package-lock.json
 phpunit.xml
+vendor
 .phpunit.result.cache
 .phpunit.cache
 .idea

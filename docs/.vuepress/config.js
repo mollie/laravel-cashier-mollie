@@ -81,5 +81,10 @@ module.exports = {
                 hostname: "https://www.cashiermollie.com"
             },
         ],
-    ]
+    ],
+    configureWebpack: {
+        output: {
+            hashFunction: "sha256",
+        },
+    },
 }
