@@ -20,7 +20,7 @@ jobs:
 
             - name: Install and Build 🔧
               run: |
-                  npm ci
+                  npm install
                   npm run build --openssl-legacy-provider
 
 #            - name: Deploy 🚀
