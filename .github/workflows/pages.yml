@@ -9,11 +9,12 @@ jobs:
     build-and-deploy:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout 🛎️
+            - name: Checkout
               uses: actions/checkout@v3.5.3
               with:
                   persist-credentials: false
 
+            - name: Set up Node
             - uses: actions/setup-node@v3
               with:
                 node-version: 20
@@ -21,13 +22,14 @@ jobs:
             - name: Install and Build 🔧
               run: |
                   npm install
+                  export NODE_OPTIONS=--openssl-legacy-provider
                   npm run build
 
-#            - name: Deploy 🚀
-#              uses: JamesIves/github-pages-deploy-action@v4.4.2
-#              with:
-#                  token: ${{ secrets.GITHUB_TOKEN }}
-#                  branch: gh-pages # The branch the action should deploy to.
-#                  folder: docs/.vuepress/dist # The folder the action should deploy.
-#                  clean: true # Automatically remove deleted files from the deploy branch
-#                  dry-run: true
+            - name: Deploy 🚀
+              uses: JamesIves/github-pages-deploy-action@v4.4.2
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  branch: gh-pages # The branch the action should deploy to.
+                  folder: docs/.vuepress/dist # The folder the action should deploy.
+                  clean: true # Automatically remove deleted files from the deploy branch
+                  dry-run: true
