@@ -14,14 +14,14 @@ jobs:
               with:
                   persist-credentials: false
 
-            - uses: actions/setup-node@v3
-              with:
-                node-version: 18.12.1
+#            - uses: actions/setup-node@v3
+#              with:
+#                node-version: 18.12.1
 
             - name: Install and Build 🔧
               run: |
-                  npm install -
-                  npm run build
+                  npm ci
+                  npm run build --openssl-legacy-provider
 
 #            - name: Deploy 🚀
 #              uses: JamesIves/github-pages-deploy-action@v4.4.2
