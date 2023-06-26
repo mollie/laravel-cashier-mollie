@@ -159,6 +159,24 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     }
 
     /** @test */
+    public function swappingOnTrialDoesNotCreateAnOrderEvenWhenInvoiceNowIsTrue()
+    {
+        $subscription = $this->getUser()->subscriptions()->save(
+            SubscriptionFactory::new()->make([
+                'trial_ends_at' => now()->addWeek(),
+                'plan' => 'monthly-20-1',
+            ])
+        );
+
+        $this->assertTrue($subscription->onTrial());
+        $this->assertEquals(0, Order::count());
+
+        $subscription->swap('weekly-20-1', true);
+
+        $this->assertEquals(0, Order::count());
+    }
+
+    /** @test */
     public function canSwapNextCycle()
     {
         $user = $this->getUserWithZeroBalance();
