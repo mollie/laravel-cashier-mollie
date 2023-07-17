@@ -3,6 +3,7 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -76,6 +77,68 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     protected $dispatchesEvents = [
         'created' => SubscriptionStarted::class,
     ];
+
+    public function scopeWhereActive(Builder $query): Builder
+    {
+        return $query->whereNull('ends_at')
+            ->orWhere(fn (Builder $query) => $this->scopeWhereOnTrial($query))
+            ->orWhere(fn (Builder $query) => $this->scopeWhereOnGracePeriod($query));
+    }
+
+    public function scopeWhereNotActive(Builder $query): Builder
+    {
+        return $query->whereNotNull('ends_at')
+            ->where(fn (Builder $query) => $this->scopeWhereNotOnTrial($query))
+            ->where(fn (Builder $query) => $this->scopeWhereNotOnGracePeriod($query));
+    }
+
+    public function scopeWhereCancelled(Builder $query): Builder
+    {
+        return $query->whereNotNull('ends_at')
+            ->where(fn (Builder $query) => $this->scopeWhereNotOnGracePeriod($query));
+    }
+
+    public function scopeWhereNotCancelled(Builder $query): Builder
+    {
+        return $query->whereNull('ends_at')
+            ->orWhere(fn (Builder $query) => $this->scopeWhereOnGracePeriod($query));
+    }
+
+    public function scopeWhereOnTrial(Builder $query): Builder
+    {
+        return $query->whereNotNull('trial_ends_at')
+            ->where('trial_ends_at', '>', now());
+    }
+
+    public function scopeWhereNotOnTrial(Builder $query): Builder
+    {
+        return $query->whereNull('trial_ends_at')
+            ->orWhere('trial_ends_at', '<=', now());
+    }
+
+    public function scopeWhereOnGracePeriod(Builder $query): Builder
+    {
+        return $query->whereNotNull('ends_at')
+            ->where('ends_at', '>', now());
+    }
+
+    public function scopeWhereNotOnGracePeriod(Builder $query): Builder
+    {
+        return $query->whereNull('ends_at')
+            ->orWhere('ends_at', '<=', now());
+    }
+
+    public function scopeWhereRecurring(Builder $query): Builder
+    {
+        return $query->where(fn (Builder $query) => $this->scopeWhereNotOnTrial($query))
+            ->where(fn (Builder $query) => $this->scopeWhereNotCancelled($query));
+    }
+
+    public function scopeWhereNotRecurring(Builder $query): Builder
+    {
+        return $query->where(fn (Builder $query) => $this->scopeWhereOnTrial($query))
+            ->orWhere(fn (Builder $query) => $this->scopeWhereCancelled($query));
+    }
 
     /**
      * Determine if the subscription is valid.
