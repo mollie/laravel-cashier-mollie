@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Tests;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\SubscriptionResumed;
@@ -512,6 +513,87 @@ class SubscriptionTest extends BaseTestCase
 
         $this->assertFalse($subscription->cancelled());
         $this->assertCarbon(now()->addWeek(), $subscription->cycle_ends_at);
+    }
+
+    /** @test */
+    public function canQueryActiveSubscriptions()
+    {
+        SubscriptionFactory::new()
+            ->count(4)
+            ->state(new Sequence(
+                ['ends_at' => null],
+                ['trial_ends_at' => now()->addWeek()],
+                ['ends_at' => now()->addMonth()],
+                ['ends_at' => now()],
+            ))
+            ->create();
+
+        $this->assertEquals(3, Subscription::whereActive()->count());
+        $this->assertEquals(1, Subscription::whereNotActive()->count());
+    }
+
+    /** @test */
+    public function canQueryOnTrialSubscriptions()
+    {
+        SubscriptionFactory::new()
+            ->count(3)
+            ->state(new Sequence(
+                ['trial_ends_at' => now()->subWeek()],
+                ['trial_ends_at' => now()->addWeek()],
+                ['trial_ends_at' => null],
+            ))
+            ->create();
+
+        $this->assertEquals(1, Subscription::whereOnTrial()->count());
+        $this->assertEquals(2, Subscription::whereNotOnTrial()->count());
+    }
+
+    /** @test */
+    public function canQueryOnGracePeriodSubscriptions()
+    {
+        SubscriptionFactory::new()
+            ->count(3)
+            ->state(new Sequence(
+                ['ends_at' => now()->subWeek()],
+                ['ends_at' => now()->addWeek()],
+                ['ends_at' => null],
+            ))
+            ->create();
+
+        $this->assertEquals(1, Subscription::whereOnGracePeriod()->count());
+        $this->assertEquals(2, Subscription::whereNotOnGracePeriod()->count());
+    }
+
+    /** @test */
+    public function canQueryCancelledSubscriptions()
+    {
+        SubscriptionFactory::new()
+            ->count(3)
+            ->state(new Sequence(
+                ['ends_at' => now()->subWeek()],
+                ['ends_at' => now()->addWeek()],
+                ['ends_at' => null],
+            ))
+            ->create();
+
+        $this->assertEquals(1, Subscription::whereCancelled()->count());
+        $this->assertEquals(2, Subscription::whereNotCancelled()->count());
+    }
+
+    /** @test */
+    public function canQueryRecurringSubscriptions()
+    {
+        SubscriptionFactory::new()
+            ->count(3)
+            ->state(new Sequence(
+                ['trial_ends_at' => null, 'ends_at' => null],
+                ['trial_ends_at' => now()->addWeek(), 'ends_at' => null],
+                ['trial_ends_at' => null, 'ends_at' => now()->subMonth()],
+            ))
+            ->create();
+
+        $this->assertEquals(1, Subscription::whereRecurring()->count());
+        $this->assertEquals(2, Subscription::whereNotRecurring()->count());
     }
 
     protected function withMockedGetMollieCustomer($customerId = 'cst_unique_customer_id', $times = 1): void
