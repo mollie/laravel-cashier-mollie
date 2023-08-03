@@ -73,7 +73,7 @@ trait Billable
      */
     public function newSubscription($subscription, $plan, $firstPaymentOptions = [])
     {
-        if (! empty($this->mollie_mandate_id)) {
+        if (! empty($this->mollieMandateId())) {
             $mandate = $this->mollieMandate();
             $planModel = app(PlanRepository::class)::findOrFail($plan);
             $allowedPlanMethods = collect($planModel->firstPaymentMethod())->map(function ($allowedPlanMethod) {
@@ -84,7 +84,7 @@ trait Billable
                 && $mandate->isValid()
                 && $allowedPlanMethods->contains($mandate->method)
             ) {
-                return $this->newSubscriptionForMandateId($this->mollie_mandate_id, $subscription, $plan);
+                return $this->newSubscriptionForMandateId($this->mollieMandateId(), $subscription, $plan);
             }
         }
 
@@ -121,8 +121,8 @@ trait Billable
     public function newSubscriptionForMandateId($mandateId, $subscription, $plan)
     {
         // The mandateId has changed
-        if ($this->mollie_mandate_id !== $mandateId) {
-            $this->mollie_mandate_id = $mandateId;
+        if ($this->mollieMandateId() !== $mandateId) {
+            $this->{$this->getMollieMandateIdColumn()} = $mandateId;
             $this->guardMollieMandate();
             $this->save();
         }
@@ -131,17 +131,27 @@ trait Billable
     }
 
     /**
-     * Retrieve the Mollie customer ID for this model
+     * Get the name of the "mollie_customer_id" column.
+     *
+     * @return string
+     */
+    public function getMollieCustomerIdColumn()
+    {
+        return 'mollie_customer_id';
+    }
+
+    /**
+     * Retrieve the Mollie customer ID for the billable model.
      *
      * @return string
      */
     public function mollieCustomerId()
     {
-        if (empty($this->mollie_customer_id)) {
+        if (empty($this->{$this->getMollieCustomerIdColumn()})) {
             return $this->createAsMollieCustomer()->id;
         }
 
-        return $this->mollie_customer_id;
+        return $this->{$this->getMollieCustomerIdColumn()};
     }
 
     /**
@@ -158,7 +168,7 @@ trait Billable
         $createMollieCustomer = app()->make(CreateMollieCustomer::class);
         $customer = $createMollieCustomer->execute($options);
 
-        $this->mollie_customer_id = $customer->id;
+        $this->{$this->getMollieCustomerIdColumn()} = $customer->id;
         $this->save();
 
         return $customer;
@@ -171,14 +181,14 @@ trait Billable
      */
     public function asMollieCustomer()
     {
-        if (empty($this->mollie_customer_id)) {
+        if (empty($this->{$this->getMollieCustomerIdColumn()})) {
             return $this->createAsMollieCustomer();
         }
 
         /** @var GetMollieCustomer $getMollieCustomer */
         $getMollieCustomer = app()->make(GetMollieCustomer::class);
 
-        return $getMollieCustomer->execute($this->mollie_customer_id);
+        return $getMollieCustomer->execute($this->{$this->getMollieCustomerIdColumn()});
     }
 
     /**
@@ -410,11 +420,21 @@ trait Billable
     }
 
     /**
+     * Get the name of the "mollie_mandate_id" column.
+     *
+     * @return string
+     */
+    public function getMollieMandateIdColumn()
+    {
+        return 'mollie_mandate_id';
+    }
+
+    /**
      * @return null|string
      */
     public function mollieMandateId()
     {
-        return $this->mollie_mandate_id;
+        return $this->{$this->getMollieMandateIdColumn()};
     }
 
     /**
@@ -494,7 +514,7 @@ trait Billable
      */
     public function guardMollieMandate()
     {
-        throw_unless($this->validateMollieMandate(), new InvalidMandateException);
+        throw_unless($this->validateMollieMandate(), new InvalidMandateException());
 
         return true;
     }
@@ -510,7 +530,7 @@ trait Billable
 
         $previousId = $this->mollieMandateId();
 
-        $this->fill(['mollie_mandate_id' => null]);
+        $this->fill([$this->getMollieMandateIdColumn() => null]);
         $this->save();
 
         event(new MandateClearedFromBillable($this, $previousId));
