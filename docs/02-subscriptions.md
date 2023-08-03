@@ -219,7 +219,7 @@ If the user is on trial, the trial period will be maintained. Also, if a "quanti
 ## Subscription quantity
 
 Sometimes subscriptions are affected by "quantity". For example, your application might charge €10 per month
-**per seat**. To easily increment or decrement the subscription quantity, use the `incrementQuantity`, 
+**per seat**. To easily increment or decrement the subscription quantity, use the `incrementQuantity`,
 `decrementQuantity` and `updateQuantity` methods:
 
 ```php
@@ -304,3 +304,33 @@ $user->subscription('main')->resume();
 
 If a subscription gets cancelled and resumed before the subscription has fully expired, the user will not be billed
 immediately. Instead, their subscription will be reactivated, and they will be billed on the original billing cycle.
+
+## Subscription Scopes
+You can query your database for subscriptions in a specific state using query scopes. Here are some examples:
+
+```php
+$activeSubscriptions = Subscription::whereActive()->get();
+
+$cancelledSubscriptions = Subscription::whereCancelled()->get();
+```
+
+The complete list of available query scopes:
+
+```php
+Subscription::whereOwner($user);
+
+Subscription::whereActive();
+Subscription::whereNotActive();
+
+Subscription::whereCancelled();
+Subscription::whereNotCancelled();
+
+Subscription::whereOnTrial();
+Subscription::whereNotOnTrial();
+
+Subscription::whereOnGracePeriod();
+Subscription::whereNotOnGracePeriod();
+
+Subscription::whereRecurring();
+Subscription::whereNotRecurring();
+```
