@@ -237,10 +237,9 @@ class Order extends Model
 
                 case $totalDue->greaterThanOrEqual($minimumPaymentAmount):
 
-                    // Create Mollie payment
                     $payment = (new MandatedPaymentBuilder(
                         $owner,
-                        'Order ' . $this->number,
+                        trans('cashier::payment.description', ['number' => $this->number], Cashier::getLocale($owner)),
                         $totalDue,
                         url(config('cashier.webhook_url')),
                         [
