@@ -19,6 +19,7 @@ class Invoice
     use FormatsAmount;
 
     const DEFAULT_VIEW = 'cashier::receipt';
+    const DEFAULT_DATE_FORMAT = 'MMM D, Y';
 
     /**
      * The invoice id. Also know as "reference".
@@ -139,6 +140,11 @@ class Invoice
         $this->date = $date;
 
         return $this;
+    }
+
+    public function isoFormattedDate(): string
+    {
+        return $this->date->isoFormat(static::DEFAULT_DATE_FORMAT);
     }
 
     /**
@@ -457,7 +463,7 @@ class Invoice
      */
     public function pdf(array $data = [], string $view = self::DEFAULT_VIEW, Options $options = null)
     {
-        if (! defined('DOMPDF_ENABLE_AUTOLOAD')) {
+        if (!defined('DOMPDF_ENABLE_AUTOLOAD')) {
             define('DOMPDF_ENABLE_AUTOLOAD', false);
         }
 
@@ -481,11 +487,11 @@ class Invoice
         $filename = implode('_', [
             $this->id,
             Str::snake(config('app.name', '')),
-        ]).'.pdf';
+        ]) . '.pdf';
 
         return new Response($this->pdf($data, $view, $options), 200, [
             'Content-Description' => 'File Transfer',
-            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
             'Content-Transfer-Encoding' => 'binary',
             'Content-Type' => 'application/pdf',
         ]);
@@ -496,7 +502,7 @@ class Invoice
      */
     public function hasStartingBalance()
     {
-        return ! $this->rawStartingBalance()->isZero();
+        return !$this->rawStartingBalance()->isZero();
     }
 
     /**
