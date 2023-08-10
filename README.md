@@ -1,9 +1,12 @@
 <p align="center">
   <img src="https://github.com/mollie/laravel-cashier-mollie/assets/7265703/f99a2ef1-0618-42ae-9eb7-d3cc10328fd8" height="200" />
-  <img src="https://github.com/mollie/laravel-cashier-mollie/assets/7265703/a6cf1db7-c252-43c1-a28d-845f3a0880ba" />
 </p>
 
-# Subscription billing with Laravel Cashier for Mollie
+<h1 align="center">Subscription billing with Laravel Cashier for Mollie</h1>
+
+<p align="center">
+  <img src="https://github.com/mollie/laravel-cashier-mollie/assets/7265703/a6cf1db7-c252-43c1-a28d-845f3a0880ba" />
+</p>
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/mollie/laravel-cashier-mollie.svg?style=flat-square)](https://packagist.org/packages/mollie/laravel-cashier-mollie)
 [![Github Actions](https://github.com/mollie/laravel-cashier-mollie/workflows/tests/badge.svg)](https://github.com/mollie/laravel-cashier-mollie/actions)
