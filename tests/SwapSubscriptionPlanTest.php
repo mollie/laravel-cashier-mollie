@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Tests;
 
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Events\OrderProcessed;
 use Laravel\Cashier\Events\SubscriptionPlanSwapped;
 use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
@@ -11,7 +12,6 @@ use Laravel\Cashier\Mollie\Contracts\GetMollieMethodMinimumAmount;
 use Laravel\Cashier\Mollie\GetMollieCustomer;
 use Laravel\Cashier\Mollie\GetMollieMethodMaximumAmount;
 use Laravel\Cashier\Order\Order;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
@@ -120,6 +120,90 @@ class SwapSubscriptionPlanTest extends BaseTestCase
         $this->assertMoneyEURCents(200, $scheduled_order_item->getTax());
         $this->assertEquals('Twice as expensive monthly subscription', $scheduled_order_item->description);
         $this->assertFalse($scheduled_order_item->isProcessed());
+    }
+
+    /**
+     * @test
+     */
+    public function canSwapToAnotherPlanWithImmediatelyAppliedCoupon()
+    {
+        $now = now();
+        $this->withMockedGetMollieCustomer();
+        $this->withMockedGetMollieMandate();
+        $this->withMockedGetMollieMethodMinimumAmount();
+        $this->withMockedGetMollieMethodMaximumAmount();
+        $this->withMockedCreateMolliePayment();
+        $this->withMockedCouponRepository();
+
+        $user = $this->getUserWithZeroBalance();
+        $subscription = $user->subscriptions()->save(SubscriptionFactory::new()->make([
+            'name' => 'dummy name',
+            'plan' => 'monthly-10-1',
+            'cycle_started_at' => now(),
+            'cycle_ends_at' => now()->addMonth(),
+            'tax_percentage' => 10,
+        ]));
+        $alreadyPaidOrderItem = OrderItemFactory::new()->create([
+            'owner_id' => $user->id,
+            'order_id' => 1,
+            'unit_price' => 1000,
+            'tax_percentage' => 10,
+        ]);
+        Order::createProcessedFromItem($alreadyPaidOrderItem, [
+            'id' => 1,
+            'owner_id' => $user->id,
+        ]);
+
+        // redeem coupon
+        $user->redeemCoupon('test-coupon', $subscription->name);
+
+        // Swap to new plan
+        $subscription = $subscription->swap('monthly-20-1')->fresh();
+
+        $this->assertEquals('monthly-20-1', $subscription->plan);
+
+        // Assert that another OrderItem was scheduled for the new subscription plan
+        $newly_scheduled_order_item = $subscription->scheduledOrderItem;
+        $this->assertCarbon($now->copy()->addMonth(), $newly_scheduled_order_item->process_at, 1);
+        $this->assertMoneyEURCents(2200, $newly_scheduled_order_item->getTotal());
+        $this->assertMoneyEURCents(200, $newly_scheduled_order_item->getTax());
+        $this->assertEquals('Monthly payment premium', $newly_scheduled_order_item->description);
+        $this->assertFalse($newly_scheduled_order_item->isProcessed());
+
+        // Assert that the amount "overpaid" for the old plan results in an additional OrderItem with negative total_amount
+        $credit_item = Cashier::$orderItemModel::where('unit_price', '<', 0)->first();
+        $this->assertNotNull($credit_item);
+        $this->assertCarbon($now->copy(), $credit_item->process_at, 1);
+        $this->assertMoneyEURCents(-1100, $credit_item->getTotal());
+        $this->assertMoneyEURCents(-100, $credit_item->getTax());
+        $this->assertEquals('Monthly payment', $credit_item->description);
+        $this->assertTrue($credit_item->isProcessed());
+
+        // Assert that coupon results in an additional OrderItem with negative total_amount
+        $coupon_item = Cashier::$orderItemModel::where('orderable_type', Cashier::$appliedCouponModel)->first();
+        $this->assertNotNull($coupon_item);
+        $this->assertCarbon($now->copy(), $coupon_item->process_at, 1);
+        $this->assertMoneyEURCents(-500, $coupon_item->getTotal());
+        $this->assertMoneyEURCents(0, $coupon_item->getTax());
+        $this->assertEquals('Test coupon', $coupon_item->description);
+        $this->assertTrue($coupon_item->isProcessed());
+
+        Event::assertDispatched(SubscriptionPlanSwapped::class, function (SubscriptionPlanSwapped $event) use ($subscription) {
+            return $subscription->is($event->subscription);
+        });
+
+        Event::assertDispatched(function (OrderProcessed $event) {
+            return $event->order->items()->count() === 3
+                //   2200 costs of new plan
+                // - 1100 reimbursements from old plan
+                // - 500 coupon
+                // = 700
+                && $event->order->total === 600
+                //   200 tax from new plan
+                // - 100 tax from old plan
+                // = 100
+                && $event->order->tax === 100;
+        });
     }
 
     /** @test */
