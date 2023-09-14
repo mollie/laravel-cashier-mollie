@@ -197,7 +197,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
                 //   2200 costs of new plan
                 // - 1100 reimbursements from old plan
                 // - 500 coupon
-                // = 700
+                // = 600
                 && $event->order->total === 600
                 //   200 tax from new plan
                 // - 100 tax from old plan
