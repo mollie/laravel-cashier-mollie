@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\Coupon\Coupon;
+use Laravel\Cashier\Coupon\CouponOrderItemPreprocessor;
 use Laravel\Cashier\Coupon\FixedDiscountHandler;
 use Laravel\Cashier\Plan\AdvancedIntervalGenerator;
 use Laravel\Cashier\Tests\Database\Migrations\CreateUsersTable;
@@ -196,6 +197,9 @@ abstract class BaseTestCase extends TestCase
                             'currency' => 'EUR',
                         ],
                         'description' => 'Test mandate payment',
+                    ],
+                    'order_item_preprocessors' => [
+                        CouponOrderItemPreprocessor::class,
                     ],
                 ],
                 'plans' => [
