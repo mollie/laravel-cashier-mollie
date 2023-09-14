@@ -103,6 +103,16 @@ class InvoiceTest extends BaseTestCase
     }
 
     /** @test */
+    public function canReceiveDateInDifferentLanguages()
+    {
+        $invoice = new Invoice('EUR', null, Carbon::parse('May 15 2023'));
+        $this->assertEquals('May 15, 2023', $invoice->isoFormattedDate());
+
+        Carbon::setLocale('de');
+        $this->assertEquals('Mai 15, 2023', $invoice->isoFormattedDate());
+    }
+
+    /** @test */
     public function canAddExtraInformation()
     {
         $invoice = new Invoice('EUR');
