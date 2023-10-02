@@ -792,7 +792,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
                 return $item->order_id === $orderId;
             });
 
-            return $carry->concat($items->toArray());
+            return $carry->concat($items);
         }, new OrderItemCollection);
 
         if ($appliedCouponOrderItems->isNotEmpty()) {
