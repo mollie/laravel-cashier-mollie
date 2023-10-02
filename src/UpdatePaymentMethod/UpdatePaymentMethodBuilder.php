@@ -46,6 +46,7 @@ class UpdatePaymentMethodBuilder implements Contract
         $payment = (new FirstPaymentBuilder($this->owner))
             ->setRedirectUrl(config('cashier.update_payment_method.redirect_url'))
             ->setFirstPaymentMethod($this->allowedPaymentMethods())
+            ->setDescription(config('cashier.update_payment_method.description'))
             ->inOrderTo($this->getPaymentActions())
             ->create();
 
