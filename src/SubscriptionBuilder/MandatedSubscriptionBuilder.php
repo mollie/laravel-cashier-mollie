@@ -130,6 +130,8 @@ class MandatedSubscriptionBuilder implements Contract
         return $this->owner->subscriptions()->make([
             'name' => $this->name,
             'plan' => $this->plan->name(),
+            'owner_type' => $this->owner->getMorphClass(),
+            'owner_id' => $this->owner->id,
             'quantity' => $this->quantity,
             'tax_percentage' => $this->owner->taxPercentage() ?: 0,
             'trial_ends_at' => $this->trialExpires,
