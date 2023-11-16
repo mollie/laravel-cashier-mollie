@@ -765,4 +765,9 @@ class Order extends Model
             $this->processPayment();
         });
     }
+
+    public function amountChargedBack(): int
+    {
+        return $this->payments()->sum('amount_charged_back');
+    }
 }

@@ -15,7 +15,6 @@ class UpgradeToCashierV2 extends Migration
     {
         Schema::table('orders', function (Blueprint $table) {
             $table->unsignedInteger('amount_refunded')->after('total_due')->default(0);
-            $table->unsignedInteger('amount_charged_back')->after('amount_refunded')->default(0);
         });
 
         Schema::create('refunds', function (Blueprint $table) {
