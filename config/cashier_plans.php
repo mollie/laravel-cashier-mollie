@@ -22,7 +22,7 @@ return [
         /**
          * The default chain of subscription OrderItem preprocessors. These are called right before the Subscription's
          * OrderItem is processed into an OrderItem. You can use this for calculating variable costs a.k.a. metered billing.
-         * Can be overridden per subscription plan. Make sure the preprocessors implement the PreprocessesOrderItems
+         * Can be overridden per subscription plan. Make sure the preprocessors implement the BaseOrderItemPreprocessor
          * interface.
          */
         'order_item_preprocessors' => [
