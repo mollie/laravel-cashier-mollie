@@ -4,12 +4,7 @@ namespace Laravel\Cashier\Tests\FirstPayment\Actions;
 
 use Carbon\Carbon;
 use Laravel\Cashier\FirstPayment\Actions\StartSubscription;
-use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
-use Laravel\Cashier\Mollie\GetMollieCustomer;
 use Laravel\Cashier\Tests\BaseTestCase;
-use Mollie\Api\MollieApiClient;
-use Mollie\Api\Resources\Customer;
-use Mollie\Api\Resources\Mandate;
 
 class StartSubscriptionWithPlanIntervalArrayTest extends BaseTestCase
 {
@@ -17,15 +12,15 @@ class StartSubscriptionWithPlanIntervalArrayTest extends BaseTestCase
     {
         parent::setUp();
         $this->withPackageMigrations()
-             ->withConfiguredPlansWithIntervalArray()
-             ->withTestNow('2019-01-29');
+            ->withConfiguredPlansWithIntervalArray()
+            ->withTestNow('2019-01-29');
     }
 
     /** @test */
     public function canStartSubscriptionWithFixedIntervalTest()
     {
-        $this->withMockedGetMollieCustomer();
-        $this->withMockedGetMollieMandate();
+        $this->withMockedGetMollieCustomer(2);
+        $this->withMockedGetMollieMandate(2);
         $user = $this->getMandatedUser();
 
         $this->assertFalse($user->subscribed('default'));
@@ -51,8 +46,8 @@ class StartSubscriptionWithPlanIntervalArrayTest extends BaseTestCase
     /** @test */
     public function canStartSubscriptionWithoutFixedInterval()
     {
-        $this->withMockedGetMollieCustomer();
-        $this->withMockedGetMollieMandate();
+        $this->withMockedGetMollieCustomer(2);
+        $this->withMockedGetMollieMandate(2);
         $user = $this->getMandatedUser();
 
         $this->assertFalse($user->subscribed('default'));
@@ -73,34 +68,5 @@ class StartSubscriptionWithPlanIntervalArrayTest extends BaseTestCase
         $this->assertEquals(1, $subscription->quantity);
         $this->assertCarbon(now(), $subscription->cycle_started_at);
         $this->assertCarbon(Carbon::parse('2019-03-01'), $subscription->cycle_ends_at);
-    }
-
-    protected function withMockedGetMollieCustomer($customerId = 'cst_unique_customer_id', $times = 2): void
-    {
-        $this->mock(GetMollieCustomer::class, function ($mock) use ($customerId, $times) {
-            $customer = new Customer(new MollieApiClient);
-            $customer->id = $customerId;
-
-            return $mock->shouldReceive('execute')->with($customerId)->times($times)->andReturn($customer);
-        });
-    }
-
-    protected function withMockedGetMollieMandate($attributes = [[
-        'mandateId' => 'mdt_unique_mandate_id',
-        'customerId' => 'cst_unique_customer_id',
-    ]], $times = 2): void
-    {
-        $this->mock(GetMollieMandate::class, function ($mock) use ($times, $attributes) {
-            foreach ($attributes as $data) {
-                $mandate = new Mandate(new MollieApiClient);
-                $mandate->id = $data['mandateId'];
-                $mandate->status = 'valid';
-                $mandate->method = 'directdebit';
-
-                $mock->shouldReceive('execute')->with($data['customerId'], $data['mandateId'])->times($times)->andReturn($mandate);
-            }
-
-            return $mock;
-        });
     }
 }

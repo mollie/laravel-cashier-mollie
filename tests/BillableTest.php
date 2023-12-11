@@ -8,15 +8,10 @@ use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
 use Laravel\Cashier\Tests\Database\Factories\RedeemedCouponFactory;
 use Laravel\Cashier\Events\MandateClearedFromBillable;
 use Laravel\Cashier\Exceptions\MandateIsNotYetFinalizedException;
-use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
-use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Order\Invoice;
 use Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder;
 use Laravel\Cashier\SubscriptionBuilder\MandatedSubscriptionBuilder;
 use Laravel\Cashier\Tests\Fixtures\User;
-use Mollie\Api\MollieApiClient;
-use Mollie\Api\Resources\Customer;
-use Mollie\Api\Resources\Mandate;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -50,7 +45,7 @@ class BillableTest extends BaseTestCase
         $this->withConfiguredPlans();
         $this->withPackageMigrations();
         $this->withMockedGetMollieCustomer();
-        $this->withMockedGetMollieMandateRevoked();
+        $this->withMockedGetMollieMandateRevoked(1, [['mandateId' => 'mdt_unique_revoked_mandate_id']]);
 
         $user = $this->getUser(false, [
             'mollie_mandate_id' => 'mdt_unique_revoked_mandate_id',
@@ -69,7 +64,7 @@ class BillableTest extends BaseTestCase
 
         $this->withConfiguredPlans();
         $this->withMockedGetMollieCustomer();
-        $this->withMockedGetMolliePendingMandate();
+        $this->withMockedGetMollieMandatePending();
         $user = $this->getMandatedUser(false);
 
         $user->newSubscriptionForMandateId('mdt_unique_mandate_id', 'main', 'monthly-10-1')->create();
@@ -80,7 +75,7 @@ class BillableTest extends BaseTestCase
     {
         $this->withConfiguredPlans();
         $this->withMockedGetMollieCustomer();
-        $this->withMockedGetMollieMandate();
+        $this->withMockedGetMollieMandateAccepted();
         $user = $this->getMandatedUser(false, [
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
             'mollie_customer_id' => 'cst_unique_customer_id',
@@ -109,8 +104,8 @@ class BillableTest extends BaseTestCase
         $this->withPackageMigrations();
         $this->withConfiguredPlans();
         $this->withMockedCouponRepository(); // 'test-coupon'
-        $this->withMockedGetMollieCustomerThreeTimes();
-        $this->withMockedGetMollieMandateThreeTimes();
+        $this->withMockedGetMollieCustomer(3);
+        $this->withMockedGetMollieMandateAccepted(3);
 
         $user = $this->getMandatedUser(true, [
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
@@ -133,8 +128,8 @@ class BillableTest extends BaseTestCase
         $this->withPackageMigrations();
         $this->withConfiguredPlans();
         $this->withMockedCouponRepository(); // 'test-coupon'
-        $this->withMockedGetMollieCustomerThreeTimes();
-        $this->withMockedGetMollieMandateThreeTimes();
+        $this->withMockedGetMollieCustomer(3);
+        $this->withMockedGetMollieMandateAccepted(3);
 
         $user = $this->getMandatedUser(true, [
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
@@ -305,72 +300,5 @@ class BillableTest extends BaseTestCase
 
         $this->assertInstanceOf(Invoice::class, $invoice);
         $this->assertEquals('2018-0000-0002', $invoice->id());
-    }
-
-    protected function withMockedGetMollieCustomer(): void
-    {
-        $this->mock(GetMollieCustomer::class, function ($mock) {
-            $customer = new Customer(new MollieApiClient);
-            $customer->id = 'cst_unique_customer_id';
-
-            return $mock->shouldReceive('execute')->with('cst_unique_customer_id')->once()->andReturn($customer);
-        });
-    }
-
-    protected function withMockedGetMollieCustomerThreeTimes(): void
-    {
-        $this->mock(GetMollieCustomer::class, function ($mock) {
-            $customer = new Customer(new MollieApiClient);
-            $customer->id = 'cst_unique_customer_id';
-
-            return $mock->shouldReceive('execute')->with('cst_unique_customer_id')->times(3)->andReturn($customer);
-        });
-    }
-
-    protected function withMockedGetMollieMandateRevoked(): void
-    {
-        $this->mock(GetMollieMandate::class, function ($mock) {
-            $mandate = new Mandate(new MollieApiClient);
-            $mandate->id = 'mdt_unique_revoked_mandate_id';
-            $mandate->status = 'invalid';
-
-            return $mock->shouldReceive('execute')->with('cst_unique_customer_id', 'mdt_unique_revoked_mandate_id')->once()->andReturn($mandate);
-        });
-    }
-
-    protected function withMockedGetMollieMandate(): void
-    {
-        $this->mock(GetMollieMandate::class, function ($mock) {
-            $mandate = new Mandate(new MollieApiClient);
-            $mandate->id = 'mdt_unique_mandate_id';
-            $mandate->status = 'valid';
-            $mandate->method = 'directdebit';
-
-            return $mock->shouldReceive('execute')->with('cst_unique_customer_id', 'mdt_unique_mandate_id')->once()->andReturn($mandate);
-        });
-    }
-
-    protected function withMockedGetMolliePendingMandate(): void
-    {
-        $this->mock(GetMollieMandate::class, function ($mock) {
-            $mandate = new Mandate(new MollieApiClient);
-            $mandate->id = 'mdt_unique_mandate_id';
-            $mandate->status = 'pending';
-            $mandate->method = 'directdebit';
-
-            return $mock->shouldReceive('execute')->with('cst_unique_customer_id', 'mdt_unique_mandate_id')->once()->andReturn($mandate);
-        });
-    }
-
-    protected function withMockedGetMollieMandateThreeTimes(): void
-    {
-        $this->mock(GetMollieMandate::class, function ($mock) {
-            $mandate = new Mandate(new MollieApiClient);
-            $mandate->id = 'mdt_unique_revoked_mandate_id';
-            $mandate->status = 'valid';
-            $mandate->method = 'directdebit';
-
-            return $mock->shouldReceive('execute')->with('cst_unique_customer_id', 'mdt_unique_mandate_id')->times(3)->andReturn($mandate);
-        });
     }
 }

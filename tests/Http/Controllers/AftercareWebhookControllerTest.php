@@ -10,7 +10,6 @@ use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\ChargebackReceived;
 use Laravel\Cashier\Events\RefundProcessed;
 use Laravel\Cashier\Http\Controllers\AftercareWebhookController;
-use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Refunds\RefundItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
@@ -30,9 +29,8 @@ class AftercareWebhookControllerTest extends BaseTestCase
         Event::fake();
         $this->withPackageMigrations();
 
-        $molliePaymentId = 'tr_123xyz';
         $molliePayment = new MolliePayment(new MollieApiClient);
-        $molliePayment->id = 'tr_dummy_payment_id';
+        $molliePayment->id = 'tr_123xyz';
         $molliePayment->status = 'paid';
         $molliePayment->amount = (object) [
             'currency' => 'EUR',
@@ -52,18 +50,13 @@ class AftercareWebhookControllerTest extends BaseTestCase
             'type' => 'application/json',
         ];
 
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($molliePaymentId, $molliePayment) {
-            return $mock->shouldReceive('execute')
-                ->with($molliePaymentId, [])
-                ->once()
-                ->andReturn($molliePayment);
-        });
+        $this->withMockedGetMolliePayment(1, $molliePayment);
 
         /** @var AftercareWebhookController $controller */
         $controller = $this->app->make(AftercareWebhookController::class);
 
         $controller->handleWebhook(
-            $this->getWebhookRequest($molliePaymentId)
+            $this->getWebhookRequest($molliePayment->id)
         );
 
         $localPayment->refresh();
@@ -148,12 +141,7 @@ class AftercareWebhookControllerTest extends BaseTestCase
             'type' => 'application/hal+json',
         ];
 
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($molliePaymentId, $molliePayment) {
-            return $mock->shouldReceive('execute')
-                ->with($molliePaymentId, [])
-                ->once()
-                ->andReturn($molliePayment);
-        });
+        $this->withMockedGetMolliePayment(1, $molliePayment);
 
         /** @var AftercareWebhookController $controller */
         $controller = $this->app->make(AftercareWebhookController::class);

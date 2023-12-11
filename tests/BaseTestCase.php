@@ -3,24 +3,21 @@
 namespace Laravel\Cashier\Tests;
 
 use Carbon\Carbon;
-use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
-use Laravel\Cashier\Coupon\Contracts\CouponRepository;
-use Laravel\Cashier\Coupon\Coupon;
+use Laravel\Cashier\CashierServiceProvider;
 use Laravel\Cashier\Coupon\CouponOrderItemPreprocessor;
-use Laravel\Cashier\Coupon\FixedDiscountHandler;
 use Laravel\Cashier\Plan\AdvancedIntervalGenerator;
 use Laravel\Cashier\Tests\Database\Migrations\CreateUsersTable;
 use Laravel\Cashier\Tests\Fixtures\User;
-use Mockery;
-use Mollie\Api\MollieApiClient;
-use Mollie\Laravel\Wrappers\MollieApiWrapper;
+use Laravel\Cashier\Tests\Traits\InteractsWithMocks;
 use Money\Currency;
 use Money\Money;
 use Orchestra\Testbench\TestCase;
 
 abstract class BaseTestCase extends TestCase
 {
+    use InteractsWithMocks;
+
     protected $interactWithMollieAPI = false;
 
     /**
@@ -35,11 +32,6 @@ abstract class BaseTestCase extends TestCase
         config(['cashier.webhook_url' => 'https://www.example.com/webhook']);
         config(['cashier.aftercare_webhook_url' => 'https://www.example.com/aftercare-webhook']);
         config(['cashier.first_payment.webhook_url' => 'https://www.example.com/mandate-webhook']);
-
-        if (!$this->interactWithMollieAPI) {
-            // Disable the Mollie API
-            $this->mock(MollieApiWrapper::class, null);
-        }
     }
 
     /**
@@ -48,7 +40,7 @@ abstract class BaseTestCase extends TestCase
      */
     protected function getPackageProviders($app)
     {
-        return ['Laravel\Cashier\CashierServiceProvider'];
+        return [CashierServiceProvider::class];
     }
 
     /**
@@ -157,7 +149,7 @@ abstract class BaseTestCase extends TestCase
      */
     protected function withFixtureModels()
     {
-        config(['cashier.billable_model' => 'Laravel\Cashier\Tests\Fixtures\User']);
+        config(['cashier.billable_model' => User::class]);
 
         return $this;
     }
@@ -303,11 +295,6 @@ abstract class BaseTestCase extends TestCase
         return env('MANDATED_CUSTOMER_DIRECTDEBIT');
     }
 
-    protected function getMandatedCustomer()
-    {
-        return mollie()->customers()->get($this->getMandatedCustomerId());
-    }
-
     protected function getMandatedUser($persist = true, $overrides = [])
     {
         return $this->getCustomerUser($persist, array_merge([
@@ -338,35 +325,14 @@ abstract class BaseTestCase extends TestCase
         return $user;
     }
 
-    protected function getMandatePayment()
-    {
-        return mollie()->payments()->get($this->getMandatePaymentID());
-    }
-
     protected function getMandatePaymentID()
     {
         return env('MANDATE_PAYMENT_PAID_ID');
     }
 
-    protected function getSubscriptionMandatePaymentID()
-    {
-        return env('SUBSCRIPTION_MANDATE_PAYMENT_PAID_ID');
-    }
-
     protected function getMandateId()
     {
         return env('MANDATED_CUSTOMER_DIRECTDEBIT_MANDATE_ID');
-    }
-
-    /**
-     * @return \Mollie\Api\MollieApiClient
-     *
-     * @throws \Mollie\Api\Exceptions\IncompatiblePlatform
-     * @throws \ReflectionException
-     */
-    protected function getMollieClientMock()
-    {
-        return new MollieApiClient($this->createMock(Client::class));
     }
 
     /**
@@ -388,103 +354,5 @@ abstract class BaseTestCase extends TestCase
     protected function assertMoneyEURCents(int $value, Money $money)
     {
         $this->assertMoney($value, 'EUR', $money);
-    }
-
-    /**
-     * @param  \Laravel\Cashier\Coupon\Coupon  $coupon
-     * @param  null  $couponHandler
-     * @param  null  $context
-     * @return CouponRepository The mocked coupon repository
-     */
-    protected function withMockedCouponRepository(Coupon $coupon = null, $couponHandler = null, $context = null)
-    {
-        if (is_null($couponHandler)) {
-            $couponHandler = new FixedDiscountHandler;
-        }
-
-        if (is_null($context)) {
-            $context = [
-                'description' => 'Test coupon',
-                'discount' => [
-                    'value' => '5.00',
-                    'currency' => 'EUR',
-                ],
-            ];
-        }
-
-        if (is_null($coupon)) {
-            $coupon = new Coupon(
-                'test-coupon',
-                $couponHandler,
-                $context
-            );
-        }
-
-        return $this->mock(CouponRepository::class, function ($mock) use ($coupon) {
-            return $mock->shouldReceive('findOrFail')->with($coupon->name())->andReturn($coupon);
-        });
-    }
-
-    /**
-     * @param  \Laravel\Cashier\Coupon\Coupon  $coupon
-     * @param  null  $couponHandler
-     * @param  null  $context
-     * @return CouponRepository The mocked coupon repository
-     */
-    protected function withMockedUsdCouponRepository(Coupon $coupon = null, $couponHandler = null, $context = null)
-    {
-        if (is_null($couponHandler)) {
-            $couponHandler = new FixedDiscountHandler;
-        }
-
-        if (is_null($context)) {
-            $context = [
-                'description' => 'Test USD coupon',
-                'discount' => [
-                    'value' => '5.00',
-                    'currency' => 'USD',
-                ],
-            ];
-        }
-
-        if (is_null($coupon)) {
-            $coupon = new Coupon(
-                'usddiscount',
-                $couponHandler,
-                $context
-            );
-        }
-
-        return $this->mock(CouponRepository::class, function ($mock) use ($coupon) {
-            return $mock->shouldReceive('findOrFail')->with($coupon->name())->andReturn($coupon);
-        });
-    }
-
-    /**
-     * Register an instance of an object in the container.
-     * Included for Laravel 5.5 / 5.6 compatibility.
-     *
-     * @param  string  $abstract
-     * @param  object  $instance
-     * @return object
-     */
-    protected function instance($abstract, $instance)
-    {
-        $this->app->instance($abstract, $instance);
-
-        return $instance;
-    }
-
-    /**
-     * Mock an instance of an object in the container.
-     * Included for Laravel 5.5 / 5.6 compatibility.
-     *
-     * @param  string  $abstract
-     * @param  \Closure|null  $mock
-     * @return object
-     */
-    protected function mock($abstract, \Closure $mock = null)
-    {
-        return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args())));
     }
 }
