@@ -3,13 +3,8 @@
 namespace Laravel\Cashier\Tests\Charge;
 
 use Laravel\Cashier\Http\RedirectToCheckoutResponse;
-use Laravel\Cashier\Mollie\Contracts\CreateMollieCustomer;
-use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
-use Mollie\Api\MollieApiClient;
-use Mollie\Api\Resources\Customer;
-use Mollie\Api\Resources\Payment as MolliePayment;
 use Money\Currency;
 use Money\Money;
 
@@ -18,20 +13,15 @@ class FirstPaymentChargeBuilderTest extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->withPackageMigrations();
-        $customer = new Customer(new MollieApiClient);
-        $customer->id = 'cst_unique_customer_id';
 
-        $this->mock(CreateMollieCustomer::class, function ($mock) use ($customer) {
-            return $mock->shouldReceive('execute')
-                ->andReturn($customer);
-        });
+        $this->withPackageMigrations();
+        $this->withMockedCreateMollieCustomer();
     }
 
     /** @test */
     public function redirectToCheckoutResponse()
     {
-        $this->withMockedCreateMolliePayment();
+        $this->withMockedCreateMolliePayment(1, '3.00');
         $owner = User::factory()->create();
         $this->assertEquals(0, $owner->orderItems()->count());
         $this->assertEquals(0, $owner->orders()->count());
@@ -54,26 +44,5 @@ class FirstPaymentChargeBuilderTest extends BaseTestCase
         $this->assertEquals(0, $owner->orderItems()->count());
         $this->assertEquals(0, $owner->orders()->count());
         $this->assertInstanceOf(RedirectToCheckoutResponse::class, $builder);
-    }
-
-    protected function withMockedCreateMolliePayment(): void
-    {
-        $this->mock(CreateMolliePayment::class, function ($mock) {
-            $payment = new MolliePayment(new MollieApiClient);
-            $payment->id = 'tr_unique_payment_id';
-            $payment->amount = (object) [
-                'currency' => 'EUR',
-                'value' => '3.00',
-            ];
-            $payment->_links = json_decode(json_encode([
-                'checkout' => [
-                    'href' => 'https://foo-redirect-bar.com',
-                    'type' => 'text/html',
-                ],
-            ]));
-            $payment->mandateId = 'mdt_dummy_mandate_id';
-
-            return $mock->shouldReceive('execute')->once()->andReturn($payment);
-        });
     }
 }

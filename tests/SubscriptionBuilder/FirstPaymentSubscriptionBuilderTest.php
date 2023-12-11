@@ -12,18 +12,11 @@ use Laravel\Cashier\Events\SubscriptionStarted;
 use Laravel\Cashier\Exceptions\CouponException;
 use Laravel\Cashier\FirstPayment\Actions\AddGenericOrderItem;
 use Laravel\Cashier\FirstPayment\Actions\StartSubscription;
-use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
-use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
-use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
-use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
-use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder;
 use Laravel\Cashier\SubscriptionBuilder\RedirectToCheckoutResponse;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Mollie\Api\MollieApiClient;
-use Mollie\Api\Resources\Customer;
-use Mollie\Api\Resources\Mandate;
 use Mollie\Api\Resources\Payment as MolliePayment;
 
 class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
@@ -52,8 +45,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         config(['cashier_plans.plans.monthly-10-1.first_payment' => $firstPayment]);
         config(['cashier.locale' => 'nl_NL']);
 
-        $this->withMockedGetMollieCustomerTwice();
-
+        $this->withMockedGetMollieCustomer(2);
         $this->withMockedCreateMolliePayment();
 
         $builder = $this->getBuilder()
@@ -111,7 +103,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     {
         config(['cashier.locale' => 'nl_NL']);
 
-        $this->withMockedGetMollieCustomerTwice();
+        $this->withMockedGetMollieCustomer(2);
         $this->withMockedCreateMolliePayment();
 
         $builder = $this->getBuilder()->quantity(3);
@@ -182,38 +174,15 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
 
         Cashier::$paymentModel::createFromMolliePayment($molliePayment, $this->user);
 
-        $this->mock(GetMolliePayment::class, function ($mock) use ($molliePayment) {
-            return $mock->shouldReceive('execute')
-                ->with('tr_unique_payment_id', [])
-                ->once()
-                ->andReturn($molliePayment);
-        });
+        $this->withMockedGetMolliePayment(1, $molliePayment);
+        $this->withMockedGetMollieMandateAccepted(2);
 
-        $this->mock(GetMollieMandate::class, function ($mock) {
-            $mandate = new Mandate(new MollieApiClient);
-            $mandate->id = 'mdt_unique_mandate_id';
-            $mandate->status = 'valid';
-            $mandate->method = 'directdebit';
-
-            return $mock->shouldReceive('execute')
-                ->with('cst_unique_customer_id', 'mdt_unique_mandate_id')
-                ->twice()
-                ->andReturn($mandate);
-        });
-
-        $this->withMockedGetMollieCustomer();
+        $this->withMockedGetMollieCustomer(2);
 
         $this->assertFalse($this->user->subscribed());
         $this->assertNull($this->user->mollie_mandate_id);
 
-        $this->mock(UpdateMolliePayment::class, function (UpdateMolliePayment $mock) {
-            $payment = new MolliePayment(new MollieApiClient);
-            $payment->redirectUrl = 'https://www.example.com/tr_unique_id';
-
-            return $mock->shouldReceive('execute')
-                ->once()
-                ->andReturn($payment);
-        });
+        $this->withMockedUpdateMolliePayment();
 
         $response = $this->post(route('webhooks.mollie.first_payment', [
             'id' => 'tr_unique_payment_id',
@@ -260,7 +229,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     {
         $this->withMockedCouponRepository();
         $this->withMockedCreateMolliePayment();
-        $this->withMockedGetMollieCustomerTwice();
+        $this->withMockedGetMollieCustomer(2);
 
         $builder = $this->getBuilder()->withCoupon('test-coupon');
         $builder->create();
@@ -275,7 +244,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     public function testHandlesTrialDays()
     {
         $this->withMockedCreateMolliePayment();
-        $this->withMockedGetMollieCustomerTwice();
+        $this->withMockedGetMollieCustomer(2);
         $trialBuilder = $this->getBuilder();
 
         $trialBuilder->trialDays(5)->create();
@@ -290,7 +259,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     public function testHandlesNoTrialMode()
     {
         $this->withMockedCreateMolliePayment();
-        $this->withMockedGetMollieCustomerTwice();
+        $this->withMockedGetMollieCustomer(2);
         $skipTrialBuilder = $this->getBuilder()->trialDays(5)->skipTrial();
 
         $skipTrialBuilder->create();
@@ -311,52 +280,5 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
             'default',
             'monthly-10-1'
         );
-    }
-
-    protected function withMockedGetMollieCustomer()
-    {
-        $this->mock(GetMollieCustomer::class, function ($mock) {
-            $customer = new Customer(new MollieApiClient);
-            $customer->id = 'cst_unique_customer_id';
-
-            return $mock->shouldReceive('execute')
-                ->with('cst_unique_customer_id')
-                ->twice()
-                ->andReturn($customer);
-        });
-    }
-
-    protected function withMockedGetMollieCustomerTwice()
-    {
-        $this->mock(GetMollieCustomer::class, function ($mock) {
-            $customer = new Customer(new MollieApiClient);
-            $customer->id = 'cst_unique_customer_id';
-
-            return $mock->shouldReceive('execute')
-                ->with('cst_unique_customer_id')
-                ->twice()
-                ->andReturn($customer);
-        });
-    }
-
-    protected function withMockedCreateMolliePayment(): void
-    {
-        $this->mock(CreateMolliePayment::class, function ($mock) {
-            $payment = new MolliePayment(new MollieApiClient);
-            $payment->id = 'tr_unique_payment_id';
-            $payment->amount = (object) [
-                'currency' => 'EUR',
-                'value' => '10.00',
-            ];
-            $payment->_links = json_decode(json_encode([
-                'checkout' => [
-                    'href' => 'https://foo-redirect-bar.com',
-                    'type' => 'text/html',
-                ],
-            ]));
-            $payment->mandateId = 'mdt_dummy_mandate_id';
-
-            return $mock->shouldReceive('execute')->once()->andReturn($payment);
-        });
     }
 }

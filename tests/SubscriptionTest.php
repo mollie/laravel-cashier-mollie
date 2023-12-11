@@ -7,16 +7,11 @@ use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\SubscriptionResumed;
-use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
-use Laravel\Cashier\Mollie\GetMollieCustomer;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
 use LogicException;
-use Mollie\Api\MollieApiClient;
-use Mollie\Api\Resources\Customer;
-use Mollie\Api\Resources\Mandate;
 
 class SubscriptionTest extends BaseTestCase
 {
@@ -153,8 +148,8 @@ class SubscriptionTest extends BaseTestCase
     {
         Carbon::setTestNow(Carbon::parse('2018-01-01'));
         $this->withConfiguredPlans();
-        $this->withMockedGetMollieCustomer('cst_unique_customer_id', 2);
-        $this->withMockedGetMollieMandate();
+        $this->withMockedGetMollieCustomer(2);
+        $this->withMockedGetMollieMandateAccepted(2);
 
         $user = User::factory()->create([
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
@@ -236,8 +231,8 @@ class SubscriptionTest extends BaseTestCase
     {
         Carbon::setTestNow(Carbon::parse('2019-01-29'));
         $this->withConfiguredPlansWithIntervalArray();
-        $this->withMockedGetMollieCustomer('cst_unique_customer_id', 2);
-        $this->withMockedGetMollieMandate();
+        $this->withMockedGetMollieCustomer(2);
+        $this->withMockedGetMollieMandateAccepted(2);
 
         $user = User::factory()->create([
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
@@ -319,8 +314,8 @@ class SubscriptionTest extends BaseTestCase
     {
         Carbon::setTestNow(Carbon::parse('2019-01-31'));
         $this->withConfiguredPlansWithIntervalArray();
-        $this->withMockedGetMollieCustomer('cst_unique_customer_id', 2);
-        $this->withMockedGetMollieMandate();
+        $this->withMockedGetMollieCustomer(2);
+        $this->withMockedGetMollieMandateAccepted(2);
 
         $user = User::factory()->create([
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
@@ -594,34 +589,5 @@ class SubscriptionTest extends BaseTestCase
 
         $this->assertEquals(1, Subscription::whereRecurring()->count());
         $this->assertEquals(2, Subscription::whereNotRecurring()->count());
-    }
-
-    protected function withMockedGetMollieCustomer($customerId = 'cst_unique_customer_id', $times = 1): void
-    {
-        $this->mock(GetMollieCustomer::class, function ($mock) use ($customerId, $times) {
-            $customer = new Customer(new MollieApiClient);
-            $customer->id = $customerId;
-
-            return $mock->shouldReceive('execute')->with($customerId)->times($times)->andReturn($customer);
-        });
-    }
-
-    protected function withMockedGetMollieMandate($attributes = [[
-        'mandateId' => 'mdt_unique_mandate_id',
-        'customerId' => 'cst_unique_customer_id',
-    ]], $times = 2): void
-    {
-        $this->mock(GetMollieMandate::class, function ($mock) use ($times, $attributes) {
-            foreach ($attributes as $data) {
-                $mandate = new Mandate(new MollieApiClient);
-                $mandate->id = $data['mandateId'];
-                $mandate->status = 'valid';
-                $mandate->method = 'directdebit';
-
-                $mock->shouldReceive('execute')->with($data['customerId'], $data['mandateId'])->times($times)->andReturn($mandate);
-            }
-
-            return $mock;
-        });
     }
 }
