@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Laravel\Cashier\Refunds;
 
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
