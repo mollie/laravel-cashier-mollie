@@ -14,12 +14,6 @@ use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 
 class PercentageCouponTest extends BaseTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->withPackageMigrations();
-    }
-
     /** @test */
     public function couponCalculatesTheRightPrice()
     {

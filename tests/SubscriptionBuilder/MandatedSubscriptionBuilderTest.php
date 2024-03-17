@@ -15,7 +15,6 @@ class MandatedSubscriptionBuilderTest extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->withPackageMigrations();
         $this->withConfiguredPlans();
         $this->user = $this->getCustomerUser(true, [
             'tax_percentage' => 20,

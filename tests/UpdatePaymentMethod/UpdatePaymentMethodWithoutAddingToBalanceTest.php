@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Tests\UpdatePaymentMethod;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\MandateUpdated;
@@ -17,8 +18,6 @@ class UpdatePaymentMethodWithoutAddingToBalanceTest extends BaseTestCase
     /** @test */
     public function canUpdatePaymentMethodWithoutAddingToBalance()
     {
-        $this->withPackageMigrations();
-
         $owner = User::factory()->create([
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
         ]);

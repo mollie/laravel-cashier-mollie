@@ -7,7 +7,6 @@ use Illuminate\Support\Collection;
 use Laravel\Cashier\CashierServiceProvider;
 use Laravel\Cashier\Coupon\CouponOrderItemPreprocessor;
 use Laravel\Cashier\Plan\AdvancedIntervalGenerator;
-use Laravel\Cashier\Tests\Database\Migrations\CreateUsersTable;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Laravel\Cashier\Tests\Traits\InteractsWithMocks;
 use Money\Currency;
@@ -27,6 +26,7 @@ abstract class BaseTestCase extends TestCase
     {
         parent::setUp();
 
+        $this->setupDatabase();
         $this->withFixtureModels();
 
         config(['cashier.webhook_url' => 'https://www.example.com/webhook']);
@@ -43,12 +43,7 @@ abstract class BaseTestCase extends TestCase
         return [CashierServiceProvider::class];
     }
 
-    /**
-     * Execute table migrations.
-     *
-     * @return $this
-     */
-    protected function withPackageMigrations()
+    protected function setupDatabase(): void
     {
         $migrations_dir = __DIR__ . '/../database/migrations';
 
@@ -56,52 +51,49 @@ abstract class BaseTestCase extends TestCase
             collect(
                 [
                     [
-                        'class' => CreateUsersTable::class,
-                        'file_path' => __DIR__ . '/Database/Migrations/create_users_table.php',
+                        'class' => \Laravel\Cashier\Tests\Database\Migrations\CreateUsersTable::class,
+                        'file_path' => __DIR__ . '/Database/Migrations/create_users_table.php'
                     ],
                     [
                         'class' => '\CreateSubscriptionsTable',
-                        'file_path' => $migrations_dir . '/create_subscriptions_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_subscriptions_table.php',
                     ],
                     [
                         'class' => '\CreateOrderItemsTable',
-                        'file_path' => $migrations_dir . '/create_order_items_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_order_items_table.php',
                     ],
                     [
                         'class' => '\CreateOrdersTable',
-                        'file_path' => $migrations_dir . '/create_orders_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_orders_table.php',
                     ],
                     [
                         'class' => '\CreateCreditsTable',
-                        'file_path' => $migrations_dir . '/create_credits_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_credits_table.php',
                     ],
                     [
                         'class' => '\CreateRedeemedCouponsTable',
-                        'file_path' => $migrations_dir . '/create_redeemed_coupons_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_redeemed_coupons_table.php',
                     ],
                     [
                         'class' => '\CreateAppliedCouponsTable',
-                        'file_path' => $migrations_dir . '/create_applied_coupons_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_applied_coupons_table.php',
                     ],
                     [
                         'class' => '\CreatePaymentsTable',
-                        'file_path' => $migrations_dir . '/create_payments_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_payments_table.php',
                     ],
                     [
                         'class' => '\CreateRefundItemsTable',
-                        'file_path' => $migrations_dir . '/create_refund_items_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_refund_items_table.php',
                     ],
                     [
                         'class' => '\CreateRefundsTable',
-                        'file_path' => $migrations_dir . '/create_refunds_table.php.stub',
+                        'file_path' => $migrations_dir . '/create_refunds_table.php',
                     ],
                 ]
             )
         );
-
-        return $this;
     }
-
     /**
      * Runs a collection of migrations.
      *
@@ -109,19 +101,17 @@ abstract class BaseTestCase extends TestCase
      */
     protected function runMigrations(Collection $migrations)
     {
-        $migrations->each(function ($migration) {
-            $this->runMigration($migration['class'], $migration['file_path']);
-        });
+        $migrations->each(fn ($info) => $this->runMigration($info['class'], $info['file_path']));
     }
 
     /**
      * @param  string  $class
      * @param  string  $file_path
      */
-    protected function runMigration($class, $file_path)
+    protected function runMigration(string $className, string $file_path)
     {
-        include_once $file_path;
-        (new $class)->up();
+        require_once $file_path;
+        (new $className)->up();
     }
 
     /**

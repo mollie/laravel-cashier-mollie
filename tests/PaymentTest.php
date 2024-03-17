@@ -11,8 +11,6 @@ class PaymentTest extends BaseTestCase
     /** @test */
     public function canCreateFromBasicMolliePayment()
     {
-        $this->withPackageMigrations();
-
         $molliePayment = new MolliePayment(new MollieApiClient);
         $molliePayment->id = 'tr_dummy_payment_id';
         $molliePayment->status = 'dummy_status';
@@ -40,8 +38,6 @@ class PaymentTest extends BaseTestCase
     /** @test */
     public function canCreateFromMolliePaymentWithRefundsAndChargebacks()
     {
-        $this->withPackageMigrations();
-
         $molliePayment = new MolliePayment(new MollieApiClient);
         $molliePayment->id = 'tr_dummy_payment_id';
         $molliePayment->status = 'dummy_status';

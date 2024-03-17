@@ -18,7 +18,6 @@ class FirstPaymentHandlerTest extends BaseTestCase
     /** @test */
     public function handlesMolliePayments()
     {
-        $this->withPackageMigrations();
         Event::fake();
 
         $molliePayment = $this->getMandatePaymentStub();

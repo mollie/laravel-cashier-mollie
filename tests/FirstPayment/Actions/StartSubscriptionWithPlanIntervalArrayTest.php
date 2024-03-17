@@ -11,7 +11,7 @@ class StartSubscriptionWithPlanIntervalArrayTest extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->withPackageMigrations()
+        $this
             ->withConfiguredPlansWithIntervalArray()
             ->withTestNow('2019-01-29');
     }

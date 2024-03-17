@@ -12,7 +12,6 @@ class CreditTest extends BaseTestCase
     /** @test */
     public function testAddAmountForOwner()
     {
-        $this->withPackageMigrations();
         $user = User::factory()->create();
 
         Cashier::$creditModel::addAmountForOwner($user, Money::EUR(12345));
@@ -33,7 +32,6 @@ class CreditTest extends BaseTestCase
     /** @test */
     public function testMaxOutForOwner()
     {
-        $this->withPackageMigrations();
         $user = User::factory()->create();
 
         Cashier::$creditModel::addAmountForOwner($user, Money::USD(12348));

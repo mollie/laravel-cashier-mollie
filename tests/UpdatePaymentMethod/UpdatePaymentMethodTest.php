@@ -17,8 +17,6 @@ class UpdatePaymentMethodTest extends BaseTestCase
     /** @test */
     public function canUpdatePaymentMethod()
     {
-        $this->withPackageMigrations();
-
         $owner = User::factory()->create([
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
         ]);

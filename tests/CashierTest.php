@@ -37,7 +37,6 @@ class CashierTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->withPackageMigrations();
         $this->withConfiguredPlans();
     }
 
