@@ -70,7 +70,7 @@ Once you have pulled in the package:
         {
             return [$this->name, $this->email];
         }
-        
+
         /**
         * Get additional information to be displayed on the invoice. Typically a note provided by the customer.
         *
