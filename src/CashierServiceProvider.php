@@ -173,14 +173,4 @@ class CashierServiceProvider extends ServiceProvider
             Cashier::useCurrencyLocale($locale);
         }
     }
-
-    /**
-     * Determine if we should register the migrations.
-     *
-     * @return bool
-     */
-    protected function shouldMigrate()
-    {
-        return Cashier::$runsMigrations;
-    }
 }
