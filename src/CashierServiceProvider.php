@@ -3,7 +3,6 @@
 namespace Laravel\Cashier;
 
 use Illuminate\Foundation\Console\AboutCommand;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Cashier\Console\Commands\CashierInstall;
 use Laravel\Cashier\Console\Commands\CashierRun;
