@@ -114,18 +114,6 @@ class CashierServiceProvider extends ServiceProvider
                 __DIR__ . '/../database/migrations/create_refund_items_table.php.stub' => database_path($prefix . '_create_refund_items_table.php'),
                 __DIR__ . '/../database/migrations/create_refunds_table.php.stub' => database_path($prefix . '_create_refunds_table.php'),
             ], $tag);
-
-            // $this->publishes([
-            //     __DIR__ . '/../database/migrations/create_applied_coupons_table.php.stub' => database_path($prefix . '_create_applied_coupons_table.php'),
-            //     __DIR__ . '/../database/migrations/create_redeemed_coupons_table.php.stub' => database_path($prefix . '_create_redeemed_coupons_table.php'),
-            //     __DIR__ . '/../database/migrations/create_credits_table.php.stub' => database_path($prefix . '_create_credits_table.php'),
-            //     __DIR__ . '/../database/migrations/create_orders_table.php.stub' => database_path($prefix . '_create_orders_table.php'),
-            //     __DIR__ . '/../database/migrations/create_order_items_table.php.stub' => database_path($prefix . '_create_order_items_table.php'),
-            //     __DIR__ . '/../database/migrations/create_subscriptions_table.php.stub' => database_path($prefix . '_create_subscriptions_table.php'),
-            //     __DIR__ . '/../database/migrations/create_payments_table.php.stub' => database_path($prefix . '_create_payments_table.php'),
-            //     __DIR__ . '/../database/migrations/create_refund_items_table.php.stub' => database_path($prefix . '_create_refund_items_table.php'),
-            //     __DIR__ . '/../database/migrations/create_refunds_table.php.stub' => database_path($prefix . '_create_refunds_table.php'),
-            // ], $tag);
         }
     }
 
