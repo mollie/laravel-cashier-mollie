@@ -11,6 +11,6 @@ class CreateMolliePayment extends BaseMollieInteraction implements Contract
 {
     public function execute(array $payload): Payment
     {
-        return $this->mollie->payments()->create($payload);
+        return $this->mollie->payments->create($payload);
     }
 }

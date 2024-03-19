@@ -237,7 +237,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
         $total_cycle_seconds = $cycle_started_at->diffInSeconds($cycle_ends_at);
         $seconds_progressed = $cycle_started_at->diffInSeconds($now);
 
-        return round($seconds_progressed / $total_cycle_seconds, $precision);
+        return abs(round($seconds_progressed / $total_cycle_seconds, $precision));
     }
 
     /**
@@ -875,7 +875,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
 
             $this->save();
 
-            if (! $onTrial && $invoiceNow) {
+            if (!$onTrial && $invoiceNow) {
                 $order = Cashier::$orderModel::createFromItems($orderItems);
                 $order->processPayment();
             }

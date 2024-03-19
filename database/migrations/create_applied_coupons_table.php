@@ -11,7 +11,7 @@ class CreateAppliedCouponsTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('applied_coupons', function (Blueprint $table) {
             $table->bigIncrements('id');
@@ -26,7 +26,7 @@ class CreateAppliedCouponsTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('applied_coupons');
     }

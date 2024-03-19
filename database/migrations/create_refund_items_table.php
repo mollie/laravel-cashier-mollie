@@ -11,7 +11,7 @@ class CreateRefundItemsTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('refund_items', function (Blueprint $table) {
             $table->bigIncrements('id');
@@ -34,7 +34,7 @@ class CreateRefundItemsTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('refund_items');
     }

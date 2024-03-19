@@ -11,6 +11,6 @@ class GetMollieMandate extends BaseMollieInteraction implements Contract
 {
     public function execute(string $customerId, string $mandateId): Mandate
     {
-        return $this->mollie->mandates()->getForId($customerId, $mandateId);
+        return $this->mollie->mandates->getForId($customerId, $mandateId);
     }
 }

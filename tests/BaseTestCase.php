@@ -3,12 +3,14 @@
 namespace Laravel\Cashier\Tests;
 
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\CashierServiceProvider;
 use Laravel\Cashier\Coupon\CouponOrderItemPreprocessor;
 use Laravel\Cashier\Plan\AdvancedIntervalGenerator;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Laravel\Cashier\Tests\Traits\InteractsWithMocks;
+use Mollie\Laravel\MollieServiceProvider;
 use Money\Currency;
 use Money\Money;
 use Orchestra\Testbench\TestCase;
@@ -40,7 +42,10 @@ abstract class BaseTestCase extends TestCase
      */
     protected function getPackageProviders($app)
     {
-        return [CashierServiceProvider::class];
+        return [
+            CashierServiceProvider::class,
+            MollieServiceProvider::class,
+        ];
     }
 
     protected function setupDatabase(): void

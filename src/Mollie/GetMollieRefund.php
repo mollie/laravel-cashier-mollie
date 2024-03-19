@@ -7,12 +7,12 @@ namespace Laravel\Cashier\Mollie;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\GetMollieRefund as Contract;
 use Mollie\Api\Resources\Refund;
-use Mollie\Laravel\Wrappers\MollieApiWrapper as Mollie;
+use Mollie\Api\MollieApiClient as Mollie;
 
 class GetMollieRefund implements Contract
 {
     /**
-     * @var \Mollie\Laravel\Wrappers\MollieApiWrapper
+     * @var \Mollie\Api\MollieApiClient
      */
     protected Mollie $mollie;
 

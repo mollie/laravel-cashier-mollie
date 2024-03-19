@@ -18,6 +18,7 @@ class CashierServiceProviderTest extends BaseTestCase
         config(['cashier.currency' => 'usd']);
         $this->rebootCashierServiceProvider();
 
+
         $this->assertEquals('usd', Cashier::usesCurrency());
         $this->assertEquals('$', Cashier::usesCurrencySymbol());
     }
