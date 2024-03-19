@@ -3,7 +3,6 @@
 namespace Laravel\Cashier\Tests;
 
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\CashierServiceProvider;
 use Laravel\Cashier\Coupon\CouponOrderItemPreprocessor;
