@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier\Tests\Charge;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Cashier\Http\RedirectToCheckoutResponse;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
@@ -11,8 +10,6 @@ use Money\Money;
 
 class FirstPaymentChargeBuilderTest extends BaseTestCase
 {
-    use RefreshDatabase;
-
     protected function setUp(): void
     {
         parent::setUp();
