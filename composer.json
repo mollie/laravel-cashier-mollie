@@ -39,7 +39,7 @@
     "mollie/laravel-mollie": "^3.0",
     "mollie/mollie-api-php": "^2.65",
     "moneyphp/money": "^4.1",
-    "nesbot/carbon": "^3.0"
+    "nesbot/carbon": "^2.72|^3.0"
   },
   "require-dev": {
     "guzzlehttp/guzzle": "^7.0",
