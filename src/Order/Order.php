@@ -219,6 +219,7 @@ class Order extends Model
                 case $totalDue->isZero():
                     // No payment processing required
                     $this->mollie_payment_id = null;
+                    logger()->info('no payment processing');
 
                     break;
 
@@ -626,7 +627,7 @@ class Order extends Model
 
     /**
      * Get the description used when creating a mollie order.
-     * 
+     *
      * @return string
      */
     public function getDescription()

@@ -60,39 +60,39 @@ abstract class BaseTestCase extends TestCase
                     ],
                     [
                         'class' => '\CreateSubscriptionsTable',
-                        'file_path' => $migrations_dir . '/create_subscriptions_table.php',
+                        'file_path' => $migrations_dir . '/create_subscriptions_table.php.stub',
                     ],
                     [
                         'class' => '\CreateOrderItemsTable',
-                        'file_path' => $migrations_dir . '/create_order_items_table.php',
+                        'file_path' => $migrations_dir . '/create_order_items_table.php.stub',
                     ],
                     [
                         'class' => '\CreateOrdersTable',
-                        'file_path' => $migrations_dir . '/create_orders_table.php',
+                        'file_path' => $migrations_dir . '/create_orders_table.php.stub',
                     ],
                     [
                         'class' => '\CreateCreditsTable',
-                        'file_path' => $migrations_dir . '/create_credits_table.php',
+                        'file_path' => $migrations_dir . '/create_credits_table.php.stub',
                     ],
                     [
                         'class' => '\CreateRedeemedCouponsTable',
-                        'file_path' => $migrations_dir . '/create_redeemed_coupons_table.php',
+                        'file_path' => $migrations_dir . '/create_redeemed_coupons_table.php.stub',
                     ],
                     [
                         'class' => '\CreateAppliedCouponsTable',
-                        'file_path' => $migrations_dir . '/create_applied_coupons_table.php',
+                        'file_path' => $migrations_dir . '/create_applied_coupons_table.php.stub',
                     ],
                     [
                         'class' => '\CreatePaymentsTable',
-                        'file_path' => $migrations_dir . '/create_payments_table.php',
+                        'file_path' => $migrations_dir . '/create_payments_table.php.stub',
                     ],
                     [
                         'class' => '\CreateRefundItemsTable',
-                        'file_path' => $migrations_dir . '/create_refund_items_table.php',
+                        'file_path' => $migrations_dir . '/create_refund_items_table.php.stub',
                     ],
                     [
                         'class' => '\CreateRefundsTable',
-                        'file_path' => $migrations_dir . '/create_refunds_table.php',
+                        'file_path' => $migrations_dir . '/create_refunds_table.php.stub',
                     ],
                 ]
             )
