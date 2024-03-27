@@ -83,8 +83,6 @@ class OrderItemCollectionTest extends BaseTestCase
     /** @test */
     public function testOwners()
     {
-        $this->withPackageMigrations();
-
         User::factory(3)->create()->each(function ($owner) {
             $owner->orderItems()->saveMany(OrderItemFactory::new()->times(2)->make());
         });
@@ -160,8 +158,6 @@ class OrderItemCollectionTest extends BaseTestCase
     /** @test */
     public function testChunkByOwner()
     {
-        $this->withPackageMigrations();
-
         User::factory()->create(['id' => 1]);
         User::factory()->create(['id' => 2]);
 
@@ -215,8 +211,6 @@ class OrderItemCollectionTest extends BaseTestCase
     /** @test */
     public function testChunkByOwnerAndCurrency()
     {
-        $this->withPackageMigrations();
-
         User::factory()->create(['id' => 1]);
         User::factory()->create(['id' => 2]);
 

@@ -7,7 +7,7 @@ namespace Laravel\Cashier\Tests\Mollie;
 use Laravel\Cashier\Mollie\Contracts\GetMollieRefund;
 use Mollie\Api\Resources\Refund;
 
-class GetMollieRefundTest extends BaseMollieInteractionTest
+class GetMollieRefundTest extends BaseMollieInteraction
 {
     /**
      * @test

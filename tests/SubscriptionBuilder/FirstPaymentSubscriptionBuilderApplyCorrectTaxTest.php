@@ -16,7 +16,6 @@ class FirstPaymentSubscriptionBuilderApplyCorrectTaxTest extends BaseTestCase
         parent::setUp();
         Cashier::useCurrency('eur');
         $this->withTestNow('2019-01-01');
-        $this->withPackageMigrations();
         $this->withConfiguredPlans();
         $this->user = $this->getCustomerUser(true, [
             'tax_percentage' => 21,

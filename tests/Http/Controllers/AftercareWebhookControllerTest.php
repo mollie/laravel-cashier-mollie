@@ -27,7 +27,6 @@ class AftercareWebhookControllerTest extends BaseTestCase
     public function itDetectsNewChargebacks()
     {
         Event::fake();
-        $this->withPackageMigrations();
 
         $molliePayment = new MolliePayment(new MollieApiClient);
         $molliePayment->id = 'tr_123xyz';
@@ -69,7 +68,6 @@ class AftercareWebhookControllerTest extends BaseTestCase
     public function itDetectsNewRefunds()
     {
         Event::fake();
-        $this->withPackageMigrations();
         $this->withConfiguredPlans();
 
         $molliePaymentId = 'tr_123xyz';

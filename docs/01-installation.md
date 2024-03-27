@@ -70,7 +70,7 @@ Once you have pulled in the package:
         {
             return [$this->name, $this->email];
         }
-        
+
         /**
         * Get additional information to be displayed on the invoice. Typically a note provided by the customer.
         *
@@ -82,10 +82,13 @@ Once you have pulled in the package:
         }
     ```
 
-6. Schedule a periodic job to execute the `cashier:run` command. When processing lots of orders, consider increasing the job frequency to prevent hitting Mollie's rate limiter.
+6. Schedule a periodic command to execute the `CashierRun` command. When processing lots of orders, consider increasing the job frequency to prevent hitting Mollie's rate limiter.
 
     ```php
-    $schedule->command('cashier:run')
+    use Illuminate\Support\Facades\Schedule;
+    use Laravel\Cashier\Console\Commands\CashierRun;
+
+    Schedule::command(CashierRun::class)
         ->hourly() // run as often as you like (daily, monthly, every minute, ...)
         ->withoutOverlapping(); // make sure to include this
     ```

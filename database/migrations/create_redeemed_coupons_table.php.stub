@@ -11,7 +11,7 @@ class CreateRedeemedCouponsTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('redeemed_coupons', function (Blueprint $table) {
             $table->bigIncrements('id');
@@ -30,7 +30,7 @@ class CreateRedeemedCouponsTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('redeemed_coupons');
     }

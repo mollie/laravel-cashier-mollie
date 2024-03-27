@@ -30,7 +30,6 @@ class OrderTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->withPackageMigrations();
         $this->withConfiguredPlans();
     }
 

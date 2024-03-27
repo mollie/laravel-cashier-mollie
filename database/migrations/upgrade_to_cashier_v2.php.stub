@@ -11,7 +11,7 @@ class UpgradeToCashierV2 extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
             $table->unsignedInteger('amount_refunded')->after('total_due')->default(0);
@@ -67,9 +67,8 @@ class UpgradeToCashierV2 extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
-        // Requires "doctrine/dbal" in composer.json
         // Schema::table('orders', function (Blueprint $table) {
         //     $table->dropColumn(['amount_refunded', 'amount_charged_back']);
         // });

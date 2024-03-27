@@ -11,6 +11,6 @@ class GetMolliePayment extends BaseMollieInteraction implements Contract
 {
     public function execute(string $id, array $parameters = []): Payment
     {
-        return $this->mollie->payments()->get($id, $parameters);
+        return $this->mollie->payments->get($id, $parameters);
     }
 }

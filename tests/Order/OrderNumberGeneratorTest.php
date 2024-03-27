@@ -17,7 +17,6 @@ class OrderNumberGeneratorTest extends BaseTestCase
     {
         parent::setUp();
         $this->generator = new OrderNumberGenerator;
-        $this->withPackageMigrations();
     }
 
     /** @test */

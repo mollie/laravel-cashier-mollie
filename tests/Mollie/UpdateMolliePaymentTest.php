@@ -7,8 +7,9 @@ namespace Laravel\Cashier\Tests\Mollie;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Mollie\Api\Resources\Payment;
+use Mollie\Laravel\Facades\Mollie;
 
-class UpdateMolliePaymentTest extends BaseMollieInteractionTest
+class UpdateMolliePaymentTest extends BaseMollieInteraction
 {
     /**
      * @test
@@ -18,9 +19,9 @@ class UpdateMolliePaymentTest extends BaseMollieInteractionTest
     {
         /** @var UpdateMolliePayment $action */
         $action = $this->app->make(UpdateMolliePayment::class);
-        $payment = mollie()->payments->get($this->getUpdatablePaymentId());
+        $payment = Mollie::api()->payments->get($this->getUpdatablePaymentId());
         $oldWebhookUrl = $payment->webhookUrl;
-        $newWebhookUrl = 'https://example.com/'.Str::uuid();
+        $newWebhookUrl = 'https://example.com/' . Str::uuid();
         $payment->webhookUrl = $newWebhookUrl;
 
         $result = $action->execute($payment);

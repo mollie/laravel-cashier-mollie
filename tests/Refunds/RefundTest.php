@@ -21,7 +21,6 @@ class RefundTest extends BaseTestCase
     public function canHandleProcessedMollieRefund()
     {
         Event::fake();
-        $this->withPackageMigrations();
 
         $user = $this->getCustomerUser();
         $originalOrderItems = OrderItemFactory::new()->times(2)->create();
@@ -60,7 +59,6 @@ class RefundTest extends BaseTestCase
     public function canHandleFailedMollieRefund()
     {
         Event::fake();
-        $this->withPackageMigrations();
 
         $user = $this->getCustomerUser();
         $originalOrderItems = OrderItemFactory::new()->times(2)->create();

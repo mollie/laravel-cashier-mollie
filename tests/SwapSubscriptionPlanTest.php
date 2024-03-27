@@ -17,7 +17,6 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->withPackageMigrations();
         $this->withTestNow('2019-1-1');
         $this->withConfiguredPlans();
 

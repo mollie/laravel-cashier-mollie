@@ -7,7 +7,7 @@ namespace Laravel\Cashier\Tests\Mollie;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Mollie\Api\Resources\Payment;
 
-class GetMolliePaymentTest extends BaseMollieInteractionTest
+class GetMolliePaymentTest extends BaseMollieInteraction
 {
     /**
      * @test

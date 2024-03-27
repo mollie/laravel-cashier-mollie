@@ -12,7 +12,6 @@ class OrderCollectionTest extends BaseTestCase
     /** @test */
     public function canGetInvoices()
     {
-        $this->withPackageMigrations();
         $user = User::factory()->create();
         $orders = $user->orders()->saveMany(OrderFactory::new()->times(2)->make());
 

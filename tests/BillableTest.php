@@ -20,7 +20,6 @@ class BillableTest extends BaseTestCase
     /** @test */
     public function testTaxPercentage()
     {
-        $this->withPackageMigrations();
         $user = User::factory()->create([
             'tax_percentage' => 21.5,
         ]);
@@ -43,7 +42,6 @@ class BillableTest extends BaseTestCase
     public function returnsFirstPaymentSubscriptionBuilderIfOwnerMandateIsInvalid()
     {
         $this->withConfiguredPlans();
-        $this->withPackageMigrations();
         $this->withMockedGetMollieCustomer();
         $this->withMockedGetMollieMandateRevoked(1, [['mandateId' => 'mdt_unique_revoked_mandate_id']]);
 
@@ -89,8 +87,6 @@ class BillableTest extends BaseTestCase
     /** @test */
     public function canRetrieveRedeemedCoupons()
     {
-        $this->withPackageMigrations();
-
         $user = User::factory()->create();
 
         $redeemedCoupons = $user->redeemedCoupons;
@@ -101,7 +97,6 @@ class BillableTest extends BaseTestCase
     /** @test */
     public function canRedeemCouponForExistingSubscription()
     {
-        $this->withPackageMigrations();
         $this->withConfiguredPlans();
         $this->withMockedCouponRepository(); // 'test-coupon'
         $this->withMockedGetMollieCustomer(3);
@@ -125,7 +120,6 @@ class BillableTest extends BaseTestCase
     /** @test */
     public function canRedeemCouponAndRevokeOtherCoupons()
     {
-        $this->withPackageMigrations();
         $this->withConfiguredPlans();
         $this->withMockedCouponRepository(); // 'test-coupon'
         $this->withMockedGetMollieCustomer(3);
@@ -153,7 +147,6 @@ class BillableTest extends BaseTestCase
     public function clearMollieMandate()
     {
         Event::fake();
-        $this->withPackageMigrations();
         $user = $this->getUser(true, ['mollie_mandate_id' => 'foo-bar']);
         $this->assertEquals('foo-bar', $user->mollieMandateId());
 
@@ -171,7 +164,6 @@ class BillableTest extends BaseTestCase
     /** @test */
     public function canFindInvoice()
     {
-        $this->withPackageMigrations();
         $user = $this->getUser();
         OrderFactory::times(2)->create([
             'owner_id' => $user->id,
@@ -187,7 +179,6 @@ class BillableTest extends BaseTestCase
     /** @test */
     public function findInvoiceReturnsNullIfInvoiceDoesNotExist()
     {
-        $this->withPackageMigrations();
         $user = $this->getUser();
 
         $invoice = $user->findInvoice('does_not_exist');
@@ -198,7 +189,6 @@ class BillableTest extends BaseTestCase
     /** @test */
     public function findInvoiceThrowsExceptionIfInvoiceExistButIsAssociatedWithOtherBillableModel()
     {
-        $this->withPackageMigrations();
         $userA = $this->getUser();
         OrderFactory::new()->create([
             'number' => 'foo-bar',
@@ -215,7 +205,6 @@ class BillableTest extends BaseTestCase
     /** @test */
     public function canFindInvoiceUsingFindInvoiceOrFail()
     {
-        $this->withPackageMigrations();
         $user = $this->getUser();
         OrderFactory::times(2)->create([
             'owner_id' => $user->id,
@@ -231,7 +220,6 @@ class BillableTest extends BaseTestCase
     /** @test */
     public function findInvoiceOrFailThrowsExceptionWhenNotFindingTheInvoice()
     {
-        $this->withPackageMigrations();
         $user = $this->getUser();
 
         $this->expectException(NotFoundHttpException::class);
@@ -242,7 +230,6 @@ class BillableTest extends BaseTestCase
     /** @test */
     public function findInvoiceOrFailThrowsExceptionIfInvoiceExistButIsAssociatedWithOtherBillableModel()
     {
-        $this->withPackageMigrations();
         $userA = $this->getUser();
         OrderFactory::new()->create([
             'number' => 'foo-bar',
@@ -259,7 +246,6 @@ class BillableTest extends BaseTestCase
     /** @test */
     public function canFindInvoiceByOrderId()
     {
-        $this->withPackageMigrations();
         $user = $this->getUser();
 
         $user->orders()->saveMany([
@@ -282,7 +268,6 @@ class BillableTest extends BaseTestCase
     /** @test */
     public function canFindInvoiceByOrderIdUsingFindInvoiceByOrderIdOrFail()
     {
-        $this->withPackageMigrations();
         $user = $this->getUser();
 
         $user->orders()->saveMany([
