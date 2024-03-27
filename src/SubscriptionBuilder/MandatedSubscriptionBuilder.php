@@ -67,20 +67,29 @@ class MandatedSubscriptionBuilder implements Contract
     protected $validateCoupon = true;
 
     /**
+     * Additional data to be stored on the subscription.
+     *
+     * @var array
+     */
+    protected $data = [];
+
+    /**
      * Create a new subscription builder instance.
      *
      * @param  mixed  $owner
      * @param  string  $name
      * @param  string  $plan
+     * @param  array  $data
      *
      * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
      */
-    public function __construct(Model $owner, string $name, string $plan)
+    public function __construct(Model $owner, string $name, string $plan, array $data = [])
     {
         $this->name = $name;
         $this->owner = $owner;
         $this->nextPaymentAt = Carbon::now();
         $this->plan = app(PlanRepository::class)::findOrFail($plan);
+        $this->data = $data;
     }
 
     /**
@@ -127,7 +136,7 @@ class MandatedSubscriptionBuilder implements Contract
      */
     public function makeSubscription($now = null)
     {
-        return $this->owner->subscriptions()->make([
+        return $this->owner->subscriptions()->make(array_merge([
             'name' => $this->name,
             'plan' => $this->plan->name(),
             'quantity' => $this->quantity,
@@ -135,7 +144,7 @@ class MandatedSubscriptionBuilder implements Contract
             'trial_ends_at' => $this->trialExpires,
             'cycle_started_at' => $now ?: now(),
             'cycle_ends_at' => $this->nextPaymentAt,
-        ]);
+        ], $this->data));
     }
 
     /**

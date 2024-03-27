@@ -65,13 +65,14 @@ trait Billable
      * @param  string  $subscription
      * @param  string  $plan
      * @param  array  $firstPaymentOptions
+     * @param  array  $data
      * @return \Laravel\Cashier\SubscriptionBuilder\Contracts\SubscriptionBuilder
      *
      * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
      * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
      * @throws \Throwable
      */
-    public function newSubscription($subscription, $plan, $firstPaymentOptions = [])
+    public function newSubscription($subscription, $plan, $firstPaymentOptions = [], $data = [])
     {
         if (! empty($this->mollieMandateId())) {
             $mandate = $this->mollieMandate();
@@ -84,7 +85,7 @@ trait Billable
                 && $mandate->isValid()
                 && $allowedPlanMethods->contains($mandate->method)
             ) {
-                return $this->newSubscriptionForMandateId($this->mollieMandateId(), $subscription, $plan);
+                return $this->newSubscriptionForMandateId($this->mollieMandateId(), $subscription, $plan, $data);
             }
         }
 
@@ -113,12 +114,13 @@ trait Billable
      * @param  string  $mandateId
      * @param  string  $subscription
      * @param  string  $plan
+     * @param  array  $data
      * @return \Laravel\Cashier\SubscriptionBuilder\MandatedSubscriptionBuilder
      *
      * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
      * @throws \Throwable|\Laravel\Cashier\Exceptions\InvalidMandateException
      */
-    public function newSubscriptionForMandateId($mandateId, $subscription, $plan)
+    public function newSubscriptionForMandateId($mandateId, $subscription, $plan, $data = [])
     {
         // The mandateId has changed
         if ($this->mollieMandateId() !== $mandateId) {
@@ -127,7 +129,7 @@ trait Billable
             $this->save();
         }
 
-        return new MandatedSubscriptionBuilder($this, $subscription, $plan);
+        return new MandatedSubscriptionBuilder($this, $subscription, $plan, $data);
     }
 
     /**
