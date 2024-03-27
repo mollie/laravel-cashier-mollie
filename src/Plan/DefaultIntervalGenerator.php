@@ -37,6 +37,13 @@ class DefaultIntervalGenerator extends BaseIntervalGenerator implements Interval
     }
 
     /**
+     * @return string
+     */
+    public function interval() {
+        return $this->interval;
+    }
+
+    /**
      * @return bool
      */
     protected function isMonthly()
