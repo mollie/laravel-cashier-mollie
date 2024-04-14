@@ -19,7 +19,7 @@ class Invoice
     use FormatsAmount;
 
     const DEFAULT_VIEW = 'cashier::receipt';
-    const DEFAULT_DATE_FORMAT = 'MMM D, Y';
+    const DEFAULT_DATE_FORMAT = 'LLL';
 
     /**
      * The invoice id. Also know as "reference".
