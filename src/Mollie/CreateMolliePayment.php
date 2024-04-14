@@ -18,6 +18,8 @@ class CreateMolliePayment extends BaseMollieInteraction implements Contract
             $payload['profileId'] = $profile;
         }
 
-        return $this->mollie->payments->create($payload);
+        return $this->mollie->payments->create($payload + [
+            'testmode' => ! app()->environment('production'),
+        ]);
     }
 }

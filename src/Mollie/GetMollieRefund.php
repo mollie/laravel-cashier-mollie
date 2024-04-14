@@ -32,7 +32,7 @@ class GetMollieRefund extends BaseMollieInteraction implements Contract
     {
         $this->setAccessToken($model);
 
-        $payment = $this->getMolliePayment->execute($paymentId, [], $model);
+        $payment = $this->getMolliePayment->execute($paymentId, ['testmode' => ! app()->environment('production')], $model);
 
         return $payment->getRefund($refundId);
     }

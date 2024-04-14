@@ -14,6 +14,8 @@ class GetMolliePayment extends BaseMollieInteraction implements Contract
     {
         $this->setAccessToken($model);
 
-        return $this->mollie->payments->get($id, $parameters);
+        return $this->mollie->payments->get($id, $parameters + [
+            'testmode' => ! app()->environment('production'),
+        ]);
     }
 }

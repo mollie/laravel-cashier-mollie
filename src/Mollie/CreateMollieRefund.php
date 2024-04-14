@@ -31,7 +31,9 @@ class CreateMollieRefund extends BaseMollieInteraction implements Contract
         $payment = $this->getMolliePayment->execute($paymentId, [], $model);
 
         /** @var Refund $refund */
-        $refund = $payment->refund($payload);
+        $refund = $payment->refund($payload + [
+            'testmode' => ! app()->environment('production'),
+        ]);
 
         return $refund;
     }

@@ -19,7 +19,7 @@ class GetMollieMethodMaximumAmount extends BaseMollieInteraction implements Cont
 
         $maximumAmount = $this->mollie
             ->methods
-            ->get($method, ['currency' => $currency])
+            ->get($method, ['currency' => $currency, 'testmode' => ! app()->environment('production')])
             ->maximumAmount;
 
         return $maximumAmount ? mollie_object_to_money($maximumAmount) : null;

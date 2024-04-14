@@ -14,6 +14,8 @@ class GetMollieCustomer extends BaseMollieInteraction implements Contract
     {
         $this->setAccessToken($model);
 
-        return $this->mollie->customers->get($id);
+        return $this->mollie->customers->get($id, [
+            'testmode' => ! app()->environment('production'),
+        ]);
     }
 }

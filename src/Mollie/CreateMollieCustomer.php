@@ -14,6 +14,8 @@ class CreateMollieCustomer extends BaseMollieInteraction implements Contract
     {
         $this->setAccessToken($model);
 
-        return $this->mollie->customers->create($payload);
+        return $this->mollie->customers->create($payload + [
+            'testmode' => ! app()->environment('production'),
+        ]);
     }
 }

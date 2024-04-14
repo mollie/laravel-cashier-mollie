@@ -19,7 +19,7 @@ class GetMollieMethodMinimumAmount extends BaseMollieInteraction implements Cont
         
         $minimumAmount = $this->mollie
             ->methods
-            ->get($method, ['currency' => $currency])
+            ->get($method, ['currency' => $currency, 'testmode' => ! app()->environment('production')])
             ->minimumAmount;
 
         return mollie_object_to_money($minimumAmount);

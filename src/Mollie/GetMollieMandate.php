@@ -14,6 +14,8 @@ class GetMollieMandate extends BaseMollieInteraction implements Contract
     {
         $this->setAccessToken($model);
 
-        return $this->mollie->mandates->getForId($customerId, $mandateId);
+        return $this->mollie->mandates->getForId($customerId, $mandateId, [
+            'testmode' => ! app()->environment('production'),
+        ]);
     }
 }
