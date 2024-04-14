@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Contracts\ProvidesOauthToken;
 use Laravel\Cashier\Events\BalanceTurnedStale;
 use Laravel\Cashier\Events\OrderCreated;
 use Laravel\Cashier\Events\OrderPaymentFailed;
@@ -706,7 +707,11 @@ class Order extends Model
         if ((int) $this->getTotalDue()->getAmount() > 0) {
             $mandate = $this->owner->mollieMandate();
             $this->guardMandate($mandate);
-            $minimumPaymentAmount = app(MinimumPayment::class)::forMollieMandate($mandate, $this->getCurrency());
+            $minimumPaymentAmount = app(MinimumPayment::class)::forMollieMandate(
+                $mandate,
+                $this->getCurrency(),
+                $this->owner instanceof ProvidesOauthToken ? $this->owner : null
+            );
         } else {
             $minimumPaymentAmount = new Money(0, new Currency($this->getCurrency()));
         }
@@ -725,7 +730,11 @@ class Order extends Model
             $mandate = $this->owner->mollieMandate();
             $this->guardMandate($mandate);
 
-            $maximumPaymentAmount = app(MaximumPayment::class)::forMollieMandate($mandate, $this->getCurrency());
+            $maximumPaymentAmount = app(MaximumPayment::class)::forMollieMandate(
+                $mandate,
+                $this->getCurrency(),
+                $this->owner instanceof ProvidesOauthToken ? $this->owner : null
+            );
         } else {
             $maximumPaymentAmount = new Money(0, new Currency($this->getCurrency()));
         }

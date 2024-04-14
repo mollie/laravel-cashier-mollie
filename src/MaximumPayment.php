@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier;
 
+use Laravel\Cashier\Contracts\ProvidesOauthToken;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMethodMaximumAmount;
 use Laravel\Cashier\Order\Contracts\MaximumPayment as MaximumPaymentContract;
 use Mollie\Api\Resources\Mandate;
@@ -13,11 +14,11 @@ class MaximumPayment implements MaximumPaymentContract
      * @param $currency
      * @return \Money\Money
      */
-    public static function forMollieMandate(Mandate $mandate, $currency)
+    public static function forMollieMandate(Mandate $mandate, $currency, ?ProvidesOauthToken $model = null)
     {
         /** @var GetMollieMethodMaximumAmount $getMaximumAmount */
         $getMaximumAmount = app()->make(GetMollieMethodMaximumAmount::class);
 
-        return $getMaximumAmount->execute($mandate->method, $currency);
+        return $getMaximumAmount->execute($mandate->method, $currency, $model);
     }
 }

@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Contracts\ProvidesOauthToken;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentStatus;
@@ -19,6 +20,7 @@ class WebhookController extends BaseWebhookController
      */
     public function handleWebhook(Request $request)
     {
+        // TODO @younes, add retrieving with oauth token.
         $payment = $this->getMolliePaymentById($request->get('id'));
 
         if ($payment) {
@@ -32,7 +34,7 @@ class WebhookController extends BaseWebhookController
 
                         /** @var UpdateMolliePayment $updateMolliePayment */
                         $updateMolliePayment = app()->make(UpdateMolliePayment::class);
-                        $updateMolliePayment->execute($payment);
+                        $updateMolliePayment->execute($payment, $payment->owner instanceof ProvidesOauthToken ? $payment->owner : null);
 
                         break;
                     case PaymentStatus::STATUS_FAILED:

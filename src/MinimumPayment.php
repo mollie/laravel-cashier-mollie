@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier;
 
+use Laravel\Cashier\Contracts\ProvidesOauthToken;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMethodMinimumAmount;
 use Laravel\Cashier\Order\Contracts\MinimumPayment as MinimumPaymentContract;
 use Mollie\Api\Resources\Mandate;
@@ -13,11 +14,11 @@ class MinimumPayment implements MinimumPaymentContract
      * @param $currency
      * @return \Money\Money
      */
-    public static function forMollieMandate(Mandate $mandate, $currency)
+    public static function forMollieMandate(Mandate $mandate, $currency, ?ProvidesOauthToken $model = null)
     {
         /** @var GetMollieMethodMinimumAmount $getMinimumAmount */
         $getMinimumAmount = app()->make(GetMollieMethodMinimumAmount::class);
 
-        return $getMinimumAmount->execute($mandate->method, $currency);
+        return $getMinimumAmount->execute($mandate->method, $currency, $model);
     }
 }

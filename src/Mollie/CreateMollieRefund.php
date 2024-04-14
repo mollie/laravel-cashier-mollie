@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Laravel\Cashier\Mollie;
 
+use Laravel\Cashier\Contracts\ProvidesOauthToken;
 use Laravel\Cashier\Mollie\Contracts\CreateMollieRefund as Contract;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Mollie\Api\Resources\Refund;
@@ -23,9 +24,11 @@ class CreateMollieRefund extends BaseMollieInteraction implements Contract
         $this->getMolliePayment = $getMolliePayment;
     }
 
-    public function execute(string $paymentId, array $payload): Refund
+    public function execute(string $paymentId, array $payload, ?ProvidesOauthToken $model = null): Refund
     {
-        $payment = $this->getMolliePayment->execute($paymentId);
+        $this->setAccessToken($model);
+
+        $payment = $this->getMolliePayment->execute($paymentId, [], $model);
 
         /** @var Refund $refund */
         $refund = $payment->refund($payload);

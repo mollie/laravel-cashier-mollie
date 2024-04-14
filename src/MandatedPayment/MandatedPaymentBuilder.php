@@ -4,6 +4,7 @@ namespace Laravel\Cashier\MandatedPayment;
 
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Contracts\ProvidesOauthToken;
 use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
 use Mollie\Api\Types\SequenceType;
 use Money\Money;
@@ -85,7 +86,7 @@ class MandatedPaymentBuilder
     {
         /** @var CreateMolliePayment $createMolliePayment */
         $createMolliePayment = app()->make(CreateMolliePayment::class);
-        $molliePayment = $createMolliePayment->execute($this->getPayload($overrides));
+        $molliePayment = $createMolliePayment->execute($this->getPayload($overrides), $this->owner instanceof ProvidesOauthToken ? $this->owner : null);
 
         Cashier::$paymentModel::createFromMolliePayment($molliePayment, $this->owner);
 

@@ -5,6 +5,7 @@ namespace Laravel\Cashier\FirstPayment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Contracts\ProvidesOauthToken;
 use Laravel\Cashier\FirstPayment\Actions\ActionCollection;
 use Laravel\Cashier\FirstPayment\Traits\PaymentMethodString;
 use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
@@ -134,7 +135,10 @@ class FirstPaymentBuilder
 
         /** @var CreateMolliePayment $createMolliePayment */
         $createMolliePayment = app()->make(CreateMolliePayment::class);
-        $this->molliePayment = $createMolliePayment->execute($payload);
+        $this->molliePayment = $createMolliePayment->execute(
+            $payload,
+            $this->owner instanceof ProvidesOauthToken ? $this->owner : null,
+        );
 
         Cashier::$paymentModel::createFromMolliePayment(
             $this->molliePayment,
@@ -152,7 +156,10 @@ class FirstPaymentBuilder
 
             /** @var UpdateMolliePayment $updateMolliePayment */
             $updateMolliePayment = app()->make(UpdateMolliePayment::class);
-            $this->molliePayment = $updateMolliePayment->execute($this->molliePayment);
+            $this->molliePayment = $updateMolliePayment->execute(
+                $this->molliePayment,
+                $this->owner instanceof ProvidesOauthToken ? $this->owner : null,
+            );
         }
 
         return $this->molliePayment;

@@ -3,6 +3,7 @@
 namespace Laravel\Cashier;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Cashier\Contracts\ProvidesOauthToken;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Order\ConvertsToMoney;
@@ -142,7 +143,7 @@ class Payment extends Model
 
             /** @var UpdateMolliePayment $updateMolliePayment */
             $updateMolliePayment = app()->make(UpdateMolliePayment::class);
-            $updateMolliePayment->execute($molliePayment);
+            $updateMolliePayment->execute($molliePayment, $owner instanceof ProvidesOauthToken ? $owner : null);
         }
 
         return $newPayment;
@@ -195,6 +196,9 @@ class Payment extends Model
      */
     public function asMolliePayment(): MolliePayment
     {
-        return app()->make(GetMolliePayment::class)->execute($this->mollie_payment_id);
+        return app()->make(GetMolliePayment::class)->execute(
+            $this->mollie_payment_id,
+            $this->owner instanceof ProvidesOauthToken ? $this->owner : null
+        );
     }
 }

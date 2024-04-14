@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Laravel\Cashier\Refunds;
 
 use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Contracts\ProvidesOauthToken;
 use Laravel\Cashier\Events\RefundInitiated;
 use Laravel\Cashier\Mollie\Contracts\CreateMollieRefund;
 use Laravel\Cashier\Order\Order;
@@ -93,7 +94,7 @@ class RefundBuilder
                 'value' => money_to_decimal($this->items->getTotal()),
                 'currency' => $currency,
             ],
-        ]);
+        ], $this->order->owner instanceof ProvidesOauthToken ? $this->order->owner : null);
 
         $refundRecord = Cashier::$refundModel::create([
             'owner_type' => $this->order->owner_type,
