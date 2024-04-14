@@ -13,13 +13,18 @@ class GetMollieMethodMaximumAmount extends BaseMollieInteraction implements Cont
     {
         $this->setAccessToken($model);
 
+        $payload = [
+            'currency' => $currency,
+            'testmode' => ! app()->environment('production'),
+        ];
+
         if ($profile = $model->getMollieProfile()) {
             $payload['profileId'] = $profile;
         }
 
         $maximumAmount = $this->mollie
             ->methods
-            ->get($method, ['currency' => $currency, 'testmode' => ! app()->environment('production')])
+            ->get($method, $payload)
             ->maximumAmount;
 
         return $maximumAmount ? mollie_object_to_money($maximumAmount) : null;

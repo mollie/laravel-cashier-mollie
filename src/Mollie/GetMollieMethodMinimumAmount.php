@@ -13,13 +13,18 @@ class GetMollieMethodMinimumAmount extends BaseMollieInteraction implements Cont
     {
         $this->setAccessToken($model);
 
+        $payload = [
+            'currency' => $currency,
+            'testmode' => ! app()->environment('production'),
+        ];
+
         if ($profile = $model->getMollieProfile()) {
             $payload['profileId'] = $profile;
         }
         
         $minimumAmount = $this->mollie
             ->methods
-            ->get($method, ['currency' => $currency, 'testmode' => ! app()->environment('production')])
+            ->get($method, $payload)
             ->minimumAmount;
 
         return mollie_object_to_money($minimumAmount);
