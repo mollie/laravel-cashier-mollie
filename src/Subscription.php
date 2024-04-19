@@ -638,13 +638,13 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
         $subscription = $item->orderable;
 
         if ($subscription->ends_at !== null) {
-            DB::transaction(function () use ($item) {
-                if (! $this->scheduled_order_item_id) {
-                    $item = $this->scheduleNewOrderItemAt($this->ends_at);
+            DB::transaction(function () use ($item, $subscription) {
+                if (! $subscription->scheduled_order_item_id) {
+                    $item = $subscription->scheduleNewOrderItemAt($subscription->ends_at);
                 }
 
-                $this->fill([
-                    'cycle_ends_at' => $this->plan()->interval()->getEndOfNextSubscriptionCycle($this),
+                $subscription->fill([
+                    'cycle_ends_at' => $subscription->plan()->interval()->getEndOfNextSubscriptionCycle($subscription),
                     'ends_at' => null,
                     'scheduled_order_item_id' => $item->id,
                 ])->save();
