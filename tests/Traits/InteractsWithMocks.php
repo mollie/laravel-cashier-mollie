@@ -15,13 +15,12 @@ use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Mollie\GetMollieMethodMaximumAmount;
 use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Mandate;
 use Mollie\Api\Resources\Payment;
 use Money\Currency;
 use Money\Money;
-use Mollie\Laravel\Wrappers\MollieApiWrapper;
+use Mollie\Api\MollieApiClient;
 
 /**
  * @mixin \Laravel\Cashier\Tests\BaseTestCase
@@ -32,7 +31,7 @@ trait InteractsWithMocks
     {
         if (!$this->interactWithMollieAPI) {
             // Disable the Mollie API
-            $this->mock(MollieApiWrapper::class, null);
+            $this->mock(MollieApiClient::class, null);
         }
     }
 

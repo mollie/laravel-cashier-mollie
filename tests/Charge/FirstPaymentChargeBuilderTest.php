@@ -14,7 +14,6 @@ class FirstPaymentChargeBuilderTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->withPackageMigrations();
         $this->withMockedCreateMollieCustomer();
     }
 

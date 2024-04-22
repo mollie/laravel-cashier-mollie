@@ -71,7 +71,6 @@ class WebhookControllerTest extends BaseTestCase
     /** @test **/
     public function handlesPaymentFailed()
     {
-        $this->withPackageMigrations();
         $this->withConfiguredPlans();
         $this->withTestNow('2019-01-01');
         Event::fake();
@@ -144,7 +143,6 @@ class WebhookControllerTest extends BaseTestCase
     /** @test **/
     public function handlesPaymentPaid()
     {
-        $this->withPackageMigrations();
         $this->withConfiguredPlans();
         Event::fake();
 
@@ -196,7 +194,6 @@ class WebhookControllerTest extends BaseTestCase
     /** @test **/
     public function skipsIfPaymentStatusUnchanged()
     {
-        $this->withPackageMigrations();
         Event::fake();
 
         $paymentId = 'tr_payment_paid_id';

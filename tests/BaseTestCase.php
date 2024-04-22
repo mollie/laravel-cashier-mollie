@@ -7,9 +7,9 @@ use Illuminate\Support\Collection;
 use Laravel\Cashier\CashierServiceProvider;
 use Laravel\Cashier\Coupon\CouponOrderItemPreprocessor;
 use Laravel\Cashier\Plan\AdvancedIntervalGenerator;
-use Laravel\Cashier\Tests\Database\Migrations\CreateUsersTable;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Laravel\Cashier\Tests\Traits\InteractsWithMocks;
+use Mollie\Laravel\MollieServiceProvider;
 use Money\Currency;
 use Money\Money;
 use Orchestra\Testbench\TestCase;
@@ -27,6 +27,7 @@ abstract class BaseTestCase extends TestCase
     {
         parent::setUp();
 
+        $this->setupDatabase();
         $this->withFixtureModels();
 
         config(['cashier.webhook_url' => 'https://www.example.com/webhook']);
@@ -40,15 +41,13 @@ abstract class BaseTestCase extends TestCase
      */
     protected function getPackageProviders($app)
     {
-        return [CashierServiceProvider::class];
+        return [
+            CashierServiceProvider::class,
+            MollieServiceProvider::class,
+        ];
     }
 
-    /**
-     * Execute table migrations.
-     *
-     * @return $this
-     */
-    protected function withPackageMigrations()
+    protected function setupDatabase(): void
     {
         $migrations_dir = __DIR__ . '/../database/migrations';
 
@@ -56,8 +55,8 @@ abstract class BaseTestCase extends TestCase
             collect(
                 [
                     [
-                        'class' => CreateUsersTable::class,
-                        'file_path' => __DIR__ . '/Database/Migrations/create_users_table.php',
+                        'class' => \Laravel\Cashier\Tests\Database\Migrations\CreateUsersTable::class,
+                        'file_path' => __DIR__ . '/Database/Migrations/create_users_table.php'
                     ],
                     [
                         'class' => '\CreateSubscriptionsTable',
@@ -98,10 +97,7 @@ abstract class BaseTestCase extends TestCase
                 ]
             )
         );
-
-        return $this;
     }
-
     /**
      * Runs a collection of migrations.
      *
@@ -109,19 +105,17 @@ abstract class BaseTestCase extends TestCase
      */
     protected function runMigrations(Collection $migrations)
     {
-        $migrations->each(function ($migration) {
-            $this->runMigration($migration['class'], $migration['file_path']);
-        });
+        $migrations->each(fn ($info) => $this->runMigration($info['class'], $info['file_path']));
     }
 
     /**
      * @param  string  $class
      * @param  string  $file_path
      */
-    protected function runMigration($class, $file_path)
+    protected function runMigration(string $className, string $file_path)
     {
-        include_once $file_path;
-        (new $class)->up();
+        require_once $file_path;
+        (new $className)->up();
     }
 
     /**

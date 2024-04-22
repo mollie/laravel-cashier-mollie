@@ -13,7 +13,7 @@ class StartSubscriptionTest extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->withPackageMigrations()
+        $this
             ->withConfiguredPlans()
             ->withTestNow('2019-01-01');
     }

@@ -66,8 +66,6 @@ class OrderItemTest extends BaseTestCase
 
     public function testScopeProcessed()
     {
-        $this->withPackageMigrations();
-
         OrderItemFactory::new()->times(3)->create([
             'order_id' => null,
         ]);
@@ -82,8 +80,6 @@ class OrderItemTest extends BaseTestCase
 
     public function testScopeUnprocessed()
     {
-        $this->withPackageMigrations();
-
         OrderItemFactory::new()->times(3)->create([
             'order_id' => null,
         ]);
@@ -98,8 +94,6 @@ class OrderItemTest extends BaseTestCase
 
     public function testScopeShouldProcess()
     {
-        $this->withPackageMigrations();
-
         OrderItemFactory::new()->times(2)->create([
             'order_id' => 1,
             'process_at' => now()->subHour(),
@@ -118,8 +112,6 @@ class OrderItemTest extends BaseTestCase
 
     public function testScopeDue()
     {
-        $this->withPackageMigrations();
-
         OrderItemFactory::new()->times(2)->create([
             'process_at' => now()->subHour(),
         ]);

@@ -11,7 +11,7 @@ class GetMollieMethodMaximumAmount extends BaseMollieInteraction implements Cont
     public function execute(string $method, string $currency): ?Money
     {
         $maximumAmount = $this->mollie
-            ->methods()
+            ->methods
             ->get($method, ['currency' => $currency])
             ->maximumAmount;
 

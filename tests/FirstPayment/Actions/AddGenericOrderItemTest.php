@@ -15,8 +15,6 @@ class AddGenericOrderItemTest extends BaseTestCase
     /** @test */
     public function canGetPayload()
     {
-        $this->withPackageMigrations();
-
         $action = new AddGenericOrderItem(
             $this->getMandatedUser(true, ['tax_percentage' => 20]),
             new Money(5, new Currency('EUR')),
@@ -78,7 +76,6 @@ class AddGenericOrderItemTest extends BaseTestCase
     /** @test */
     public function canExecute()
     {
-        $this->withPackageMigrations();
         $user = User::factory()->create(['tax_percentage' => 20]);
         $this->assertFalse($user->hasCredit());
 

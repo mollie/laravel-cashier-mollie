@@ -9,12 +9,6 @@ use Laravel\Cashier\Tests\Fixtures\User;
 
 class ManageChargesTest extends BaseTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->withPackageMigrations();
-    }
-
     /** @test */
     public function usingMandatedChargeBuilderWhenValidMandate()
     {
