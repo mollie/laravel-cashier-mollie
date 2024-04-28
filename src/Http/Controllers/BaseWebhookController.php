@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Http\Controllers;
 
+use Laravel\Cashier\Contracts\ProvidesOauthToken;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Mollie\Api\Exceptions\ApiException;
 
@@ -23,14 +24,15 @@ abstract class BaseWebhookController
      *
      * @param  string  $id
      * @param  array  $parameters
+     * @param  \Laravel\Cashier\Contracts\ProvidesOauthToken|null  $owner
      * @return \Mollie\Api\Resources\Payment|null
      *
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function getMolliePaymentById(string $id, array $parameters = [])
+    public function getMolliePaymentById(string $id, array $parameters = [], ?ProvidesOauthToken $owner = null)
     {
         try {
-            return $this->getMolliePayment->execute($id, $parameters);
+            return $this->getMolliePayment->execute($id, $parameters, $owner);
         } catch (ApiException $e) {
             if (! config('app.debug')) {
                 // Prevent leaking information

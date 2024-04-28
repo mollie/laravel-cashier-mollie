@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Contracts\ProvidesOauthToken;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
+use Laravel\Cashier\Payment as CashierPayment;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentStatus;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,25 +21,29 @@ class WebhookController extends BaseWebhookController
      */
     public function handleWebhook(Request $request)
     {
-        // TODO @younes, add retrieving with oauth token.
-        $payment = $this->getMolliePaymentById($request->get('id'));
+        $payment = CashierPayment::with('owner')->firstWhere('mollie_payment_id', $request->get('id'));
 
-        if ($payment) {
-            $order = $this->getOrder($payment);
+        $molliePayment = $this->getMolliePaymentById(
+            $request->get('id'),
+            owner: $payment->owner instanceof ProvidesOauthToken ? $payment->owner : null,
+        );
 
-            if ($order && $order->mollie_payment_status !== $payment->status) {
-                switch ($payment->status) {
+        if ($molliePayment) {
+            $order = $this->getOrder($molliePayment);
+
+            if ($order && $order->mollie_payment_status !== $molliePayment->status) {
+                switch ($molliePayment->status) {
                     case PaymentStatus::STATUS_PAID:
-                        $order->handlePaymentPaid($payment);
-                        $payment->webhookUrl = route('webhooks.mollie.aftercare');
+                        $order->handlePaymentPaid($molliePayment);
+                        $molliePayment->webhookUrl = route('webhooks.mollie.aftercare');
 
                         /** @var UpdateMolliePayment $updateMolliePayment */
                         $updateMolliePayment = app()->make(UpdateMolliePayment::class);
-                        $updateMolliePayment->execute($payment, $payment->owner instanceof ProvidesOauthToken ? $payment->owner : null);
+                        $updateMolliePayment->execute($molliePayment, $payment->owner instanceof ProvidesOauthToken ? $payment->owner : null);
 
                         break;
                     case PaymentStatus::STATUS_FAILED:
-                        $order->handlePaymentFailed($payment);
+                        $order->handlePaymentFailed($molliePayment);
 
                         break;
                     default:

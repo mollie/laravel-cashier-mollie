@@ -9,6 +9,7 @@ use Laravel\Cashier\Events\FirstPaymentFailed;
 use Laravel\Cashier\Events\FirstPaymentPaid;
 use Laravel\Cashier\FirstPayment\FirstPaymentHandler;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
+use Laravel\Cashier\Payment;
 use Symfony\Component\HttpFoundation\Response;
 
 class FirstPaymentWebhookController extends BaseWebhookController
@@ -21,21 +22,28 @@ class FirstPaymentWebhookController extends BaseWebhookController
      */
     public function handleWebhook(Request $request)
     {
-        // TODO @younes, add retrieving with oauth token.
-        $payment = $this->getMolliePaymentById($request->get('id'));
+        $payment = Payment::with('owner')->firstWhere('mollie_payment_id', $request->get('id'));
 
-        if ($payment) {
-            if ($payment->isPaid()) {
-                $order = (new FirstPaymentHandler($payment))->execute();
-                $payment->webhookUrl = route('webhooks.mollie.aftercare');
+        $molliePayment = $this->getMolliePaymentById(
+            $request->get('id'),
+            owner: $payment->owner instanceof ProvidesOauthToken ? $payment->owner : null,
+        );
+
+        if ($molliePayment) {
+            if ($molliePayment->isPaid()) {
+                $order = (new FirstPaymentHandler($molliePayment))->execute();
+                $molliePayment->webhookUrl = route('webhooks.mollie.aftercare');
 
                 /** @var UpdateMolliePayment $updateMolliePayment */
                 $updateMolliePayment = app()->make(UpdateMolliePayment::class);
-                $payment = $updateMolliePayment->execute($payment, $payment->owner instanceof ProvidesOauthToken ? $payment->owner : null);
+                $molliePayment = $updateMolliePayment->execute(
+                    $molliePayment,
+                    $payment->owner instanceof ProvidesOauthToken ? $payment->owner : null
+                );
 
-                Event::dispatch(new FirstPaymentPaid($payment, $order));
-            } elseif ($payment->isFailed()) {
-                Event::dispatch(new FirstPaymentFailed($payment));
+                Event::dispatch(new FirstPaymentPaid($molliePayment, $order));
+            } elseif ($molliePayment->isFailed()) {
+                Event::dispatch(new FirstPaymentFailed($molliePayment));
             }
         }
 
