@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Contracts\ProvidesOauthToken;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
-use Laravel\Cashier\Payment as CashierPayment;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentStatus;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +20,7 @@ class WebhookController extends BaseWebhookController
      */
     public function handleWebhook(Request $request)
     {
-        $payment = CashierPayment::with('owner')->firstWhere('mollie_payment_id', $request->get('id'));
+        $payment = Cashier::$paymentModel::with('owner')->firstWhere('mollie_payment_id', $request->get('id'));
 
         $molliePayment = $this->getMolliePaymentById(
             $request->get('id'),

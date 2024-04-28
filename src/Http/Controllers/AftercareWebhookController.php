@@ -9,7 +9,6 @@ use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Contracts\ProvidesOauthToken;
 use Laravel\Cashier\Events\ChargebackReceived;
 use Laravel\Cashier\Order\Order;
-use Laravel\Cashier\Payment;
 use Laravel\Cashier\Refunds\Refund;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Resources\Refund as MollieRefund;
@@ -28,7 +27,7 @@ class AftercareWebhookController extends BaseWebhookController
      */
     public function handleWebhook(Request $request)
     {
-        $payment = Payment::with('owner')->firstWhere('mollie_payment_id', $request->get('id'));
+        $payment = Cashier::$paymentModel::with('owner')->firstWhere('mollie_payment_id', $request->get('id'));
 
         $molliePayment = $this->getMolliePaymentById(
             $request->get('id'),

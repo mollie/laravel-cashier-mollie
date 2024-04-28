@@ -4,12 +4,12 @@ namespace Laravel\Cashier\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Contracts\ProvidesOauthToken;
 use Laravel\Cashier\Events\FirstPaymentFailed;
 use Laravel\Cashier\Events\FirstPaymentPaid;
 use Laravel\Cashier\FirstPayment\FirstPaymentHandler;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
-use Laravel\Cashier\Payment;
 use Symfony\Component\HttpFoundation\Response;
 
 class FirstPaymentWebhookController extends BaseWebhookController
@@ -22,7 +22,7 @@ class FirstPaymentWebhookController extends BaseWebhookController
      */
     public function handleWebhook(Request $request)
     {
-        $payment = Payment::with('owner')->firstWhere('mollie_payment_id', $request->get('id'));
+        $payment = Cashier::$paymentModel::with('owner')->firstWhere('mollie_payment_id', $request->get('id'));
 
         $molliePayment = $this->getMolliePaymentById(
             $request->get('id'),
