@@ -2,7 +2,7 @@
 
 namespace Laravel\Cashier\Order\Contracts;
 
-use Laravel\Cashier\Contracts\ProvidesOauthToken;
+use Laravel\Cashier\Contracts\ProvidesOauthInformation;
 use Mollie\Api\Resources\Mandate;
 
 interface MaximumPayment
@@ -10,8 +10,8 @@ interface MaximumPayment
     /**
      * @param  \Mollie\Api\Resources\Mandate  $mandate
      * @param $currency
-     * @param  \Laravel\Cashier\Contracts\ProvidesOauthToken|null  $model
+     * @param  \Laravel\Cashier\Contracts\ProvidesOauthInformation|null  $model
      * @return \Money\Money
      */
-    public static function forMollieMandate(Mandate $mandate, $currency, ?ProvidesOauthToken $model = null);
+    public static function forMollieMandate(Mandate $mandate, $currency, ?ProvidesOauthInformation $model = null);
 }

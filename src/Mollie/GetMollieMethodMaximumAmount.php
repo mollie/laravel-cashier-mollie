@@ -4,22 +4,25 @@ declare(strict_types=1);
 
 namespace Laravel\Cashier\Mollie;
 
-use Laravel\Cashier\Contracts\ProvidesOauthToken;
+use Laravel\Cashier\Contracts\ProvidesOauthInformation;
 use Money\Money;
 
 class GetMollieMethodMaximumAmount extends BaseMollieInteraction implements Contracts\GetMollieMethodMaximumAmount
 {
-    public function execute(string $method, string $currency, ?ProvidesOauthToken $model = null): ?Money
+    public function execute(string $method, string $currency, ?ProvidesOauthInformation $model = null): ?Money
     {
         $this->setAccessToken($model);
 
         $payload = [
             'currency' => $currency,
-            'testmode' => ! app()->environment('production'),
         ];
 
-        if ($profile = $model->getMollieProfile()) {
+        if ($profile = $model?->getMollieProfile()) {
             $payload['profileId'] = $profile;
+        }
+
+        if ($model?->isMollieTestmode()) {
+            $payload['testmode'] = true;
         }
 
         $maximumAmount = $this->mollie

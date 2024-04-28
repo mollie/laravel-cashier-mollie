@@ -5,7 +5,7 @@ namespace Laravel\Cashier\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Contracts\ProvidesOauthToken;
+use Laravel\Cashier\Contracts\ProvidesOauthInformation;
 use Laravel\Cashier\Events\FirstPaymentFailed;
 use Laravel\Cashier\Events\FirstPaymentPaid;
 use Laravel\Cashier\FirstPayment\FirstPaymentHandler;
@@ -26,7 +26,7 @@ class FirstPaymentWebhookController extends BaseWebhookController
 
         $molliePayment = $this->getMolliePaymentById(
             $request->get('id'),
-            owner: $payment->owner instanceof ProvidesOauthToken ? $payment->owner : null,
+            owner: $payment->owner instanceof ProvidesOauthInformation ? $payment->owner : null,
         );
 
         if ($molliePayment) {
@@ -38,7 +38,7 @@ class FirstPaymentWebhookController extends BaseWebhookController
                 $updateMolliePayment = app()->make(UpdateMolliePayment::class);
                 $molliePayment = $updateMolliePayment->execute(
                     $molliePayment,
-                    $payment->owner instanceof ProvidesOauthToken ? $payment->owner : null
+                    $payment->owner instanceof ProvidesOauthInformation ? $payment->owner : null
                 );
 
                 Event::dispatch(new FirstPaymentPaid($molliePayment, $order));

@@ -4,18 +4,22 @@ declare(strict_types=1);
 
 namespace Laravel\Cashier\Mollie;
 
-use Laravel\Cashier\Contracts\ProvidesOauthToken;
+use Laravel\Cashier\Contracts\ProvidesOauthInformation;
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer as Contract;
 use Mollie\Api\Resources\Customer;
 
 class GetMollieCustomer extends BaseMollieInteraction implements Contract
 {
-    public function execute(string $id, ?ProvidesOauthToken $model = null): Customer
+    public function execute(string $id, ?ProvidesOauthInformation $model = null): Customer
     {
         $this->setAccessToken($model);
 
-        return $this->mollie->customers->get($id, [
-            'testmode' => ! app()->environment('production'),
-        ]);
+        $payload = [];
+
+        if ($model?->isMollieTestmode()) {
+            $payload['testmode'] = true;
+        }
+
+        return $this->mollie->customers->get($id, $payload);
     }
 }

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Laravel\Cashier\Mollie\Contracts;
 
-use Laravel\Cashier\Contracts\ProvidesOauthToken;
+use Laravel\Cashier\Contracts\ProvidesOauthInformation;
 use Mollie\Api\Resources\Payment;
 
 interface CreateMolliePayment
 {
-    public function execute(array $payload, ?ProvidesOauthToken $model = null): Payment;
+    public function execute(array $payload, ?ProvidesOauthInformation $model = null): Payment;
 }

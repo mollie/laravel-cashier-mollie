@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Contracts\ProvidesOauthToken;
+use Laravel\Cashier\Contracts\ProvidesOauthInformation;
 use Laravel\Cashier\Events\BalanceTurnedStale;
 use Laravel\Cashier\Events\OrderCreated;
 use Laravel\Cashier\Events\OrderPaymentFailed;
@@ -710,7 +710,7 @@ class Order extends Model
             $minimumPaymentAmount = app(MinimumPayment::class)::forMollieMandate(
                 $mandate,
                 $this->getCurrency(),
-                $this->owner instanceof ProvidesOauthToken ? $this->owner : null
+                $this->owner instanceof ProvidesOauthInformation ? $this->owner : null
             );
         } else {
             $minimumPaymentAmount = new Money(0, new Currency($this->getCurrency()));
@@ -733,7 +733,7 @@ class Order extends Model
             $maximumPaymentAmount = app(MaximumPayment::class)::forMollieMandate(
                 $mandate,
                 $this->getCurrency(),
-                $this->owner instanceof ProvidesOauthToken ? $this->owner : null
+                $this->owner instanceof ProvidesOauthInformation ? $this->owner : null
             );
         } else {
             $maximumPaymentAmount = new Money(0, new Currency($this->getCurrency()));

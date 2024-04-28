@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Contracts\ProvidesOauthToken;
+use Laravel\Cashier\Contracts\ProvidesOauthInformation;
 use Laravel\Cashier\Events\ChargebackReceived;
 use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Refunds\Refund;
@@ -31,7 +31,7 @@ class AftercareWebhookController extends BaseWebhookController
 
         $molliePayment = $this->getMolliePaymentById(
             $request->get('id'),
-            owner: $payment->owner instanceof ProvidesOauthToken ? $payment->owner : null,
+            owner: $payment->owner instanceof ProvidesOauthInformation ? $payment->owner : null,
         );
 
         if ($molliePayment && $molliePayment->hasRefunds()) {

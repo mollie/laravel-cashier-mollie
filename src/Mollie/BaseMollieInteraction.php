@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Laravel\Cashier\Mollie;
 
-use Laravel\Cashier\Contracts\ProvidesOauthToken;
+use Laravel\Cashier\Contracts\ProvidesOauthInformation;
 use Mollie\Api\MollieApiClient as Mollie;
 
 abstract class BaseMollieInteraction
@@ -22,9 +22,9 @@ abstract class BaseMollieInteraction
     /**
      * Set the OAuth token to be used by the interaction.
      */
-    public function setAccessToken(?ProvidesOauthToken $model = null): void
+    public function setAccessToken(?ProvidesOauthInformation $model = null): void
     {
-        if ($model && ($token = $model->getOauthToken())) {
+        if ($token = $model?->getOauthToken()) {
             $this->mollie->setAccessToken($token);
         }
     }

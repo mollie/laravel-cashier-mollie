@@ -6,7 +6,7 @@ use Dompdf\Options;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Laravel\Cashier\Charge\ManagesCharges;
-use Laravel\Cashier\Contracts\ProvidesOauthToken;
+use Laravel\Cashier\Contracts\ProvidesOauthInformation;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\Events\MandateClearedFromBillable;
 use Laravel\Cashier\Exceptions\InvalidMandateException;
@@ -169,7 +169,7 @@ trait Billable
         $createMollieCustomer = app()->make(CreateMollieCustomer::class);
         $customer = $createMollieCustomer->execute(
             $options,
-            $this instanceof ProvidesOauthToken ? $this : null,
+            $this instanceof ProvidesOauthInformation ? $this : null,
         );
 
         $this->{$this->getMollieCustomerIdColumn()} = $customer->id;
@@ -194,7 +194,7 @@ trait Billable
 
         return $getMollieCustomer->execute(
             $this->{$this->getMollieCustomerIdColumn()},
-            $this instanceof ProvidesOauthToken ? $this : null,
+            $this instanceof ProvidesOauthInformation ? $this : null,
         );
     }
 
@@ -465,7 +465,7 @@ trait Billable
                 return $getMollieMandate->execute(
                     $customer->id,
                     $mandateId,
-                    $this instanceof ProvidesOauthToken ? $this : null,
+                    $this instanceof ProvidesOauthInformation ? $this : null,
                 );
             } catch (ApiException $e) {
                 // Status 410: mandate was revoked
