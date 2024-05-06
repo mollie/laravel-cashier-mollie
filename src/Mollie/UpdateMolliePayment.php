@@ -13,8 +13,8 @@ class UpdateMolliePayment extends BaseMollieInteraction implements Contract
     public function execute(Payment $dirtyPayment, ?ProvidesOauthInformation $model = null): Payment
     {
         $this->setAccessToken($model);
-        
-        if ($model->isMollieTestmode()) {
+
+        if ($model?->isMollieTestmode()) {
             $dirtyPayment->mode = 'test';
         }
 
