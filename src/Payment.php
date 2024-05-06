@@ -198,6 +198,7 @@ class Payment extends Model
     {
         return app()->make(GetMolliePayment::class)->execute(
             $this->mollie_payment_id,
+            [],
             $this->owner instanceof ProvidesOauthInformation ? $this->owner : null
         );
     }
