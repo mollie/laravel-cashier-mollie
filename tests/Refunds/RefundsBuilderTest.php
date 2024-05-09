@@ -32,7 +32,7 @@ class RefundsBuilderTest extends BaseTestCase
                     'value' => '22.00',
                     'currency' => 'EUR',
                 ],
-            ])->once()->andReturn($mollieRefund);
+            ], null)->once()->andReturn($mollieRefund);
         });
 
         $user = $this->getUser();

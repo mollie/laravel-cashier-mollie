@@ -144,7 +144,7 @@ trait InteractsWithMocks
                 'customerId' => 'cst_unique_customer_id',
                 'status' => 'pending',
             ]
-        ]);
+        ], null);
     }
 
     protected function withMockedGetMollieMandate(
@@ -165,7 +165,7 @@ trait InteractsWithMocks
                 $mandate->method = 'directdebit';
 
                 $mock->shouldReceive('execute')
-                    ->with($data['customerId'], $data['mandateId'])
+                    ->with($data['customerId'], $data['mandateId'], null)
                     ->times($times)
                     ->andReturn($mandate);
             }
@@ -194,7 +194,7 @@ trait InteractsWithMocks
                 $customer->id = $id;
 
                 $mock->shouldReceive('execute')
-                    ->with($id)
+                    ->with($id, null)
                     ->times($times)
                     ->andReturn($customer);
             }
@@ -207,7 +207,7 @@ trait InteractsWithMocks
     {
         $this->mock(GetMollieMethodMinimumAmount::class, function ($mock) use ($times, $amount) {
             return $mock->shouldReceive('execute')
-                ->with('directdebit', 'EUR')
+                ->with('directdebit', 'EUR', null)
                 ->times($times)
                 ->andReturn(new Money($amount, new Currency('EUR')));
         });
@@ -219,7 +219,7 @@ trait InteractsWithMocks
 
         $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) use ($times, $returnedValue) {
             return $mock->shouldReceive('execute')
-                ->with('directdebit', 'EUR')
+                ->with('directdebit', 'EUR', null)
                 ->times($times)
                 ->andReturn($returnedValue);
         });
@@ -279,7 +279,7 @@ trait InteractsWithMocks
 
         $this->mock(GetMolliePayment::class, function ($mock) use ($times, $molliePayment) {
             return $mock->shouldReceive('execute')
-                ->with($molliePayment->id, [])
+                ->with($molliePayment->id, [], null)
                 ->times($times)
                 ->andReturn($molliePayment);
         });
@@ -289,7 +289,7 @@ trait InteractsWithMocks
     {
         $this->mock(GetMolliePayment::class, function ($mock) use ($times, $wrongId) {
             return $mock->shouldReceive('execute')
-                ->with($wrongId, [])
+                ->with($wrongId, [], null)
                 ->times($times)
                 ->andThrow(new ApiException);
         });

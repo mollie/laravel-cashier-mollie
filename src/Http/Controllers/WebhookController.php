@@ -24,7 +24,7 @@ class WebhookController extends BaseWebhookController
 
         $molliePayment = $this->getMolliePaymentById(
             $request->get('id'),
-            owner: $payment->owner instanceof ProvidesOauthInformation ? $payment->owner : null,
+            owner: $payment?->owner instanceof ProvidesOauthInformation ? $payment?->owner : null,
         );
 
         if ($molliePayment) {
@@ -38,7 +38,7 @@ class WebhookController extends BaseWebhookController
 
                         /** @var UpdateMolliePayment $updateMolliePayment */
                         $updateMolliePayment = app()->make(UpdateMolliePayment::class);
-                        $updateMolliePayment->execute($molliePayment, $payment->owner instanceof ProvidesOauthInformation ? $payment->owner : null);
+                        $updateMolliePayment->execute($molliePayment, $payment?->owner instanceof ProvidesOauthInformation ? $payment?->owner : null);
 
                         break;
                     case PaymentStatus::STATUS_FAILED:

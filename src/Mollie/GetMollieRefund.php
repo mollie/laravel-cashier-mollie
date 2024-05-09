@@ -13,18 +13,13 @@ use Mollie\Api\MollieApiClient as Mollie;
 class GetMollieRefund extends BaseMollieInteraction implements Contract
 {
     /**
-     * @var \Mollie\Api\MollieApiClient
-     */
-    protected Mollie $mollie;
-
-    /**
      * @var \Laravel\Cashier\Mollie\Contracts\GetMolliePayment
      */
     protected GetMolliePayment $getMolliePayment;
 
     public function __construct(Mollie $mollie, GetMolliePayment $getMolliePayment)
     {
-        $this->mollie = $mollie;
+        parent::__construct($mollie);
         $this->getMolliePayment = $getMolliePayment;
     }
 
