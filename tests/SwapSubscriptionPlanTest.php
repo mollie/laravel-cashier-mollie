@@ -6,21 +6,10 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\OrderProcessed;
 use Laravel\Cashier\Events\SubscriptionPlanSwapped;
-use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
-use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
-use Laravel\Cashier\Mollie\Contracts\GetMollieMethodMinimumAmount;
-use Laravel\Cashier\Mollie\GetMollieCustomer;
-use Laravel\Cashier\Mollie\GetMollieMethodMaximumAmount;
 use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
-use Mollie\Api\MollieApiClient;
-use Mollie\Api\Resources\Customer;
-use Mollie\Api\Resources\Mandate;
-use Mollie\Api\Resources\Payment;
-use Money\Currency;
-use Money\Money;
 
 class SwapSubscriptionPlanTest extends BaseTestCase
 {
@@ -28,7 +17,6 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->withPackageMigrations();
         $this->withTestNow('2019-1-1');
         $this->withConfiguredPlans();
 
@@ -39,8 +27,8 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     public function canSwapToAnotherPlan()
     {
         $now = now();
-        $this->withMockedGetMollieCustomer();
-        $this->withMockedGetMollieMandate();
+        $this->withMockedGetMollieCustomer(2);
+        $this->withMockedGetMollieMandateAccepted(2);
         $this->withMockedGetMollieMethodMinimumAmount();
         $this->withMockedGetMollieMethodMaximumAmount();
         $this->withMockedCreateMolliePayment();
@@ -128,8 +116,8 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     public function canSwapToAnotherPlanWithImmediatelyAppliedCoupon()
     {
         $now = now();
-        $this->withMockedGetMollieCustomer();
-        $this->withMockedGetMollieMandate();
+        $this->withMockedGetMollieCustomer(2);
+        $this->withMockedGetMollieMandateAccepted(2);
         $this->withMockedGetMollieMethodMinimumAmount();
         $this->withMockedGetMollieMethodMaximumAmount();
         $this->withMockedCreateMolliePayment();
@@ -341,66 +329,5 @@ class SwapSubscriptionPlanTest extends BaseTestCase
             'cycle_ends_at' => now()->subWeeks(2)->addMonth(),
             'tax_percentage' => 10,
         ]));
-    }
-
-    protected function withMockedGetMollieCustomer($customerIds = ['cst_unique_customer_id'], $times = 2): void
-    {
-        $this->mock(GetMollieCustomer::class, function ($mock) use ($customerIds, $times) {
-            foreach ($customerIds as $id) {
-                $customer = new Customer(new MollieApiClient);
-                $customer->id = $id;
-                $mock->shouldReceive('execute')->with($id)->times($times)->andReturn($customer);
-            }
-
-            return $mock;
-        });
-    }
-
-    protected function withMockedGetMollieMandate($attributes = [[
-        'mandateId' => 'mdt_unique_mandate_id',
-        'customerId' => 'cst_unique_customer_id',
-    ]], $times = 2): void
-    {
-        $this->mock(GetMollieMandate::class, function ($mock) use ($times, $attributes) {
-            foreach ($attributes as $data) {
-                $mandate = new Mandate(new MollieApiClient);
-                $mandate->id = $data['mandateId'];
-                $mandate->status = 'valid';
-                $mandate->method = 'directdebit';
-
-                $mock->shouldReceive('execute')->with($data['customerId'], $data['mandateId'])->times($times)->andReturn($mandate);
-            }
-
-            return $mock;
-        });
-    }
-
-    protected function withMockedGetMollieMethodMinimumAmount($times = 1): void
-    {
-        $this->mock(GetMollieMethodMinimumAmount::class, function ($mock) use ($times) {
-            return $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(new Money(100, new Currency('EUR')));
-        });
-    }
-
-    protected function withMockedGetMollieMethodMaximumAmount($times = 1): void
-    {
-        $this->mock(GetMollieMethodMaximumAmount::class, function ($mock) use ($times) {
-            return $mock->shouldReceive('execute')->with('directdebit', 'EUR')->times($times)->andReturn(new Money(30000, new Currency('EUR')));
-        });
-    }
-
-    protected function withMockedCreateMolliePayment($times = 1): void
-    {
-        $this->mock(CreateMolliePayment::class, function ($mock) use ($times) {
-            $payment = new Payment($this->getMollieClientMock());
-            $payment->id = 'tr_dummy_id';
-            $payment->amount = (object) [
-                'currency' => 'EUR',
-                'value' => '10.00',
-            ];
-            $payment->mandateId = 'mdt_dummy_mandate_id';
-
-            return $mock->shouldReceive('execute')->times($times)->andReturn($payment);
-        });
     }
 }

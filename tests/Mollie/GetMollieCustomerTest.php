@@ -7,7 +7,7 @@ namespace Laravel\Cashier\Tests\Mollie;
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Mollie\Api\Resources\Customer;
 
-class GetMollieCustomerTest extends BaseMollieInteractionTest
+class GetMollieCustomerTest extends BaseMollieInteraction
 {
     /**
      * @test

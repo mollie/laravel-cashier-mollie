@@ -15,7 +15,6 @@ class AddBalanceTest extends BaseTestCase
     /** @test */
     public function canGetPayload()
     {
-        $this->withPackageMigrations();
         $action = new AddBalance(
             $this->getMandatedUser(),
             new Money(1000, new Currency('EUR')),
@@ -60,7 +59,6 @@ class AddBalanceTest extends BaseTestCase
     /** @test */
     public function canExecute()
     {
-        $this->withPackageMigrations();
         $user = User::factory()->create();
         $this->assertFalse($user->hasCredit());
 

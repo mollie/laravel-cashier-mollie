@@ -11,6 +11,6 @@ class GetMollieCustomer extends BaseMollieInteraction implements Contract
 {
     public function execute(string $id): Customer
     {
-        return $this->mollie->customers()->get($id);
+        return $this->mollie->customers->get($id);
     }
 }

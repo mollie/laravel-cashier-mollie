@@ -6,13 +6,8 @@ use Laravel\Cashier\Cashier;
 use Laravel\Cashier\FirstPayment\Actions\AddBalance;
 use Laravel\Cashier\FirstPayment\Actions\AddGenericOrderItem;
 use Laravel\Cashier\FirstPayment\FirstPaymentBuilder;
-use Laravel\Cashier\Mollie\Contracts\CreateMollieCustomer;
-use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
-use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
-use Mollie\Api\MollieApiClient;
-use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\SequenceType;
 use Money\Currency;
@@ -23,14 +18,8 @@ class FirstPaymentBuilderTest extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->withPackageMigrations();
-        $customer = new Customer(new MollieApiClient);
-        $customer->id = 'cst_unique_customer_id';
 
-        $this->mock(CreateMollieCustomer::class, function ($mock) use ($customer) {
-            return $mock->shouldReceive('execute')
-                ->andReturn($customer);
-        });
+        $this->withMockedCreateMollieCustomer();
     }
 
     /** @test */
@@ -113,27 +102,7 @@ class FirstPaymentBuilderTest extends BaseTestCase
             ),
         ]);
 
-        $this->mock(CreateMolliePayment::class, function (CreateMolliePayment $mock) {
-            $payment = new MolliePayment(new MollieApiClient);
-            $payment->id = 'tr_unique_id';
-            $payment->amount = (object) [
-                'currency' => 'EUR',
-                'value' => '12.34',
-            ];
-            $payment->amountChargedBack = (object) [
-                'currency' => 'EUR',
-                'value' => '0.00',
-            ];
-            $payment->amountRefunded = (object) [
-                'currency' => 'EUR',
-                'value' => '0.00',
-            ];
-            $payment->mandateId = 'mdt_dummy_mandate_id';
-
-            return $mock->shouldReceive('execute')
-                ->once()
-                ->andReturn($payment);
-        });
+        $this->withMockedCreateMolliePayment(1, '12.34');
 
         $payment = $builder->create();
 
@@ -152,41 +121,8 @@ class FirstPaymentBuilderTest extends BaseTestCase
             'redirectUrl' => 'https://www.example.com/{payment_id}',
         ]);
 
-        $this->mock(CreateMolliePayment::class, function (CreateMolliePayment $mock) {
-            $payment = new MolliePayment(new MollieApiClient);
-            $payment->redirectUrl = 'https://www.example.com/{payment_id}';
-            $payment->id = 'tr_unique_id';
-            $payment->amount = (object) [
-                'currency' => 'EUR',
-                'value' => '12.34',
-            ];
-            $payment->amountRefunded = (object) [
-                'currency' => 'EUR',
-                'value' => '0.00',
-            ];
-            $payment->amountChargedBack = (object) [
-                'currency' => 'EUR',
-                'value' => '0.00',
-            ];
-            $payment->mandateId = 'mdt_dummy_mandate_id';
-
-            return $mock->shouldReceive('execute')
-                ->once()
-                ->andReturn($payment);
-        });
-
-        $this->mock(UpdateMolliePayment::class, function (UpdateMolliePayment $mock) {
-            $payment = new MolliePayment(new MollieApiClient);
-            $payment->redirectUrl = 'https://www.example.com/tr_unique_id';
-            $payment->amount = (object) [
-                'currency' => 'EUR',
-                'value' => '12.34',
-            ];
-
-            return $mock->shouldReceive('execute')
-                ->once()
-                ->andReturn($payment);
-        });
+        $this->withMockedCreateMolliePayment(1, '12.34');
+        $this->withMockedUpdateMolliePayment(1, '12.34', 'https://www.example.com/tr_unique_id');
 
         $payment = $builder->inOrderTo([
             new AddGenericOrderItem($owner, new Money(100, new Currency('EUR')), 1, 'Parse redirectUrl test'),
@@ -222,19 +158,7 @@ class FirstPaymentBuilderTest extends BaseTestCase
             ),
         ]);
 
-        $this->mock(CreateMolliePayment::class, function (CreateMolliePayment $mock) {
-            $payment = new MolliePayment(new MollieApiClient);
-            $payment->id = 'tr_dummy_payment_id';
-            $payment->amount = (object) [
-                'currency' => 'EUR',
-                'value' => '12.34',
-            ];
-            $payment->mandateId = 'mdt_dummy_mandate_id';
-
-            return $mock->shouldReceive('execute')
-                ->once()
-                ->andReturn($payment);
-        });
+        $this->withMockedCreateMolliePayment(1, '12.34', 'tr_dummy_payment_id');
 
         $molliePayment = $builder->create();
 

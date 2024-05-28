@@ -26,28 +26,19 @@ class WebhookControllerTest extends BaseTestCase
     /** @test */
     public function retrievesPaymentResource()
     {
-        $id = 'tr_123xyz';
+        $payment = new MolliePayment(resolve(MollieApiClient::class));
+        $payment->id = 'tr_123xyz';
 
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($id) {
-            return $mock->shouldReceive('execute')
-                ->with($id, [])
-                ->once()
-                ->andReturn(new MolliePayment(new MollieApiClient));
-        });
+        $this->withMockedGetMolliePayment(1, $payment);
 
-        $this->assertInstanceOf(MolliePayment::class, $this->getController()->getMolliePaymentById($id));
+        $this->assertInstanceOf(MolliePayment::class, $this->getController()->getMolliePaymentById($payment->id));
     }
 
     /** @test **/
     public function MollieApiExceptionIsCatchedWhenDebugDisabled()
     {
         $wrongId = 'sub_xxxxxxxxxxx';
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($wrongId) {
-            return $mock->shouldReceive('execute')
-                ->with($wrongId, [])
-                ->once()
-                ->andThrow(new ApiException);
-        });
+        $this->withMockedGetMolliePaymentThrowingException(1, $wrongId);
 
         $this->assertFalse(config('app.debug'));
         $this->assertNull($this->getController()->getMolliePaymentById($wrongId));
@@ -57,12 +48,7 @@ class WebhookControllerTest extends BaseTestCase
     public function MollieApiExceptionIsThrownWhenDebugEnabled()
     {
         $wrongId = 'sub_xxxxxxxxxxx';
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($wrongId) {
-            return $mock->shouldReceive('execute')
-                ->with($wrongId, [])
-                ->once()
-                ->andThrow(new ApiException);
-        });
+        $this->withMockedGetMolliePaymentThrowingException(1, $wrongId);
 
         config(['app.debug' => true]);
         $this->assertTrue(config('app.debug'));
@@ -73,15 +59,9 @@ class WebhookControllerTest extends BaseTestCase
     /** @test **/
     public function handlesUnexistingIdGracefully()
     {
-        $id = 'tr_xxxxxxxxxxxxx';
-        $request = $this->getWebhookRequest($id);
-
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($id) {
-            return $mock->shouldReceive('execute')
-                ->with($id, [])
-                ->once()
-                ->andThrow(new ApiException);
-        });
+        $wrongId = 'sub_xxxxxxxxxxx';
+        $request = $this->getWebhookRequest($wrongId);
+        $this->withMockedGetMolliePaymentThrowingException(1, $wrongId);
 
         $response = $this->getController()->handleWebhook($request);
 
@@ -91,7 +71,6 @@ class WebhookControllerTest extends BaseTestCase
     /** @test **/
     public function handlesPaymentFailed()
     {
-        $this->withPackageMigrations();
         $this->withConfiguredPlans();
         $this->withTestNow('2019-01-01');
         Event::fake();
@@ -128,13 +107,7 @@ class WebhookControllerTest extends BaseTestCase
         Cashier::$paymentModel::createFromMolliePayment($payment, $user);
         $payment->status = 'failed';
 
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($payment, $paymentId) {
-            return $mock
-                ->shouldReceive('execute')
-                ->with($paymentId, [])
-                ->once()
-                ->andReturn($payment);
-        });
+        $this->withMockedGetMolliePayment(1, $payment);
 
         $response = $this->makeTestResponse($this->getController()->handleWebhook($request));
 
@@ -170,7 +143,6 @@ class WebhookControllerTest extends BaseTestCase
     /** @test **/
     public function handlesPaymentPaid()
     {
-        $this->withPackageMigrations();
         $this->withConfiguredPlans();
         Event::fake();
 
@@ -202,22 +174,8 @@ class WebhookControllerTest extends BaseTestCase
         Cashier::$paymentModel::createFromMolliePayment($payment, $user);
         $payment->status = 'paid';
 
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($payment, $paymentId) {
-            return $mock
-                ->shouldReceive('execute')
-                ->with($paymentId, [])
-                ->once()
-                ->andReturn($payment);
-        });
-
-        $this->mock(UpdateMolliePayment::class, function (UpdateMolliePayment $mock) use ($payment) {
-            $payment = new MolliePayment(new MollieApiClient);
-            $payment->redirectUrl = 'https://www.example.com/tr_unique_id';
-
-            return $mock->shouldReceive('execute')
-                ->once()
-                ->andReturn($payment);
-        });
+        $this->withMockedGetMolliePayment(1, $payment);
+        $this->withMockedUpdateMolliePayment();
 
         $response = $this->getController()->handleWebhook($request);
 
@@ -236,7 +194,6 @@ class WebhookControllerTest extends BaseTestCase
     /** @test **/
     public function skipsIfPaymentStatusUnchanged()
     {
-        $this->withPackageMigrations();
         Event::fake();
 
         $paymentId = 'tr_payment_paid_id';
@@ -248,18 +205,11 @@ class WebhookControllerTest extends BaseTestCase
 
         $request = $this->getWebhookRequest($paymentId);
 
-        $this->mock(GetMolliePayment::class, function (GetMolliePayment $mock) use ($paymentId) {
-            $payment = new MolliePayment(new MollieApiClient);
-            $payment->id = $paymentId;
-            $payment->status = 'paid';
-            $payment->mandateId = 'mdt_dummy_mandate_id';
-
-            return $mock
-                ->shouldReceive('execute')
-                ->with($paymentId, [])
-                ->once()
-                ->andReturn($payment);
-        });
+        $payment = new MolliePayment(new MollieApiClient);
+        $payment->id = $paymentId;
+        $payment->status = 'paid';
+        $payment->mandateId = 'mdt_dummy_mandate_id';
+        $this->withMockedGetMolliePayment(1, $payment);
 
         $response = $this->getController()->handleWebhook($request);
 

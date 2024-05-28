@@ -12,8 +12,6 @@ class RedeemedCouponTest extends BaseTestCase
     /** @test */
     public function canBeRevoked()
     {
-        $this->withPackageMigrations();
-
         /** @var RedeemedCoupon $redeemedCoupon */
         $redeemedCoupon = RedeemedCouponFactory::new()->create(['times_left' => 5]);
 

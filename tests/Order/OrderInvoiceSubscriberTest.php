@@ -8,16 +8,18 @@ use Laravel\Cashier\Events\FirstPaymentPaid;
 use Laravel\Cashier\Events\OrderInvoiceAvailable;
 use Laravel\Cashier\Events\OrderPaymentPaid;
 use Laravel\Cashier\Order\OrderInvoiceSubscriber;
-use Laravel\Cashier\Payment as CashierPayment;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
 use Mollie\Api\Resources\Payment;
 
 class OrderInvoiceSubscriberTest extends BaseTestCase
 {
+    private $subscriber;
+
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->subscriber = new OrderInvoiceSubscriber;
     }
 

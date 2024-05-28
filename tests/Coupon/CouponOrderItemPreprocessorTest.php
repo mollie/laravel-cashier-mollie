@@ -13,12 +13,6 @@ use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 
 class CouponOrderItemPreprocessorTest extends BaseTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->withPackageMigrations();
-    }
-
     /** @test */
     public function appliesCoupon()
     {

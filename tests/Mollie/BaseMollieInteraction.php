@@ -6,7 +6,7 @@ namespace Laravel\Cashier\Tests\Mollie;
 
 use Laravel\Cashier\Tests\BaseTestCase;
 
-abstract class BaseMollieInteractionTest extends BaseTestCase
+abstract class BaseMollieInteraction extends BaseTestCase
 {
     protected $interactWithMollieAPI = true;
 }

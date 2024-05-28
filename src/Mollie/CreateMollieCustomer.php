@@ -11,6 +11,6 @@ class CreateMollieCustomer extends BaseMollieInteraction implements Contract
 {
     public function execute(array $payload): Customer
     {
-        return $this->mollie->customers()->create($payload);
+        return $this->mollie->customers->create($payload);
     }
 }

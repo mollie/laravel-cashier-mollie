@@ -19,13 +19,6 @@ use Mollie\Api\Types\RefundStatus as MollieRefundStatus;
 
 class RefundsBuilderTest extends BaseTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->withPackageMigrations();
-    }
-
     /** @test */
     public function can_create_a_refund_for_a_complete_order(): void
     {
