@@ -32,14 +32,9 @@ class OrderInvoiceSubscriber
      */
     public function subscribe($events)
     {
-        $events->listen(
-            OrderPaymentPaid::class,
-            self::class.'@handleOrderPaymentPaid'
-        );
-
-        $events->listen(
-            FirstPaymentPaid::class,
-            self::class.'@handleFirstPaymentPaid'
-        );
+        return [
+            OrderPaymentPaid::class => 'handleOrderPaymentPaid',
+            FirstPaymentPaid::class => 'handleFirstPaymentPaid',
+        ];
     }
 }
