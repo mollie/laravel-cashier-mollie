@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Events\SubscriptionPlanSwapped;
 use Laravel\Cashier\Events\SubscriptionQuantityUpdated;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\BaseTestCase;
@@ -28,7 +29,7 @@ class SwapSubscriptionQuantityTest extends BaseTestCase
 
         $this->assertTrue($subscription->scheduledOrderItem->is($original_order_item));
 
-        // Swap to new plan
+        // Swap to new quantity
         $subscription = $subscription->updateQuantityNextCycle(3)->fresh();
 
         $this->assertEquals(1, $subscription->quantity);
@@ -61,6 +62,142 @@ class SwapSubscriptionQuantityTest extends BaseTestCase
 
         $this->assertNull($subscription->next_quantity);
         $this->assertEquals(3, $subscription->quantity);
+
+        Event::assertDispatched(SubscriptionQuantityUpdated::class, function (SubscriptionQuantityUpdated $event) use ($subscription) {
+            return $subscription->is($event->subscription);
+        });
+    }
+
+    /** @test */
+    public function canChangeQuantityAndPlanNextCycle()
+    {
+        $user = $this->getUserWithZeroBalance();
+        $subscription = $this->getSubscriptionForUser($user);
+        $original_order_item = $subscription->scheduleNewOrderItemAt(now()->subWeeks(2));
+
+        $this->assertTrue($subscription->scheduledOrderItem->is($original_order_item));
+
+        // Swap to new quantity
+        $subscription = $subscription->updateQuantityNextCycle(3)->fresh();
+        // Swap to new plan
+        $subscription = $subscription->swapNextCycle('weekly-20-1')->fresh();
+
+        $this->assertEquals(1, $subscription->quantity);
+        $this->assertEquals(3, $subscription->next_quantity);
+
+        $this->assertEquals('monthly-10-1', $subscription->plan);
+        $this->assertEquals('weekly-20-1', $subscription->next_plan);
+
+        // Check that the billing cycle remains intact
+        $cycle_should_have_started_at = now()->subWeeks(2);
+        $cycle_should_end_at = $cycle_should_have_started_at->copy()->addMonth();
+        $this->assertCarbon($cycle_should_have_started_at, $subscription->cycle_started_at);
+        $this->assertCarbon($cycle_should_end_at, $subscription->cycle_ends_at);
+
+        // Assert that the original scheduled OrderItem has been removed
+        // And assert that another OrderItem was scheduled for the new subscription quantity and plan
+        $this->assertFalse(Cashier::$orderItemModel::whereId($original_order_item->id)->exists());
+        $new_order_item = $subscription->scheduledOrderItem;
+        $this->assertFalse($new_order_item->is($original_order_item));
+        $this->assertCarbon($cycle_should_end_at, $new_order_item->process_at, 1); // based on previous plan's cycle
+        $this->assertEquals(3, $new_order_item->quantity);
+        $this->assertEquals(2200 * $subscription->next_quantity, $new_order_item->total);
+        $this->assertEquals(200 * $subscription->next_quantity, $new_order_item->tax);
+        $this->assertEquals('Twice as expensive monthly subscription', $new_order_item->description);
+
+        $this->assertFalse($user->fresh()->hasCredit());
+
+        Event::assertNotDispatched(SubscriptionQuantityUpdated::class);
+        Event::assertNotDispatched(SubscriptionPlanSwapped::class);
+
+
+        Subscription::processOrderItem($new_order_item);
+
+        $subscription = $subscription->fresh();
+
+        $this->assertNull($subscription->next_quantity);
+        $this->assertEquals(3, $subscription->quantity);
+
+        $this->assertNull($subscription->next_plan);
+        $this->assertEquals('weekly-20-1', $subscription->plan);
+
+        // Assert that the subscription cycle reflects the new plan
+        $cycle_should_have_started_at = $cycle_should_end_at->copy();
+        $cycle_should_end_at = $cycle_should_have_started_at->copy()->addWeek();
+        $this->assertCarbon($cycle_should_have_started_at, $subscription->cycle_started_at);
+        $this->assertCarbon($cycle_should_end_at, $subscription->cycle_ends_at);
+
+        Event::assertDispatched(SubscriptionPlanSwapped::class, function (SubscriptionPlanSwapped $event) use ($subscription) {
+            return $subscription->is($event->subscription);
+        });
+
+        Event::assertDispatched(SubscriptionQuantityUpdated::class, function (SubscriptionQuantityUpdated $event) use ($subscription) {
+            return $subscription->is($event->subscription);
+        });
+    }
+
+    /** @test */
+    public function canSwapPlanAndChangeQuantityNextCycle()
+    {
+        $user = $this->getUserWithZeroBalance();
+        $subscription = $this->getSubscriptionForUser($user);
+        $original_order_item = $subscription->scheduleNewOrderItemAt(now()->subWeeks(2));
+
+        $this->assertTrue($subscription->scheduledOrderItem->is($original_order_item));
+
+        // Swap to new plan
+        $subscription = $subscription->swapNextCycle('weekly-20-1')->fresh();
+        // Swap to new quantity
+        $subscription = $subscription->updateQuantityNextCycle(3)->fresh();
+
+        $this->assertEquals(1, $subscription->quantity);
+        $this->assertEquals(3, $subscription->next_quantity);
+
+        $this->assertEquals('monthly-10-1', $subscription->plan);
+        $this->assertEquals('weekly-20-1', $subscription->next_plan);
+
+        // Check that the billing cycle remains intact
+        $cycle_should_have_started_at = now()->subWeeks(2);
+        $cycle_should_end_at = $cycle_should_have_started_at->copy()->addMonth();
+        $this->assertCarbon($cycle_should_have_started_at, $subscription->cycle_started_at);
+        $this->assertCarbon($cycle_should_end_at, $subscription->cycle_ends_at);
+
+        // Assert that the original scheduled OrderItem has been removed
+        // And assert that another OrderItem was scheduled for the new subscription quantity and plan
+        $this->assertFalse(Cashier::$orderItemModel::whereId($original_order_item->id)->exists());
+        $new_order_item = $subscription->scheduledOrderItem;
+        $this->assertFalse($new_order_item->is($original_order_item));
+        $this->assertCarbon($cycle_should_end_at, $new_order_item->process_at, 1); // based on previous plan's cycle
+        $this->assertEquals(3, $new_order_item->quantity);
+        $this->assertEquals(2200 * $subscription->next_quantity, $new_order_item->total);
+        $this->assertEquals(200 * $subscription->next_quantity, $new_order_item->tax);
+        $this->assertEquals('Twice as expensive monthly subscription', $new_order_item->description);
+
+        $this->assertFalse($user->fresh()->hasCredit());
+
+        Event::assertNotDispatched(SubscriptionQuantityUpdated::class);
+        Event::assertNotDispatched(SubscriptionPlanSwapped::class);
+
+
+        Subscription::processOrderItem($new_order_item);
+
+        $subscription = $subscription->fresh();
+
+        $this->assertNull($subscription->next_quantity);
+        $this->assertEquals(3, $subscription->quantity);
+
+        $this->assertNull($subscription->next_plan);
+        $this->assertEquals('weekly-20-1', $subscription->plan);
+
+        // Assert that the subscription cycle reflects the new plan
+        $cycle_should_have_started_at = $cycle_should_end_at->copy();
+        $cycle_should_end_at = $cycle_should_have_started_at->copy()->addWeek();
+        $this->assertCarbon($cycle_should_have_started_at, $subscription->cycle_started_at);
+        $this->assertCarbon($cycle_should_end_at, $subscription->cycle_ends_at);
+
+        Event::assertDispatched(SubscriptionPlanSwapped::class, function (SubscriptionPlanSwapped $event) use ($subscription) {
+            return $subscription->is($event->subscription);
+        });
 
         Event::assertDispatched(SubscriptionQuantityUpdated::class, function (SubscriptionQuantityUpdated $event) use ($subscription) {
             return $subscription->is($event->subscription);
