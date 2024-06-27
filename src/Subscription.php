@@ -314,9 +314,11 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
 
             $this->next_plan = $plan;
 
+            $quantity = $this->next_quantity ? $this->next_quantity : $this->quantity;
+
             $this->removeScheduledOrderItem();
 
-            $this->scheduleNewOrderItemAt($this->cycle_ends_at, [], true, $newPlan);
+            $this->scheduleNewOrderItemAt($this->cycle_ends_at, [], true, $newPlan, $quantity);
 
             $this->save();
 
@@ -773,7 +775,9 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
 
             $this->removeScheduledOrderItem();
 
-            $this->scheduleNewOrderItemAt($this->cycle_ends_at, [], true, $this->plan(), $quantity);
+            $plan = $this->next_plan ? app(PlanRepository::class)::findOrFail($this->next_plan) : $this->plan();
+
+            $this->scheduleNewOrderItemAt($this->cycle_ends_at, [], true, $plan, $quantity);
 
             $this->save();
 
