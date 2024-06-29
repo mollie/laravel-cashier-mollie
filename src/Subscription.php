@@ -613,6 +613,28 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     }
 
     /**
+     * Gets the amount to be refunded for the subscription's unused time.
+     *
+     * @param  \Carbon\Carbon|null  $now
+     * @return \Money\Money
+     */
+    public function getReimburseAmountForUnusedTime(?Carbon $now = null): ?Money
+    {
+        $now = $now ?: now();
+
+        if ($this->onTrial()) {
+            return null;
+        }
+        if (round($this->getCycleLeftAttribute($now), 5) == 0) {
+            return null;
+        }
+
+        return $this->reimbursableAmount()
+            ->negative()
+            ->multiply(sprintf('%.8F', $this->getCycleLeftAttribute($now)));
+    }
+
+    /**
      * Handle a failed payment.
      *
      * @param  \Laravel\Cashier\Order\OrderItem  $item
