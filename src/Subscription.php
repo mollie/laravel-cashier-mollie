@@ -661,7 +661,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
 
         if ($subscription->ends_at !== null) {
             DB::transaction(function () use ($item, $subscription) {
-                if (! $subscription->scheduled_order_item_id) {
+                if (!$subscription->scheduled_order_item_id) {
                     $item = $subscription->scheduleNewOrderItemAt($subscription->ends_at);
                 }
 
