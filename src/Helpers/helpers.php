@@ -6,7 +6,7 @@ use Money\Formatter\DecimalMoneyFormatter;
 use Money\Money;
 use Money\Parser\DecimalMoneyParser;
 
-if (! function_exists('object_to_array_recursive')) {
+if (!function_exists('object_to_array_recursive')) {
     /**
      * Recursively cast an object into an array.
      *
@@ -23,7 +23,7 @@ if (! function_exists('object_to_array_recursive')) {
     }
 }
 
-if (! function_exists('money')) {
+if (!function_exists('money')) {
     /**
      * Create a Money object from a Mollie Amount array.
      *
@@ -37,7 +37,7 @@ if (! function_exists('money')) {
     }
 }
 
-if (! function_exists('decimal_to_money')) {
+if (!function_exists('decimal_to_money')) {
     /**
      * Create a Money object from a decimal string / currency pair.
      *
@@ -53,7 +53,7 @@ if (! function_exists('decimal_to_money')) {
     }
 }
 
-if (! function_exists('mollie_array_to_money')) {
+if (!function_exists('mollie_array_to_money')) {
     /**
      * Create a Money object from a Mollie Amount array.
      *
@@ -66,7 +66,7 @@ if (! function_exists('mollie_array_to_money')) {
     }
 }
 
-if (! function_exists('money_to_mollie_array')) {
+if (!function_exists('money_to_mollie_array')) {
     /**
      * Create a Mollie Amount array from a Money object.
      *
@@ -84,7 +84,7 @@ if (! function_exists('money_to_mollie_array')) {
     }
 }
 
-if (! function_exists('mollie_object_to_money')) {
+if (!function_exists('mollie_object_to_money')) {
     /**
      * Create a Money object from a Mollie Amount object.
      *
@@ -97,7 +97,7 @@ if (! function_exists('mollie_object_to_money')) {
     }
 }
 
-if (! function_exists('money_to_decimal')) {
+if (!function_exists('money_to_decimal')) {
 
     /**
      * Format the money as basic decimal

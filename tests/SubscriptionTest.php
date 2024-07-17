@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\SubscriptionResumed;
 use Laravel\Cashier\Subscription;
-use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
 use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
@@ -592,7 +591,7 @@ class SubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function halfWayThroughSubscriptionReturnsPositiveReimburesmentAmount()
+    public function halfwayThroughSubscriptionReturnsPositiveReimbursementAmount()
     {
         $this->withConfiguredPlans();
 
@@ -611,7 +610,7 @@ class SubscriptionTest extends BaseTestCase
 
         $this->assertEquals(
             money('-50', 'EUR'),
-            $subscriptionHalfWayThrough->getReimburseAmountForUnusedTime()
+            $subscriptionHalfWayThrough->getReimbursableAmountForUnusedTime()
         );
     }
 
@@ -634,8 +633,8 @@ class SubscriptionTest extends BaseTestCase
             ]);
 
         $this->assertEquals(
-            null,
-            $nonReimbursable->getReimburseAmountForUnusedTime()
+            money(0, 'EUR'),
+            $nonReimbursable->getReimbursableAmountForUnusedTime()
         );
     }
 }

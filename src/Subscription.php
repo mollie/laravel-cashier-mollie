@@ -613,20 +613,22 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     }
 
     /**
-     * Gets the amount to be refunded for the subscription's unused time.
+     * Gets the amount to be reimbursed for the subscription's unused time.
+     *
+     * Result range value: (-X up to 0)
      *
      * @param  \Carbon\Carbon|null  $now
      * @return \Money\Money
      */
-    public function getReimburseAmountForUnusedTime(?Carbon $now = null): ?Money
+    public function getReimbursableAmountForUnusedTime(?Carbon $now = null): Money
     {
         $now = $now ?: now();
 
         if ($this->onTrial()) {
-            return null;
+            return $this->zero();
         }
         if (round($this->getCycleLeftAttribute($now), 5) == 0) {
-            return null;
+            return $this->zero();
         }
 
         return $this->reimbursableAmount()
@@ -792,12 +794,10 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     protected function reimbursableAmount()
     {
-        $zeroAmount = new Money('0.00', new Currency($this->currency));
-
         // Determine base amount eligible to reimburse
         $latestProcessedOrderItem = $this->latestProcessedOrderItem();
         if (!$latestProcessedOrderItem) {
-            return $zeroAmount;
+            return $this->zero();
         }
 
         $reimbursableAmount = $latestProcessedOrderItem->getTotal()
@@ -831,7 +831,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
 
         // Guard against a negative value
         if ($reimbursableAmount->isNegative()) {
-            return $zeroAmount;
+            return $this->zero();
         }
 
         return $reimbursableAmount;
@@ -970,5 +970,10 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     public function latestProcessedOrderItem()
     {
         return $this->orderItems()->processed()->orderByDesc('process_at')->first();
+    }
+
+    private function zero(): Money
+    {
+        return new Money('0.00', new Currency($this->currency));
     }
 }
