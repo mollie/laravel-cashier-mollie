@@ -613,6 +613,30 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     }
 
     /**
+     * Gets the amount to be reimbursed for the subscription's unused time.
+     *
+     * Result range value: (-X up to 0)
+     *
+     * @param  \Carbon\Carbon|null  $now
+     * @return \Money\Money
+     */
+    public function getReimbursableAmountForUnusedTime(?Carbon $now = null): Money
+    {
+        $now = $now ?: now();
+
+        if ($this->onTrial()) {
+            return $this->zero();
+        }
+        if (round($this->getCycleLeftAttribute($now), 5) == 0) {
+            return $this->zero();
+        }
+
+        return $this->reimbursableAmount()
+            ->negative()
+            ->multiply(sprintf('%.8F', $this->getCycleLeftAttribute($now)));
+    }
+
+    /**
      * Handle a failed payment.
      *
      * @param  \Laravel\Cashier\Order\OrderItem  $item
@@ -639,7 +663,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
 
         if ($subscription->ends_at !== null) {
             DB::transaction(function () use ($item, $subscription) {
-                if (! $subscription->scheduled_order_item_id) {
+                if (!$subscription->scheduled_order_item_id) {
                     $item = $subscription->scheduleNewOrderItemAt($subscription->ends_at);
                 }
 
@@ -770,12 +794,10 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     protected function reimbursableAmount()
     {
-        $zeroAmount = new Money('0.00', new Currency($this->currency));
-
         // Determine base amount eligible to reimburse
         $latestProcessedOrderItem = $this->latestProcessedOrderItem();
         if (!$latestProcessedOrderItem) {
-            return $zeroAmount;
+            return $this->zero();
         }
 
         $reimbursableAmount = $latestProcessedOrderItem->getTotal()
@@ -809,7 +831,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
 
         // Guard against a negative value
         if ($reimbursableAmount->isNegative()) {
-            return $zeroAmount;
+            return $this->zero();
         }
 
         return $reimbursableAmount;
@@ -948,5 +970,10 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     public function latestProcessedOrderItem()
     {
         return $this->orderItems()->processed()->orderByDesc('process_at')->first();
+    }
+
+    private function zero(): Money
+    {
+        return new Money('0.00', new Currency($this->currency));
     }
 }
