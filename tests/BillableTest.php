@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Tests;
 
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Coupon\RedeemedCouponCollection;
+use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
 use Laravel\Cashier\Tests\Database\Factories\RedeemedCouponFactory;
 use Laravel\Cashier\Events\MandateClearedFromBillable;
@@ -11,6 +12,7 @@ use Laravel\Cashier\Exceptions\MandateIsNotYetFinalizedException;
 use Laravel\Cashier\Order\Invoice;
 use Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder;
 use Laravel\Cashier\SubscriptionBuilder\MandatedSubscriptionBuilder;
+use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -285,5 +287,30 @@ class BillableTest extends BaseTestCase
 
         $this->assertInstanceOf(Invoice::class, $invoice);
         $this->assertEquals('2018-0000-0002', $invoice->id());
+    }
+
+    /** @test */
+    public function testHasActiveSubscriptions()
+    {
+        $this->withConfiguredPlans();
+        $this->withMockedCouponRepository(); // 'test-coupon'
+        $this->withMockedGetMollieCustomer(3);
+        $this->withMockedGetMollieMandateAccepted(3);
+
+        $user = $this->getMandatedUser(true, [
+            'mollie_mandate_id' => 'mdt_unique_mandate_id',
+            'mollie_customer_id' => 'cst_unique_customer_id',
+        ]);
+        $user->newSubscription('default', 'monthly-10-1')->create();
+
+        $this->assertTrue($user->hasActiveSubscriptions());
+    }
+
+    /** @test */
+    public function testHasActiveSubscriptionsFalse()
+    {
+        $user = User::factory()->create();
+
+        $this->assertFalse($user->hasActiveSubscriptions());
     }
 }
