@@ -264,15 +264,13 @@ trait Billable
      *
      * @return bool
      */
-    public function hasActiveSubscriptions()
+    public function hasActiveSubscription(): bool
     {
-        return $this->subscriptions
-                    ->map(fn($subscription) => $subscription->valid())
-                    ->reduce(function (bool $carry, bool $item) {
-                        return $carry || $item;
-                    }, false);
+        return $this
+            ->subscriptions()
+            ->whereActive()
+            ->exists();
     }
-
     /**
      * @param $plans
      * @param  string  $subscription
