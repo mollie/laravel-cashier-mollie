@@ -290,7 +290,7 @@ class BillableTest extends BaseTestCase
     }
 
     /** @test */
-    public function testHasActiveSubscriptions()
+    public function testHasActiveSubscription()
     {
         $this->withConfiguredPlans();
         $this->withMockedCouponRepository(); // 'test-coupon'
@@ -303,7 +303,7 @@ class BillableTest extends BaseTestCase
         ]);
         $user->newSubscription('default', 'monthly-10-1')->create();
 
-        $this->assertTrue($user->hasActiveSubscriptions());
+        $this->assertTrue($user->hasActiveSubscription());
     }
 
     /** @test */
@@ -311,6 +311,6 @@ class BillableTest extends BaseTestCase
     {
         $user = User::factory()->create();
 
-        $this->assertFalse($user->hasActiveSubscriptions());
+        $this->assertFalse($user->hasActiveSubscription());
     }
 }
