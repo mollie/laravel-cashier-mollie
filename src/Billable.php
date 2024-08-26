@@ -260,6 +260,18 @@ trait Billable
     }
 
     /**
+     * Determine if the billable model has any active subscription.
+     *
+     * @return bool
+     */
+    public function hasActiveSubscription(): bool
+    {
+        return $this
+            ->subscriptions()
+            ->whereActive()
+            ->exists();
+    }
+    /**
      * @param $plans
      * @param  string  $subscription
      * @return bool
