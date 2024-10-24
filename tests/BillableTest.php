@@ -313,4 +313,53 @@ class BillableTest extends BaseTestCase
 
         $this->assertFalse($user->hasActiveSubscription());
     }
+
+    public function testGetScheduledOrderItems()
+    {
+        $this->withConfiguredPlans();
+        $this->withMockedCouponRepository(); // 'test-coupon'
+        $this->withMockedGetMollieCustomer(3);
+        $this->withMockedGetMollieMandateAccepted(3);
+
+        $user = $this->getMandatedUser(true, [
+            'mollie_mandate_id' => 'mdt_unique_mandate_id',
+            'mollie_customer_id' => 'cst_unique_customer_id',
+        ]);
+        $subscription = $user->newSubscription('default', 'monthly-10-1')->create();
+
+        $this->assertEquals($subscription->scheduledOrderItem->original, $user->scheduledOrderItems[0]->original);
+    }
+
+    public function testGetTwoScheduledOrderItems()
+    {
+        $this->withConfiguredPlans();
+        $this->withMockedCouponRepository(); // 'test-coupon'
+        $this->withMockedGetMollieCustomer(6);
+        $this->withMockedGetMollieMandateAccepted(6);
+
+        $user = $this->getMandatedUser(true, [
+            'mollie_mandate_id' => 'mdt_unique_mandate_id',
+            'mollie_customer_id' => 'cst_unique_customer_id',
+        ]);
+
+        $subscription1 = $user->newSubscription('default', 'monthly-10-1')->create();
+        $subscription2 = $user->newSubscription('default', 'monthly-20-1')->create();
+
+        $this->assertEquals($subscription1->scheduledOrderItem->original, $user->scheduledOrderItems[0]->original);
+        $this->assertEquals($subscription2->scheduledOrderItem->original, $user->scheduledOrderItems[1]->original);
+    }
+
+    public function testGetNoScheduledOrderItems()
+    {
+        $this->withConfiguredPlans();
+        $this->withMockedCouponRepository(); // 'test-coupon'
+
+        $user = $this->getMandatedUser(true, [
+            'mollie_mandate_id' => 'mdt_unique_mandate_id',
+            'mollie_customer_id' => 'cst_unique_customer_id',
+        ]);
+
+
+        $this->assertEquals($user->scheduledOrderItems, $user->orderItems);
+    }
 }
