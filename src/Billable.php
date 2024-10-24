@@ -319,6 +319,16 @@ trait Billable
     }
 
     /**
+     * Get all the Scheduled Order Items for the billable model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+     */
+    public function scheduledOrderItems()
+    {
+        return $this->morphToMany(Cashier::$orderItemModel, 'owner', 'subscriptions', 'owner_id', 'scheduled_order_item_id');
+    }
+
+    /**
      * Get the balances for the billable model. A separate balance is kept for each currency.
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
