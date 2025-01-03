@@ -17,6 +17,8 @@ class ChargeItemBuilder
 
     protected float $taxPercentage;
 
+    protected ?string $identifier = null;
+
     public function __construct(Model $owner)
     {
         $this->owner = $owner;
@@ -51,14 +53,22 @@ class ChargeItemBuilder
         return $this;
     }
 
+    public function identifier(string $identifier): ChargeItemBuilder
+    {
+        $this->identifier = $identifier;
+
+        return $this;
+    }
+
     public function make(): ChargeItem
     {
         return new ChargeItem(
-            $this->owner,
-            $this->unitPrice,
-            $this->description,
-            $this->quantity,
-            $this->taxPercentage
+            owner: $this->owner,
+            unitPrice: $this->unitPrice,
+            description: $this->description,
+            quantity: $this->quantity,
+            taxPercentage: $this->taxPercentage,
+            identifier: $this->identifier,
         );
     }
 }

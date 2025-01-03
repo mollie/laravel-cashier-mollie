@@ -33,6 +33,7 @@ class AddGenericOrderItemTest extends BaseTestCase
             'taxPercentage' => 20,
             'description' => 'Adding a test order item',
             'quantity' => 1,
+            'identifier' => null,
         ], $payload);
     }
 

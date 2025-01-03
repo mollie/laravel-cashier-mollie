@@ -24,12 +24,15 @@ class ChargeItem
 
     protected int $roundingMode;
 
+    protected ?string $identifier;
+
     public function __construct(
         Model $owner,
         Money $unitPrice,
         string $description,
         int $quantity = 1,
         float $taxPercentage = 0,
+        ?string $identifier = null,
         int $roundingMode = Money::ROUND_HALF_UP
     ) {
         $this->owner = $owner;
@@ -38,16 +41,18 @@ class ChargeItem
         $this->quantity = $quantity;
         $this->taxPercentage = $taxPercentage;
         $this->roundingMode = $roundingMode;
+        $this->identifier = $identifier;
     }
 
     public function toFirstPaymentAction(): FirstPaymentAction
     {
         $item = new AddGenericOrderItem(
-            $this->owner,
-            $this->unitPrice,
-            $this->quantity,
-            $this->description,
-            $this->roundingMode
+            owner: $this->owner,
+            unitPrice: $this->unitPrice,
+            quantity: $this->quantity,
+            description: $this->description,
+            roundingMode: $this->roundingMode,
+            identifier: $this->identifier
         );
 
         $item->withTaxPercentage($this->taxPercentage);
