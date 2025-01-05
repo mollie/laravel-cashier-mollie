@@ -40,6 +40,7 @@ class CashierInstall extends Command
 
         $this->comment('Publishing Cashier configuration files...');
         $this->callSilent('vendor:publish', ['--tag' => 'cashier-configs']);
+        $this->publishLocalMigrations();
 
         if ($this->option('template')) {
             $this->callSilent('vendor:publish', ['--tag' => 'cashier-views']);
@@ -56,5 +57,18 @@ class CashierInstall extends Command
         }
 
         $this->info('Cashier was installed successfully.');
+    }
+
+    /**
+     * Copy local migrations to the application.
+     */
+    private function publishLocalMigrations(): void
+    {
+        if (! class_exists('AlterOrderItemsAddIdentifier')) {
+            copy(
+                __DIR__.'/../../../database/migrations/alter_order_items_add_metadata.php.stub',
+                database_path('migrations/'.date('Y_m_d_His', time()).'_alter_order_items_add_metadata.php')
+            );
+        }
     }
 }

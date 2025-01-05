@@ -25,6 +25,7 @@ $user = App\User::find(1);
 $item = new \Laravel\Cashier\Charge\ChargeItemBuilder($user);
 $item->unitPrice(money(100,'EUR')); //1 EUR
 $item->description('Test Item 1');
+$item->metadata(['isbn' => '123', 'sku' => 'abc' ])
 $chargeItem = $item->make();
 
 $item2 = new \Laravel\Cashier\Charge\ChargeItemBuilder($user);

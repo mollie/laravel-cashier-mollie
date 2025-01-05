@@ -94,6 +94,10 @@ abstract class BaseTestCase extends TestCase
                         'class' => '\CreateRefundsTable',
                         'file_path' => $migrations_dir . '/create_refunds_table.php.stub',
                     ],
+                    [
+                        'class' => '\AlterOrderItemsAddIdentifier',
+                        'file_path' => $migrations_dir . '/alter_order_items_add_identifier.php.stub',
+                    ],
                 ]
             )
         );

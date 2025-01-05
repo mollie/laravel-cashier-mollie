@@ -33,4 +33,23 @@ class AddBalance extends AddGenericOrderItem
 
         return parent::execute();
     }
+
+    /**
+     * @param  array  $payload
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
+     * @return self
+     */
+    public static function createFromPayload(array $payload, Model $owner)
+    {
+        $taxPercentage = $payload['taxPercentage'] ?? 0;
+        $quantity = $payload['quantity'] ?? 1;
+        $unit_price = $payload['subtotal'] ?? $payload['unit_price'];
+
+        return (new self(
+            owner: $owner,
+            subtotal: mollie_array_to_money($unit_price),
+            quantity: $quantity,
+            description: $payload['description'],
+        ))->withTaxPercentage($taxPercentage);
+    }
 }

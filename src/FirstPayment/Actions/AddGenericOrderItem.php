@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\FirstPayment\Actions;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use Money\Money;
 
 class AddGenericOrderItem extends BaseAction
@@ -14,10 +15,17 @@ class AddGenericOrderItem extends BaseAction
      * @param  \Money\Money  $unitPrice
      * @param  int  $quantity
      * @param  string  $description
+     * @param  ?string  $metadata
      * @param  int  $roundingMode
      */
-    public function __construct(Model $owner, Money $unitPrice, int $quantity, string $description, int $roundingMode = Money::ROUND_HALF_UP)
-    {
+    public function __construct(
+        Model $owner,
+        Money $unitPrice,
+        int $quantity,
+        string $description,
+        int $roundingMode = Money::ROUND_HALF_UP,
+        ?string $metadata = null,
+    ) {
         $this->owner = $owner;
         $this->taxPercentage = $this->owner->taxPercentage();
         $this->unitPrice = $unitPrice;
@@ -25,6 +33,7 @@ class AddGenericOrderItem extends BaseAction
         $this->currency = $unitPrice->getCurrency()->getCode();
         $this->description = $description;
         $this->roundingMode = $roundingMode;
+        $this->metadata = $metadata;
     }
 
     /**
@@ -37,12 +46,14 @@ class AddGenericOrderItem extends BaseAction
         $taxPercentage = $payload['taxPercentage'] ?? 0;
         $quantity = $payload['quantity'] ?? 1;
         $unit_price = $payload['subtotal'] ?? $payload['unit_price'];
+        $metadata = $payload['metadata'] ?? null;
 
-        return (new static(
-            $owner,
-            mollie_array_to_money($unit_price),
-            $quantity,
-            $payload['description']
+        return (new self(
+            owner: $owner,
+            unitPrice: mollie_array_to_money($unit_price),
+            quantity: $quantity,
+            description: $payload['description'],
+            metadata: $metadata,
         ))->withTaxPercentage($taxPercentage);
     }
 
@@ -57,6 +68,7 @@ class AddGenericOrderItem extends BaseAction
             'unit_price' => money_to_mollie_array($this->getUnitPrice()),
             'quantity' => $this->getQuantity(),
             'taxPercentage' => $this->getTaxPercentage(),
+            'metadata' => $this->metadata,
         ];
     }
 
@@ -74,6 +86,7 @@ class AddGenericOrderItem extends BaseAction
             'unit_price' => $this->getUnitPrice()->getAmount(),
             'tax_percentage' => $this->getTaxPercentage(),
             'quantity' => $this->getQuantity(),
+            'metadata' => $this->metadata,
         ])->toCollection();
     }
 

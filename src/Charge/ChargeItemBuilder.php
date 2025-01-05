@@ -17,6 +17,8 @@ class ChargeItemBuilder
 
     protected float $taxPercentage;
 
+    protected ?string $metadata = null;
+
     public function __construct(Model $owner)
     {
         $this->owner = $owner;
@@ -51,14 +53,22 @@ class ChargeItemBuilder
         return $this;
     }
 
+    public function metadata(array $metadata): ChargeItemBuilder
+    {
+        $this->metadata = json_encode($metadata);
+
+        return $this;
+    }
+
     public function make(): ChargeItem
     {
         return new ChargeItem(
-            $this->owner,
-            $this->unitPrice,
-            $this->description,
-            $this->quantity,
-            $this->taxPercentage
+            owner: $this->owner,
+            unitPrice: $this->unitPrice,
+            description: $this->description,
+            quantity: $this->quantity,
+            taxPercentage: $this->taxPercentage,
+            metadata: $this->metadata,
         );
     }
 }

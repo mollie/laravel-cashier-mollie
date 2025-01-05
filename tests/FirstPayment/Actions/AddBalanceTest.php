@@ -33,6 +33,7 @@ class AddBalanceTest extends BaseTestCase
             'taxPercentage' => 0,
             'description' => 'Adding some test balance',
             'quantity' => 1,
+            'metadata' => null,
         ], $payload);
     }
 
