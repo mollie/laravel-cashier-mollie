@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('mollie_refund_status');
             $table->integer('total');
             $table->string('currency', 3);
+            $table->text('metadata')->nullable();
             $table->timestamps();
         });
     }

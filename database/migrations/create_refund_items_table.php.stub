@@ -25,6 +25,7 @@ return new class extends Migration
             $table->unsignedInteger('quantity');
             $table->integer('unit_price');
             $table->decimal('tax_percentage', 6, 4);
+            $table->text('metadata')->nullable();
             $table->timestamps();
         });
     }

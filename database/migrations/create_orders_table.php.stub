@@ -30,6 +30,7 @@ return new class extends Migration
             $table->string('mollie_payment_id')->nullable();
             $table->string('mollie_payment_status', 16)->nullable();
             $table->datetime('processed_at')->nullable();
+            $table->text('metadata')->nullable();
             $table->timestamps();
         });
     }
