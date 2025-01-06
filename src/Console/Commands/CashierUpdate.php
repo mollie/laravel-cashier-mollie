@@ -18,7 +18,7 @@ class CashierUpdate extends Command
      *
      * @var string
      */
-    protected $description = 'Update Cashier Mollie to v2';
+    protected $description = 'Update Cashier Mollie to v3';
 
     /**
      * Execute the console command.
@@ -34,7 +34,7 @@ class CashierUpdate extends Command
             }
         }
 
-        $this->comment('Publishing Cashier v2 migrations...');
+        $this->comment('Publishing Cashier v3 migrations...');
         $this->callSilent('vendor:publish', ['--tag' => 'cashier-update']);
 
         $this->info('Cashier was updated successfully.');

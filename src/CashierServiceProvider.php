@@ -20,7 +20,7 @@ class CashierServiceProvider extends ServiceProvider
 {
     use RegistersMollieInteractions;
 
-    const PACKAGE_VERSION = '2.15.1';
+    const PACKAGE_VERSION = '3.0.0';
 
     /**
      * Bootstrap the application services.
@@ -123,7 +123,7 @@ class CashierServiceProvider extends ServiceProvider
             $prefix = 'migrations/' . date('Y_m_d_His', time());
 
             $this->publishes([
-                __DIR__ . '/../database/migrations/upgrade_to_cashier_v2.php.stub' => database_path($prefix . '_upgrade_to_cashier_v2.php'),
+                __DIR__ . '/../database/migrations/upgrade_to_cashier_v3.php.stub' => database_path($prefix . '_upgrade_to_cashier_v3.php'),
             ], $tag);
         }
     }
