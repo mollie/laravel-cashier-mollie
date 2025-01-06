@@ -47,6 +47,7 @@ use Money\Money;
  * @property \Carbon\Carbon|null processed_at
  * @property int amount_refunded
  * @property int amount_charged_back
+ * @property array|null metadata
  * @property \Laravel\Cashier\Order\OrderItemCollection items
  * @property \Laravel\Cashier\Refunds\RefundCollection refunds
  *
@@ -72,6 +73,7 @@ class Order extends Model
         'credit_used' => 'int',
         'total_due' => 'int',
         'processed_at' => 'datetime',
+        'metadata' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

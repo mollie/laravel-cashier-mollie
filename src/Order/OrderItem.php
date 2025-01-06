@@ -25,6 +25,7 @@ use Laravel\Cashier\Traits\HasOwner;
  * @property mixed $id
  * @property Order $order
  * @property mixed $order_id
+ * @property array|null metadata
  *
  * @method static create(array $array)
  * @method static make(array $array)
@@ -47,6 +48,7 @@ class OrderItem extends Model implements InvoicableItem
         'tax_percentage' => 'float',
         'orderable_id' => 'int',
         'process_at' => 'datetime',
+        'metadata' => 'array',
     ];
 
     protected $guarded = [];

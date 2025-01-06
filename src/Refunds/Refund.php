@@ -28,6 +28,7 @@ use Mollie\Api\Types\RefundStatus;
  * @property \Laravel\Cashier\Refunds\RefundItemCollection items
  * @property Order order
  * @property Order originalOrder
+ * @property array|null metadata
  */
 class Refund extends Model
 {
@@ -37,6 +38,7 @@ class Refund extends Model
 
     protected $casts = [
         'total' => 'int',
+        'metadata' => 'array',
     ];
 
     /**

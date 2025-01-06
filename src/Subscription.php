@@ -45,6 +45,7 @@ use Money\Money;
  * @property float cycle_progress
  * @property float cycle_left
  * @property string $currency
+ * @property array|null metadata
  */
 class Subscription extends Model implements InteractsWithOrderItems, PreprocessesOrderItems, AcceptsCoupons, IsRefundable
 {
@@ -67,6 +68,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
         'cycle_started_at' => 'datetime',
         'cycle_ends_at' => 'datetime',
         'ends_at' => 'datetime',
+        'metadata' => 'array',
     ];
 
     /**

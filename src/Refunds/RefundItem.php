@@ -24,6 +24,7 @@ use Money\Money;
  * @property string description
  * @property array<string> description_extra_lines
  * @property OrderItem originalOrderItem
+ * @property array|null metadata
  *
  * @method static create(array $array)
  * @method static make(array $array)
@@ -45,6 +46,7 @@ class RefundItem extends Model
         'subtotal' => 'int',
         'tax' => 'int',
         'total' => 'int',
+        'metadata' => 'array',
     ];
 
     /**
