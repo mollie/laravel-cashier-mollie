@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier;
 
-
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Cashier\Order\OrderInvoiceSubscriber;
@@ -27,6 +26,6 @@ class EventServiceProvider extends ServiceProvider
     public function boot(Dispatcher $events)
     {
         collect($this->subscribe)
-            ->each(fn(string $subscriber) => $events->subscribe($subscriber));
+            ->each(fn (string $subscriber) => $events->subscribe($subscriber));
     }
 }

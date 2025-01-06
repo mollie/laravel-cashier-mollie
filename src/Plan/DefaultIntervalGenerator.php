@@ -39,7 +39,8 @@ class DefaultIntervalGenerator extends BaseIntervalGenerator implements Interval
     /**
      * @return string
      */
-    public function interval() {
+    public function interval()
+    {
         return $this->interval;
     }
 
