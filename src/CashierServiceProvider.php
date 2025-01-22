@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Laravel\Cashier\Console\Commands\CashierInstall;
 use Laravel\Cashier\Console\Commands\CashierRun;
 use Laravel\Cashier\Console\Commands\CashierUpdate;
+use Laravel\Cashier\Console\Commands\SyncSubscriptionPrices;
 use Laravel\Cashier\Coupon\ConfigCouponRepository;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\Mollie\RegistersMollieInteractions;
@@ -70,6 +71,7 @@ class CashierServiceProvider extends ServiceProvider
                 CashierInstall::class,
                 CashierRun::class,
                 CashierUpdate::class,
+                SyncSubscriptionPrices::class,
             ]);
         }
     }
