@@ -1,5 +1,19 @@
 # Subscriptions
 
+## Configuring subscription plans
+
+You may configure subscription plans in `config/cashier_plans.php`.
+
+Note that any already scheduled order items will not be affected by the plan change.
+
+If you want to see your plan changes reflected immediately, run the `SyncSubscriptionPlans` command using
+
+```bash
+php artisan cashier:sync-plans
+```
+
+This will update the scheduled order items to match the new plan configuration.
+
 ## Creating subscriptions
 
 To create a subscription, first retrieve an instance of your billable model, which typically will be an instance of
