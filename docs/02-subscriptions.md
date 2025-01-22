@@ -4,7 +4,7 @@
 
 You may configure subscription plans in `config/cashier_plans.php`.
 
-Note that any already scheduled order items will not be affected by the plan change.
+Note that any already scheduled order items will not be affected when you make changes to a plan.
 
 If you want to see your plan changes reflected immediately, run the `SyncSubscriptionPlans` command using
 
