@@ -30,16 +30,16 @@
     }
   ],
   "require": {
-    "php": "^8.1",
+    "php": "^8.3",
     "ext-json": "*",
     "ext-intl": "*",
-    "dompdf/dompdf": "^2.0",
+    "dompdf/dompdf": "^3.1",
     "illuminate/database": "^10|^11",
     "illuminate/support": "^10|^11",
     "mollie/laravel-mollie": "^3.0",
     "mollie/mollie-api-php": "^2.65",
-    "moneyphp/money": "^4.1",
-    "nesbot/carbon": "^2.72|^3.0"
+    "moneyphp/money": "^4.6.0",
+    "nesbot/carbon": "^3.8"
   },
   "require-dev": {
     "guzzlehttp/guzzle": "^7.0",
