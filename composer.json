@@ -30,14 +30,14 @@
     }
   ],
   "require": {
-    "php": "^8.3",
+    "php": "^8.2",
     "ext-json": "*",
     "ext-intl": "*",
     "dompdf/dompdf": "^3.1",
     "illuminate/database": "^10|^11",
     "illuminate/support": "^10|^11",
     "mollie/laravel-mollie": "^3.0",
-    "mollie/mollie-api-php": "^2.65",
+    "mollie/mollie-api-php": "^2.76",
     "moneyphp/money": "^4.6.0",
     "nesbot/carbon": "^3.8"
   },
