@@ -12,6 +12,10 @@ return new class extends Migration
         'refunds',
         'refund_items',
         'subscriptions',
+        'payments',
+        'applied_coupons',
+        'redeemed_coupons',
+        'credits',
     ];
 
     /**

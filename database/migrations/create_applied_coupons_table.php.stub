@@ -17,6 +17,7 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('redeemed_coupon_id');
             $table->morphs('model');
+            $table->text('metadata')->nullable();
             $table->timestamps();
         });
     }

@@ -11,6 +11,7 @@ use Laravel\Cashier\Order\OrderItem;
  * @method static create(array $array)
  *
  * @property \Laravel\Cashier\Order\OrderItemCollection $orderItems
+ * @property array|null $metadata
  */
 class AppliedCoupon extends Model implements InteractsWithOrderItems
 {
@@ -20,6 +21,10 @@ class AppliedCoupon extends Model implements InteractsWithOrderItems
      * @var array
      */
     protected $guarded = [];
+
+    protected $casts = [
+        'metadata' => 'array',
+    ];
 
     /**
      * Get the model relation the coupon was applied to.

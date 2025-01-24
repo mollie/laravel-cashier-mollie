@@ -27,6 +27,7 @@ use Money\Money;
  * @property string first_payment_actions
  * @property string mollie_mandate_id
  * @property \Laravel\Cashier\Order\Order order
+ * @property array|null metadata
  *
  * @method static create(array $data)
  * @method static make(array $data)
@@ -48,6 +49,7 @@ class Payment extends Model
      */
     protected $casts = [
         'first_payment_actions' => 'object',
+        'metadata' => 'array',
     ];
 
     /**

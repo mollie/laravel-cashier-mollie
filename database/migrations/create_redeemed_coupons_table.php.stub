@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('owner_type');
             $table->unsignedBigInteger('owner_id');
             $table->unsignedInteger('times_left')->default(1);
+            $table->text('metadata')->nullable();
             $table->timestamps();
         });
     }

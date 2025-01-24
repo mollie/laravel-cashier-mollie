@@ -17,6 +17,7 @@ use Laravel\Cashier\Order\OrderItemCollection;
  * @property mixed model_id
  * @property string name
  * @property int times_left
+ * @property array|null metadata
  */
 class RedeemedCoupon extends Model
 {
@@ -26,6 +27,10 @@ class RedeemedCoupon extends Model
      * @var array
      */
     protected $guarded = [];
+
+    protected $casts = [
+        'metadata' => 'array',
+    ];
 
     /**
      * @param  \Laravel\Cashier\Coupon\Coupon  $coupon

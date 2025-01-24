@@ -8,11 +8,18 @@ use Laravel\Cashier\Traits\HasOwner;
 use Money\Currency;
 use Money\Money;
 
+/**
+ * @property array|null $metadata
+ */
 class Credit extends Model
 {
     use HasOwner;
 
     protected $guarded = [];
+
+    protected $casts = [
+        'metadata' => 'array',
+    ];
 
     /**
      * Add a credit amount for a specific owner.
