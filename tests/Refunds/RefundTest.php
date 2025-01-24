@@ -18,7 +18,7 @@ use Mollie\Api\Types\RefundStatus as MollieRefundStatus;
 class RefundTest extends BaseTestCase
 {
     /** @test */
-    public function canHandleProcessedMollieRefund()
+    public function can_handle_processed_mollie_refund()
     {
         Event::fake();
 
@@ -56,7 +56,7 @@ class RefundTest extends BaseTestCase
     }
 
     /** @test */
-    public function canHandleFailedMollieRefund()
+    public function can_handle_failed_mollie_refund()
     {
         Event::fake();
 

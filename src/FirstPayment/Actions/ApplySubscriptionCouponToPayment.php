@@ -24,10 +24,6 @@ class ApplySubscriptionCouponToPayment extends BaseNullAction
 
     /**
      * ApplySubscriptionCouponToPayment constructor.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
-     * @param  \Laravel\Cashier\Coupon\Coupon  $coupon
-     * @param  \Laravel\Cashier\Order\OrderItemCollection  $orderItems
      */
     public function __construct(Model $owner, Coupon $coupon, OrderItemCollection $orderItems)
     {

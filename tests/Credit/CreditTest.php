@@ -10,7 +10,7 @@ use Money\Money;
 class CreditTest extends BaseTestCase
 {
     /** @test */
-    public function testAddAmountForOwner()
+    public function test_add_amount_for_owner()
     {
         $user = User::factory()->create();
 
@@ -30,7 +30,7 @@ class CreditTest extends BaseTestCase
     }
 
     /** @test */
-    public function testMaxOutForOwner()
+    public function test_max_out_for_owner()
     {
         $user = User::factory()->create();
 

@@ -10,7 +10,7 @@ use Laravel\Cashier\Tests\Fixtures\User;
 class OrderCollectionTest extends BaseTestCase
 {
     /** @test */
-    public function canGetInvoices()
+    public function can_get_invoices()
     {
         $user = User::factory()->create();
         $orders = $user->orders()->saveMany(OrderFactory::new()->times(2)->make());

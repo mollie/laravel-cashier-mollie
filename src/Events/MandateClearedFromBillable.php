@@ -22,7 +22,6 @@ class MandateClearedFromBillable
      * ClearedMandate constructor.
      *
      * @param  mixed  $owner
-     * @param  string  $oldMandateId
      */
     public function __construct($owner, string $oldMandateId)
     {

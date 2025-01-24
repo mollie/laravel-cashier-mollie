@@ -68,7 +68,6 @@ class OrderItemCollection extends Collection
     /**
      * Filter this collection by currency symbol.
      *
-     * @param $currency
      * @return \Laravel\Cashier\Order\OrderItemCollection
      */
     public function whereCurrency($currency)
@@ -127,7 +126,6 @@ class OrderItemCollection extends Collection
     /**
      * Create an OrderItemCollection from a basic Collection.
      *
-     * @param  \Illuminate\Support\Collection  $collection
      * @return \Laravel\Cashier\Order\OrderItemCollection
      */
     public static function fromBaseCollection(BaseCollection $collection)
@@ -160,8 +158,6 @@ class OrderItemCollection extends Collection
     }
 
     /**
-     * @return \Money\Money
-     *
      * @throws \LogicException
      */
     public function getTotal(): Money

@@ -12,7 +12,7 @@ use Laravel\Cashier\Tests\Fixtures\User;
 class OrderItemCollectionTest extends BaseTestCase
 {
     /** @test */
-    public function testCurrencies()
+    public function test_currencies()
     {
         $collection = new OrderItemCollection([
             OrderItemFactory::new()->USD()->make(),
@@ -24,7 +24,7 @@ class OrderItemCollectionTest extends BaseTestCase
     }
 
     /** @test */
-    public function testCurrency()
+    public function test_currency()
     {
         $collection = new OrderItemCollection([
             OrderItemFactory::new()->USD()->make(),
@@ -35,7 +35,7 @@ class OrderItemCollectionTest extends BaseTestCase
     }
 
     /** @test */
-    public function testCurrencyThrowsExceptionWhenMultipleCurrenciesAreUsed()
+    public function test_currency_throws_exception_when_multiple_currencies_are_used()
     {
         $collection = new OrderItemCollection([
             OrderItemFactory::new()->USD()->make(),
@@ -49,7 +49,7 @@ class OrderItemCollectionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canGetTotal()
+    public function can_get_total()
     {
         $collection = new OrderItemCollection([
             OrderItemFactory::new()->EUR()->make([
@@ -68,7 +68,7 @@ class OrderItemCollectionTest extends BaseTestCase
     }
 
     /** @test */
-    public function cannotGetTotalForMultipleCurrencies()
+    public function cannot_get_total_for_multiple_currencies()
     {
         $collection = new OrderItemCollection([
             OrderItemFactory::new()->USD()->make(),
@@ -81,7 +81,7 @@ class OrderItemCollectionTest extends BaseTestCase
     }
 
     /** @test */
-    public function testOwners()
+    public function test_owners()
     {
         User::factory(3)->create()->each(function ($owner) {
             $owner->orderItems()->saveMany(OrderItemFactory::new()->times(2)->make());
@@ -96,7 +96,7 @@ class OrderItemCollectionTest extends BaseTestCase
     }
 
     /** @test */
-    public function testWhereOwners()
+    public function test_where_owners()
     {
         $item1 = OrderItemFactory::new()->make([
             'owner_id' => 1,
@@ -133,7 +133,7 @@ class OrderItemCollectionTest extends BaseTestCase
     }
 
     /** @test */
-    public function testWhereCurrency()
+    public function test_where_currency()
     {
         $item1 = OrderItemFactory::new()->EUR()->make();
         $item2 = OrderItemFactory::new()->USD()->make();
@@ -156,7 +156,7 @@ class OrderItemCollectionTest extends BaseTestCase
     }
 
     /** @test */
-    public function testChunkByOwner()
+    public function test_chunk_by_owner()
     {
         User::factory()->create(['id' => 1]);
         User::factory()->create(['id' => 2]);
@@ -192,7 +192,7 @@ class OrderItemCollectionTest extends BaseTestCase
     }
 
     /** @test */
-    public function testChunkByCurrency()
+    public function test_chunk_by_currency()
     {
         $collection = new OrderItemCollection([
             OrderItemFactory::new()->USD()->make(),
@@ -209,7 +209,7 @@ class OrderItemCollectionTest extends BaseTestCase
     }
 
     /** @test */
-    public function testChunkByOwnerAndCurrency()
+    public function test_chunk_by_owner_and_currency()
     {
         User::factory()->create(['id' => 1]);
         User::factory()->create(['id' => 2]);
@@ -242,7 +242,7 @@ class OrderItemCollectionTest extends BaseTestCase
     }
 
     /** @test */
-    public function testTaxPercentages()
+    public function test_tax_percentages()
     {
         $collection = new OrderItemCollection([
             OrderItemFactory::new()->make(['tax_percentage' => 21.5]),

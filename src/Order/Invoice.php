@@ -19,6 +19,7 @@ class Invoice
     use FormatsAmount;
 
     const DEFAULT_VIEW = 'cashier::receipt';
+
     const DEFAULT_DATE_FORMAT = 'MMM D, Y';
 
     /**
@@ -132,7 +133,6 @@ class Invoice
     }
 
     /**
-     * @param  \Carbon\Carbon  $date
      * @return $this
      */
     public function setDate(Carbon $date)
@@ -148,7 +148,6 @@ class Invoice
     }
 
     /**
-     * @param  \Laravel\Cashier\Order\Contracts\InvoicableItem  $item
      * @return $this
      */
     public function addItem(InvoicableItem $item)
@@ -161,7 +160,6 @@ class Invoice
     /**
      * Add multiple InvoicableItems
      *
-     * @param  \Illuminate\Support\Collection  $items
      * @return $this
      */
     public function addItems(Collection $items)
@@ -310,7 +308,6 @@ class Invoice
     /**
      * Set the receiver address using an array of strings.
      *
-     * @param  array  $lines
      * @return $this
      */
     public function setReceiverAddress(array $lines)
@@ -341,7 +338,6 @@ class Invoice
     }
 
     /**
-     * @param  \Money\Money  $amount
      * @return $this
      */
     public function setStartingBalance(Money $amount)
@@ -372,7 +368,6 @@ class Invoice
     }
 
     /**
-     * @param  \Money\Money  $amount
      * @return $this
      */
     public function setUsedBalance(Money $amount)
@@ -403,7 +398,6 @@ class Invoice
     }
 
     /**
-     * @param  \Money\Money  $amount
      * @return $this
      */
     public function setCompletedBalance(Money $amount)
@@ -429,7 +423,6 @@ class Invoice
     /**
      * Set the extra information. Useful for adding a note.
      *
-     * @param  array  $lines
      * @return $this
      */
     public function setExtraInformation(array $lines)
@@ -442,8 +435,6 @@ class Invoice
     /**
      * Get the View instance for the invoice.
      *
-     * @param  array  $data
-     * @param  string  $view
      * @return \Illuminate\Contracts\View\View
      */
     public function view(array $data = [], string $view = self::DEFAULT_VIEW)
@@ -456,14 +447,11 @@ class Invoice
     /**
      * Capture the invoice as a PDF and return the raw bytes.
      *
-     * @param  array  $data
-     * @param  string  $view
-     * @param  \Dompdf\Options  $options
      * @return string
      */
-    public function pdf(array $data = [], string $view = self::DEFAULT_VIEW, Options $options = null)
+    public function pdf(array $data = [], string $view = self::DEFAULT_VIEW, ?Options $options = null)
     {
-        if (!defined('DOMPDF_ENABLE_AUTOLOAD')) {
+        if (! defined('DOMPDF_ENABLE_AUTOLOAD')) {
             define('DOMPDF_ENABLE_AUTOLOAD', false);
         }
 
@@ -478,20 +466,18 @@ class Invoice
      * Create an invoice download response.
      *
      * @param  null|array  $data
-     * @param  string  $view
-     * @param  \Dompdf\Options  $options
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function download(array $data = [], string $view = self::DEFAULT_VIEW, Options $options = null)
+    public function download(array $data = [], string $view = self::DEFAULT_VIEW, ?Options $options = null)
     {
         $filename = implode('_', [
             $this->id,
             Str::snake(config('app.name', '')),
-        ]) . '.pdf';
+        ]).'.pdf';
 
         return new Response($this->pdf($data, $view, $options), 200, [
             'Content-Description' => 'File Transfer',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             'Content-Transfer-Encoding' => 'binary',
             'Content-Type' => 'application/pdf',
         ]);
@@ -502,15 +488,13 @@ class Invoice
      */
     public function hasStartingBalance()
     {
-        return !$this->rawStartingBalance()->isZero();
+        return ! $this->rawStartingBalance()->isZero();
     }
 
     /**
      * Helper method. By default a collection of lines (strings) is returned.
      * If a separator is provided an imploded string is returned.
      *
-     * @param  \Illuminate\Support\Collection  $collection
-     * @param $separator
      * @return \Illuminate\Support\Collection|string
      */
     private function optionallyImplode(Collection $collection, $separator)

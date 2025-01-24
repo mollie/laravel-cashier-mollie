@@ -33,8 +33,6 @@ class RedeemedCoupon extends Model
     ];
 
     /**
-     * @param  \Laravel\Cashier\Coupon\Coupon  $coupon
-     * @param  \Laravel\Cashier\Coupon\Contracts\AcceptsCoupons  $model
      * @return \Illuminate\Database\Eloquent\Model|\Laravel\Cashier\Coupon\RedeemedCoupon
      */
     public static function record(Coupon $coupon, AcceptsCoupons $model)
@@ -79,7 +77,6 @@ class RedeemedCoupon extends Model
     }
 
     /**
-     * @param  \Laravel\Cashier\Order\OrderItemCollection  $items
      * @return \Laravel\Cashier\Order\OrderItemCollection
      */
     public function applyTo(OrderItemCollection $items)
@@ -110,7 +107,6 @@ class RedeemedCoupon extends Model
     /**
      * Scope a query to only include coupons which are being processed
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive(Builder $query)
@@ -119,9 +115,6 @@ class RedeemedCoupon extends Model
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string  $modelType
-     * @param $modelId
      * @return mixed
      */
     public function scopeWhereModel(Builder $query, string $modelType, $modelId)
@@ -140,7 +133,6 @@ class RedeemedCoupon extends Model
     /**
      * Create a new Eloquent Collection instance.
      *
-     * @param  array  $models
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function newCollection(array $models = [])

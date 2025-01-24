@@ -11,9 +11,10 @@ class CreateMolliePaymentTest extends BaseMollieInteraction
 {
     /**
      * @test
+     *
      * @group mollie_integration
      */
-    public function testExecute()
+    public function test_execute()
     {
         /** @var CreateMolliePayment $action */
         $action = $this->app->make(CreateMolliePayment::class);
