@@ -732,27 +732,26 @@ class OrderTest extends BaseTestCase
         $filename = __DIR__ . '/../../example_invoice_output.html';
         $some_content = 'Invoice dummy';
 
-        if (collect($this->getGroups())->contains('generate_new_invoice_template')) {
-            $this->assertFileIsWritable($filename);
+        $this->assertFileIsWritable($filename);
 
-            if (is_writable($filename)) {
-                if (!$handle = fopen($filename, 'w')) {
-                    echo "Cannot open file ($filename)";
-                    exit;
-                }
-
-                if (fwrite($handle, $invoice->view()->render()) === false) {
-                    echo "Cannot write to file ($filename)";
-                    exit;
-                }
-
-                echo "Success, wrote ($some_content) to file ($filename)";
-
-                fclose($handle);
-            } else {
-                $this->fail('Cannot write example invoice to ' . $filename);
+        if (is_writable($filename)) {
+            if (!$handle = fopen($filename, 'w')) {
+                echo "Cannot open file ($filename)";
+                exit;
             }
+
+            if (fwrite($handle, $invoice->view()->render()) === false) {
+                echo "Cannot write to file ($filename)";
+                exit;
+            }
+
+            echo "Success, wrote ($some_content) to file ($filename)";
+
+            fclose($handle);
+        } else {
+            $this->fail('Cannot write example invoice to ' . $filename);
         }
+
         $this->assertTrue(true, 'Unable to generate dummy invoice.');
     }
 
