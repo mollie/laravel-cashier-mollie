@@ -9,9 +9,6 @@ abstract class BaseNullAction extends BaseAction
 {
     /**
      * Rebuild the Action from a payload.
-     *
-     * @param  array  $payload
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
      */
     public static function createFromPayload(array $payload, Model $owner)
     {

@@ -20,7 +20,7 @@ class StartSubscriptionTest extends BaseTestCase
 
     /** @test
      */
-    public function canGetBasicPayload()
+    public function can_get_basic_payload()
     {
         $action = new StartSubscription(
             $this->getMandatedUser(true, ['tax_percentage' => 20]),
@@ -45,7 +45,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canGetPayloadWithTrialDays()
+    public function can_get_payload_with_trial_days()
     {
         $action = new StartSubscription(
             $this->getMandatedUser(true, ['tax_percentage' => 20]),
@@ -73,7 +73,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canGetPayloadWithTrialUntil()
+    public function can_get_payload_with_trial_until()
     {
         $action = new StartSubscription(
             $this->getMandatedUser(true, ['tax_percentage' => 20]),
@@ -101,7 +101,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canGetPayloadWithSkipTrial()
+    public function can_get_payload_with_skip_trial()
     {
         $action = new StartSubscription(
             $this->getMandatedUser(true, ['tax_percentage' => 20]),
@@ -129,7 +129,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canGetPayloadWithCoupon()
+    public function can_get_payload_with_coupon()
     {
         $this->withMockedCouponRepository();
 
@@ -159,13 +159,13 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canCreateFromBasicPayload()
+    public function can_create_from_basic_payload()
     {
         $this->assertFromPayloadToPayload();
     }
 
     /** @test */
-    public function canCreateFromPayloadWithTrialUntil()
+    public function can_create_from_payload_with_trial_until()
     {
         $this->assertFromPayloadToPayload([
             'trialUntil' => Carbon::parse('01-01-2019')->toIso8601String(),
@@ -177,7 +177,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canCreateFromPayloadWithTrialDays()
+    public function can_create_from_payload_with_trial_days()
     {
         $this->assertFromPayloadToPayload([
             'trialDays' => 5,
@@ -189,7 +189,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canCreateFromPayloadWithSkipTrial()
+    public function can_create_from_payload_with_skip_trial()
     {
         $this->assertFromPayloadToPayload([
             'skipTrial' => true,
@@ -201,7 +201,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canCreateFromPayloadWithQuantity()
+    public function can_create_from_payload_with_quantity()
     {
         $this->assertFromPayloadToPayload([
             'quantity' => 5,
@@ -213,7 +213,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canCreateFromPayloadWithTrialAndQuantity()
+    public function can_create_from_payload_with_trial_and_quantity()
     {
         $this->assertFromPayloadToPayload([
             'quantity' => 5,
@@ -226,7 +226,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canCreateFromPayloadWithCouponNoTrial()
+    public function can_create_from_payload_with_coupon_no_trial()
     {
         $this->withMockedCouponRepository();
         $this->assertFromPayloadToPayload([
@@ -239,7 +239,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canCreateFromPayloadWithCouponAndTrial()
+    public function can_create_from_payload_with_coupon_and_trial()
     {
         $this->withMockedCouponRepository();
         $this->assertFromPayloadToPayload([
@@ -253,7 +253,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canCreateFromPayloadWithoutTaxPercentage()
+    public function can_create_from_payload_without_tax_percentage()
     {
         $this->withMockedCouponRepository();
         $this->assertFromPayloadToPayload([
@@ -268,7 +268,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canStartDefaultSubscription()
+    public function can_start_default_subscription()
     {
         Carbon::setTestNow('2019-01-29');
 
@@ -312,7 +312,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canStartSubscriptionWithTrialDays()
+    public function can_start_subscription_with_trial_days()
     {
         $user = $this->getMandatedUser(true, ['tax_percentage' => 20]);
         $this->withMockedGetMollieCustomer(2);
@@ -362,7 +362,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canStartSubscriptionWithTrialUntil()
+    public function can_start_subscription_with_trial_until()
     {
         $this->withMockedGetMollieCustomer(2);
         $this->withMockedGetMollieMandateAccepted(2);
@@ -409,7 +409,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canStartSubscriptionWithQuantityNoTrial()
+    public function can_start_subscription_with_quantity_no_trial()
     {
         $this->withMockedGetMollieCustomer(2);
         $this->withMockedGetMollieMandateAccepted(2);
@@ -457,7 +457,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canStartSubscriptionWithQuantityAndTrialUntil()
+    public function can_start_subscription_with_quantity_and_trial_until()
     {
         $this->withMockedGetMollieCustomer(2);
         $this->withMockedGetMollieMandateAccepted(2);
@@ -507,7 +507,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canStartSubscriptionUsingNextPaymentAt()
+    public function can_start_subscription_using_next_payment_at()
     {
         $this->withMockedGetMollieCustomer(2);
         $this->withMockedGetMollieMandateAccepted(2);
@@ -546,7 +546,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canStartSubscriptionWithCouponNoTrial()
+    public function can_start_subscription_with_coupon_no_trial()
     {
         $this->withMockedCouponRepository();
         $this->withMockedGetMollieCustomer(2);
@@ -599,7 +599,7 @@ class StartSubscriptionTest extends BaseTestCase
     }
 
     /** @test */
-    public function canStartSubscriptionWithCouponAndTrial()
+    public function can_start_subscription_with_coupon_and_trial()
     {
         $this->withMockedCouponRepository();
         $this->withMockedGetMollieCustomer(2);

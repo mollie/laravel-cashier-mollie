@@ -6,19 +6,13 @@ namespace Laravel\Cashier\Mollie;
 
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\GetMollieRefund as Contract;
-use Mollie\Api\Resources\Refund;
 use Mollie\Api\MollieApiClient as Mollie;
+use Mollie\Api\Resources\Refund;
 
 class GetMollieRefund implements Contract
 {
-    /**
-     * @var \Mollie\Api\MollieApiClient
-     */
     protected Mollie $mollie;
 
-    /**
-     * @var \Laravel\Cashier\Mollie\Contracts\GetMolliePayment
-     */
     protected GetMolliePayment $getMolliePayment;
 
     public function __construct(Mollie $mollie, GetMolliePayment $getMolliePayment)

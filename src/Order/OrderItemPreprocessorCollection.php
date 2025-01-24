@@ -27,7 +27,6 @@ class OrderItemPreprocessorCollection extends Collection
     }
 
     /**
-     * @param  \Laravel\Cashier\Order\OrderItem  $item
      * @return \Laravel\Cashier\Order\OrderItemCollection
      */
     public function handle(OrderItem $item)
@@ -42,7 +41,6 @@ class OrderItemPreprocessorCollection extends Collection
     /**
      * Create an OrderItemCollection from a basic Collection.
      *
-     * @param  \Illuminate\Support\Collection  $collection
      * @return \Laravel\Cashier\Order\OrderItemPreprocessorCollection
      */
     public static function fromBaseCollection(BaseCollection $collection)

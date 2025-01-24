@@ -24,7 +24,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     }
 
     /** @test */
-    public function canSwapToAnotherPlan()
+    public function can_swap_to_another_plan()
     {
         $now = now();
         $this->withMockedGetMollieCustomer(2);
@@ -113,7 +113,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     /**
      * @test
      */
-    public function canSwapToAnotherPlanWithImmediatelyAppliedCoupon()
+    public function can_swap_to_another_plan_with_immediately_applied_coupon()
     {
         $now = now();
         $this->withMockedGetMollieCustomer(2);
@@ -195,7 +195,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     }
 
     /** @test */
-    public function swappingACancelledSubscriptionResumesIt()
+    public function swapping_a_cancelled_subscription_resumes_it()
     {
         $subscription = $this->getUser()->subscriptions()->save(
             SubscriptionFactory::new()->make([
@@ -213,7 +213,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     }
 
     /** @test */
-    public function swappingACancelledSubscriptionAtNextCycleResumesIt()
+    public function swapping_a_cancelled_subscription_at_next_cycle_resumes_it()
     {
         $subscription = $this->getUser()->subscriptions()->save(
             SubscriptionFactory::new()->make([
@@ -231,7 +231,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     }
 
     /** @test */
-    public function swappingOnTrialDoesNotCreateAnOrderEvenWhenInvoiceNowIsTrue()
+    public function swapping_on_trial_does_not_create_an_order_even_when_invoice_now_is_true()
     {
         $subscription = $this->getUser()->subscriptions()->save(
             SubscriptionFactory::new()->make([
@@ -249,7 +249,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     }
 
     /** @test */
-    public function canSwapNextCycle()
+    public function can_swap_next_cycle()
     {
         $user = $this->getUserWithZeroBalance();
         $subscription = $this->getSubscriptionForUser($user);
@@ -317,7 +317,6 @@ class SwapSubscriptionPlanTest extends BaseTestCase
     }
 
     /**
-     * @param $user
      * @return Subscription
      */
     protected function getSubscriptionForUser($user)

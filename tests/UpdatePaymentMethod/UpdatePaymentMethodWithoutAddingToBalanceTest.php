@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier\Tests\UpdatePaymentMethod;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\MandateUpdated;
@@ -16,7 +15,7 @@ use Mollie\Api\Resources\Payment;
 class UpdatePaymentMethodWithoutAddingToBalanceTest extends BaseTestCase
 {
     /** @test */
-    public function canUpdatePaymentMethodWithoutAddingToBalance()
+    public function can_update_payment_method_without_adding_to_balance()
     {
         $owner = User::factory()->create([
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
@@ -58,7 +57,7 @@ class UpdatePaymentMethodWithoutAddingToBalanceTest extends BaseTestCase
 
     protected function getNewMandatePaymentStub(): Payment
     {
-        $newPayment = new Payment(new MollieApiClient());
+        $newPayment = new Payment(new MollieApiClient);
         $newPayment->sequenceType = 'first';
         $newPayment->id = 'new_tr_unique_mandate_payment_id';
         $newPayment->customerId = 'cst_unique_customer_id';

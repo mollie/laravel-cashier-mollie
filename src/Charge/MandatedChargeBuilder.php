@@ -64,8 +64,6 @@ class MandatedChargeBuilder implements Contract
     }
 
     /**
-     * @return ?Order
-     *
      * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
      */
     public function create(): ?Order

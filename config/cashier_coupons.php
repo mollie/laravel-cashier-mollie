@@ -9,7 +9,7 @@ return [
          * The class responsible for validating and applying the coupon discount.
          * Must extend \Cashier\Discount\BaseCouponHandler
          */
-        //'handler' => '\SomeHandler',
+        // 'handler' => '\SomeHandler',
 
         /**
          * The number of times this coupon will be applied. I.e. If you'd like to prove 6 months discount on a

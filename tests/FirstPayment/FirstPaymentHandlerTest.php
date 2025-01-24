@@ -16,7 +16,7 @@ use Mollie\Api\Types\PaymentStatus;
 class FirstPaymentHandlerTest extends BaseTestCase
 {
     /** @test */
-    public function handlesMolliePayments()
+    public function handles_mollie_payments()
     {
         Event::fake();
 
@@ -86,7 +86,7 @@ class FirstPaymentHandlerTest extends BaseTestCase
 
     protected function getMandatePaymentStub(): MolliePayment
     {
-        $payment = new MolliePayment(new MollieApiClient());
+        $payment = new MolliePayment(new MollieApiClient);
         $payment->sequenceType = 'first';
         $payment->id = 'tr_unique_mandate_payment_id';
         $payment->customerId = 'cst_unique_customer_id';

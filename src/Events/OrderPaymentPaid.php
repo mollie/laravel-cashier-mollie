@@ -24,9 +24,6 @@ class OrderPaymentPaid
 
     /**
      * Creates a new OrderPaymentPaid event.
-     *
-     * @param $order
-     * @param $payment
      */
     public function __construct($order, $payment)
     {

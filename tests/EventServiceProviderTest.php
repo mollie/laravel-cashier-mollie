@@ -11,7 +11,7 @@ use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
 class EventServiceProviderTest extends BaseTestCase
 {
     /** @test */
-    public function itIsWiredUpAndFiring()
+    public function it_is_wired_up_and_firing()
     {
         Event::fake(OrderInvoiceAvailable::class);
 

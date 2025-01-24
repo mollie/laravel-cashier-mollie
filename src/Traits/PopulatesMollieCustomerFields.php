@@ -15,10 +15,10 @@ trait PopulatesMollieCustomerFields
         return [
             'email' => $this->email,
             'name' => $this->name,
-            //'locale' => $this->locale,
-            //'metadata' => [
+            // 'locale' => $this->locale,
+            // 'metadata' => [
             //    'id' => $this->id,
-            //],
+            // ],
         ];
     }
 }

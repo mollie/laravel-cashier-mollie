@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateOrderItemsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -27,6 +27,7 @@ class CreateOrderItemsTable extends Migration
             $table->integer('unit_price');
             $table->decimal('tax_percentage', 6, 4);
             $table->unsignedBigInteger('order_id')->nullable();
+            $table->text('metadata')->nullable();
             $table->timestamps();
         });
     }
@@ -40,4 +41,4 @@ class CreateOrderItemsTable extends Migration
     {
         Schema::dropIfExists('order_items');
     }
-}
+};

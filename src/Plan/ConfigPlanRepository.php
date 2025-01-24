@@ -14,7 +14,6 @@ class ConfigPlanRepository implements PlanRepository
     /**
      * Get a plan by its name.
      *
-     * @param $name
      * @return null|\Laravel\Cashier\Plan\Contracts\Plan
      */
     public static function find(string $name)
@@ -31,7 +30,6 @@ class ConfigPlanRepository implements PlanRepository
     /**
      * Get a plan by its name or throw an exception.
      *
-     * @param  string  $name
      * @return \Laravel\Cashier\Plan\Contracts\Plan
      *
      * @throws PlanNotFoundException
@@ -61,9 +59,6 @@ class ConfigPlanRepository implements PlanRepository
     }
 
     /**
-     * @param  string  $name
-     * @param  array  $planConfig
-     * @param  array  $planDefaults
      * @return \Laravel\Cashier\Plan\Plan
      */
     public static function populatePlan(string $name, array $planConfig, array $planDefaults = [])
@@ -104,8 +99,6 @@ class ConfigPlanRepository implements PlanRepository
     }
 
     /**
-     * @param  array  $planConfig
-     * @param  array  $planDefaults
      * @return array
      */
     protected static function toPlanArray(array $planConfig, array $planDefaults = [])

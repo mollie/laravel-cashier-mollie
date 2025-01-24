@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateOrdersTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -30,6 +30,7 @@ class CreateOrdersTable extends Migration
             $table->string('mollie_payment_id')->nullable();
             $table->string('mollie_payment_status', 16)->nullable();
             $table->datetime('processed_at')->nullable();
+            $table->text('metadata')->nullable();
             $table->timestamps();
         });
     }
@@ -43,4 +44,4 @@ class CreateOrdersTable extends Migration
     {
         Schema::dropIfExists('orders');
     }
-}
+};

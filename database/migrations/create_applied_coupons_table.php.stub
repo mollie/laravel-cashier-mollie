@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAppliedCouponsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -17,6 +17,7 @@ class CreateAppliedCouponsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('redeemed_coupon_id');
             $table->morphs('model');
+            $table->text('metadata')->nullable();
             $table->timestamps();
         });
     }
@@ -30,4 +31,4 @@ class CreateAppliedCouponsTable extends Migration
     {
         Schema::dropIfExists('applied_coupons');
     }
-}
+};

@@ -233,7 +233,6 @@ class Cashier
     /**
      * Set the custom currency formatter.
      *
-     * @param  callable  $callback
      * @return void
      */
     public static function formatCurrencyUsing(callable $callback)
@@ -244,7 +243,6 @@ class Cashier
     /**
      * Format the given amount into a displayable currency.
      *
-     * @param  \Money\Money  $money
      * @return string
      */
     public static function formatAmount(Money $money)
@@ -359,7 +357,6 @@ class Cashier
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @return null|string
      */
     public static function getLocale(Model $owner)

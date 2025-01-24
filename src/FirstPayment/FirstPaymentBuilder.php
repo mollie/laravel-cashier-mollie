@@ -68,8 +68,7 @@ class FirstPaymentBuilder
     /**
      * FirstPaymentBuilder constructor.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
-     * @param  array  $options Overrides the Mollie Payment payload
+     * @param  array  $options  Overrides the Mollie Payment payload
      */
     public function __construct(Model $owner, array $options = [])
     {
@@ -84,7 +83,6 @@ class FirstPaymentBuilder
     /**
      * Define actions to be executed once the payment has been paid.
      *
-     * @param  array  $actions
      * @return $this
      */
     public function inOrderTo(array $actions = [])
@@ -170,7 +168,6 @@ class FirstPaymentBuilder
     }
 
     /**
-     * @param  string  $description
      * @return FirstPaymentBuilder
      */
     public function setDescription(string $description)
@@ -183,7 +180,6 @@ class FirstPaymentBuilder
     /**
      * Override the default Mollie redirectUrl. Takes an absolute or relative url.
      *
-     * @param  string  $redirectUrl
      * @return $this
      */
     public function setRedirectUrl(string $redirectUrl)
@@ -196,7 +192,6 @@ class FirstPaymentBuilder
     /**
      * Override the default Mollie webhookUrl. Takes an absolute or relative url.
      *
-     * @param  string  $webhookUrl
      * @return $this
      */
     public function setWebhookUrl(string $webhookUrl)

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCreditsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -19,6 +19,7 @@ class CreateCreditsTable extends Migration
             $table->unsignedBigInteger('owner_id');
             $table->string('currency', 3);
             $table->integer('value');
+            $table->text('metadata')->nullable();
             $table->timestamps();
         });
     }
@@ -32,4 +33,4 @@ class CreateCreditsTable extends Migration
     {
         Schema::dropIfExists('credits');
     }
-}
+};

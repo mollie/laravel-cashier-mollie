@@ -23,7 +23,7 @@ class ManageSubscriptionTest extends BaseTestCase
      *
      * @test
      */
-    public function canCreateDirectDebitSubscriptionForMandatedCustomer()
+    public function can_create_direct_debit_subscription_for_mandated_customer()
     {
         $this->withMockedGetMollieCustomer(10);
         $this->withMockedGetMollieMandateAccepted(10, [[
@@ -217,7 +217,7 @@ class ManageSubscriptionTest extends BaseTestCase
         $this->assertInstanceOf(Carbon::class, $invoice->date());
     }
 
-    public function testCreatingSubscriptionWithTrial()
+    public function test_creating_subscription_with_trial()
     {
         $this->withMockedGetMollieCustomer(2);
         $this->withMockedGetMollieMandateAccepted(2, [[
@@ -287,7 +287,7 @@ class ManageSubscriptionTest extends BaseTestCase
         $this->assertCarbon(now()->addDays(7), $item->process_at);
     }
 
-    public function testGenericTrials()
+    public function test_generic_trials()
     {
         $user = new User;
         $this->assertFalse($user->onGenericTrial());

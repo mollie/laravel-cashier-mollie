@@ -59,8 +59,6 @@ class FirstPaymentSubscriptionBuilder implements Contract
      * Create a new subscription builder instance.
      *
      * @param  mixed  $owner
-     * @param  string  $name
-     * @param  string  $plan
      * @param  array  $paymentOptions
      *
      * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
@@ -125,7 +123,6 @@ class FirstPaymentSubscriptionBuilder implements Contract
     /**
      * Specify the number of days of the trial.
      *
-     * @param  int  $trialDays
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
@@ -139,7 +136,6 @@ class FirstPaymentSubscriptionBuilder implements Contract
     /**
      * Specify the ending date of the trial.
      *
-     * @param  Carbon  $trialUntil
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
@@ -169,7 +165,6 @@ class FirstPaymentSubscriptionBuilder implements Contract
     /**
      * Specify the quantity of the subscription.
      *
-     * @param  int  $quantity
      * @return $this
      *
      * @throws \Throwable|\LogicException
@@ -185,7 +180,6 @@ class FirstPaymentSubscriptionBuilder implements Contract
     /**
      * Specify a discount coupon.
      *
-     * @param  string  $coupon
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\CouponNotFoundException
@@ -200,7 +194,6 @@ class FirstPaymentSubscriptionBuilder implements Contract
     /**
      * Override the default next payment date. This is superseded by the trial end date.
      *
-     * @param  \Carbon\Carbon  $nextPaymentAt
      * @return $this
      */
     public function nextPaymentAt(Carbon $nextPaymentAt)
@@ -241,7 +234,6 @@ class FirstPaymentSubscriptionBuilder implements Contract
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @param  array  $paymentOptions
      * @return \Laravel\Cashier\FirstPayment\FirstPaymentBuilder
      */

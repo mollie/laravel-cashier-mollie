@@ -11,6 +11,7 @@ use Laravel\Cashier\Order\OrderItem;
  * @method static create(array $array)
  *
  * @property \Laravel\Cashier\Order\OrderItemCollection $orderItems
+ * @property array|null $metadata
  */
 class AppliedCoupon extends Model implements InteractsWithOrderItems
 {
@@ -20,6 +21,10 @@ class AppliedCoupon extends Model implements InteractsWithOrderItems
      * @var array
      */
     protected $guarded = [];
+
+    protected $casts = [
+        'metadata' => 'array',
+    ];
 
     /**
      * Get the model relation the coupon was applied to.
@@ -44,7 +49,6 @@ class AppliedCoupon extends Model implements InteractsWithOrderItems
     /**
      * Called right before processing the order item into an order.
      *
-     * @param  OrderItem  $item
      * @return \Laravel\Cashier\Order\OrderItemCollection
      */
     public static function preprocessOrderItem(OrderItem $item)
@@ -55,7 +59,6 @@ class AppliedCoupon extends Model implements InteractsWithOrderItems
     /**
      * Called after processing the order item into an order.
      *
-     * @param  OrderItem  $item
      * @return OrderItem The order item that's being processed
      */
     public static function processOrderItem(OrderItem $item)
@@ -66,7 +69,6 @@ class AppliedCoupon extends Model implements InteractsWithOrderItems
     /**
      * Handle a failed payment.
      *
-     * @param  OrderItem  $item
      * @return void
      */
     public static function handlePaymentFailed(OrderItem $item)
@@ -77,7 +79,6 @@ class AppliedCoupon extends Model implements InteractsWithOrderItems
     /**
      * Handle a paid payment.
      *
-     * @param  OrderItem  $item
      * @return void
      */
     public static function handlePaymentPaid(OrderItem $item)

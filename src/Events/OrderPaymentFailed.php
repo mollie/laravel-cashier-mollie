@@ -24,8 +24,6 @@ class OrderPaymentFailed
 
     /**
      * Creates a new OrderPaymentFailed event.
-     *
-     * @param $order
      */
     public function __construct($order, $payment)
     {

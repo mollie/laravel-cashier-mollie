@@ -24,7 +24,7 @@ class MandatedSubscriptionBuilderTest extends BaseTestCase
     }
 
     /** @test */
-    public function testWithCouponNoTrial()
+    public function test_with_coupon_no_trial()
     {
         $this->withMockedCouponRepository();
         $this->withMockedGetMollieMandateAccepted(2);
@@ -51,7 +51,7 @@ class MandatedSubscriptionBuilderTest extends BaseTestCase
         $this->assertEquals(1, $orderItem->quantity);
     }
 
-    public function testWithCouponAndTrial()
+    public function test_with_coupon_and_trial()
     {
         $this->withMockedCouponRepository();
         $this->withMockedGetMollieMandateAccepted(2);
@@ -82,7 +82,7 @@ class MandatedSubscriptionBuilderTest extends BaseTestCase
     }
 
     /** @test */
-    public function testWithCouponValidatesCoupon()
+    public function test_with_coupon_validates_coupon()
     {
         $this->expectException(CouponException::class);
         $this->withMockedCouponRepository(null, new InvalidatingCouponHandler);
@@ -92,7 +92,7 @@ class MandatedSubscriptionBuilderTest extends BaseTestCase
     }
 
     /** @test */
-    public function testSkipTrialWorks()
+    public function test_skip_trial_works()
     {
         $builder = $this->getBuilder()->trialDays(5);
         $this->assertTrue($builder->makeSubscription()->onTrial());

@@ -14,7 +14,7 @@ use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 class CouponOrderItemPreprocessorTest extends BaseTestCase
 {
     /** @test */
-    public function appliesCoupon()
+    public function applies_coupon()
     {
         $this->withMockedCouponRepository();
 
@@ -26,7 +26,7 @@ class CouponOrderItemPreprocessorTest extends BaseTestCase
         /** @var \Laravel\Cashier\Coupon\Coupon $coupon */
         $coupon = app()->make(CouponRepository::class)->findOrFail('test-coupon');
         $redeemedCoupon = $coupon->redeemFor($subscription);
-        $preprocessor = new CouponOrderItemPreprocessor();
+        $preprocessor = new CouponOrderItemPreprocessor;
         $this->assertEquals(0, Cashier::$appliedCouponModel::count());
         $this->assertEquals(1, $redeemedCoupon->times_left);
 
@@ -39,9 +39,9 @@ class CouponOrderItemPreprocessorTest extends BaseTestCase
     }
 
     /** @test */
-    public function passesThroughWhenNoRedeemedCoupon()
+    public function passes_through_when_no_redeemed_coupon()
     {
-        $preprocessor = new CouponOrderItemPreprocessor();
+        $preprocessor = new CouponOrderItemPreprocessor;
         $items = OrderItemFactory::new()->times(1)->make();
         $this->assertInstanceOf(OrderItemCollection::class, $items);
         $this->assertEquals(0, Cashier::$redeemedCouponModel::count());

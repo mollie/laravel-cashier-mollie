@@ -43,7 +43,7 @@ class SyncSubscriptionPlans extends Command
             foreach ($items as $item) {
 
                 // Skip if not a subscription order item
-                if (!($item->orderable instanceof Subscription)) {
+                if (! ($item->orderable instanceof Subscription)) {
                     continue;
                 }
 
@@ -79,7 +79,7 @@ class SyncSubscriptionPlans extends Command
                         $item->unit_price,
                         $planAmount,
                         $planCurrency,
-                        $descriptionChanged ? ' and from "' . $item->description . '" to "' . $planDescription . '"' : '',
+                        $descriptionChanged ? ' and from "'.$item->description.'" to "'.$planDescription.'"' : '',
                     ));
                 }
             }

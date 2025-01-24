@@ -30,8 +30,6 @@ class UpdatePaymentMethodBuilder implements Contract
 
     /**
      * UpdatePaymentMethodBuilder constructor.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
      */
     public function __construct(Model $owner)
     {
@@ -121,8 +119,6 @@ class UpdatePaymentMethodBuilder implements Contract
     }
 
     /**
-     * @param  \Money\Money  $total
-     * @param  float  $taxPercentage
      * @return \Money\Money
      */
     protected function subtotalForTotalIncludingTax(Money $total, float $taxPercentage)

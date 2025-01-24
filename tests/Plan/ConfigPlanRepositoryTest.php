@@ -43,13 +43,13 @@ class ConfigPlanRepositoryTest extends BaseTestCase
     }
 
     /** @test */
-    public function findReturnsNullWhenNotFound()
+    public function find_returns_null_when_not_found()
     {
         $this->assertNull(ConfigPlanRepository::find('some_wrong_name'));
     }
 
     /** @test */
-    public function findReturnsPlanWhenFound()
+    public function find_returns_plan_when_found()
     {
         $this->assertInstanceOf(Plan::class, ConfigPlanRepository::find('Test'));
     }
@@ -57,27 +57,27 @@ class ConfigPlanRepositoryTest extends BaseTestCase
     /** @test
      * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
      */
-    public function findOrFailCorrect()
+    public function find_or_fail_correct()
     {
         $this->assertInstanceOf(Plan::class, ConfigPlanRepository::findOrFail('Test'));
     }
 
     /** @test */
-    public function findOrFailWrong()
+    public function find_or_fail_wrong()
     {
         $this->expectException(PlanNotFoundException::class);
         ConfigPlanRepository::findOrFail('some_wrong_name');
     }
 
     /** @test */
-    public function findIsCaseSensitive()
+    public function find_is_case_sensitive()
     {
         $this->assertNull(ConfigPlanRepository::find('test'));
         $this->assertInstanceOf(Plan::class, ConfigPlanRepository::find('Test'));
     }
 
     /** @test */
-    public function populatesPlanProperlyWithoutDefaultsSet()
+    public function populates_plan_properly_without_defaults_set()
     {
         Config::set('cashier_plans.defaults', []); // clear Plan defaults
         $plan = ConfigPlanRepository::findOrFail('Test');
@@ -98,7 +98,7 @@ class ConfigPlanRepositoryTest extends BaseTestCase
     }
 
     /** @test */
-    public function populatesPlanProperlyWithDefaultsSet()
+    public function populates_plan_properly_with_defaults_set()
     {
         Config::set('cashier_plans.defaults.first_payment', $this->firstPaymentDefaultsArray);
         $plan = ConfigPlanRepository::findOrFail('Test');

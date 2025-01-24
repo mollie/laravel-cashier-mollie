@@ -10,7 +10,7 @@ use Laravel\Cashier\Tests\Fixtures\User;
 class ManageChargesTest extends BaseTestCase
 {
     /** @test */
-    public function usingMandatedChargeBuilderWhenValidMandate()
+    public function using_mandated_charge_builder_when_valid_mandate()
     {
         $owner = User::factory()->create();
 
@@ -18,7 +18,7 @@ class ManageChargesTest extends BaseTestCase
     }
 
     /** @test */
-    public function useNewMandatedCharge()
+    public function use_new_mandated_charge()
     {
         $this->withMockedGetMollieCustomer(2);
         $this->withMockedGetMollieMandateAccepted(2);

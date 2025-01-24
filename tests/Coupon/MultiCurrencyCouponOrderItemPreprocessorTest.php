@@ -15,7 +15,7 @@ use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 class MultiCurrencyCouponOrderItemPreprocessorTest extends BaseTestCase
 {
     /** @test */
-    public function appliesCoupon()
+    public function applies_coupon()
     {
         $this->withMockedUsdCouponRepository();
 
@@ -33,7 +33,7 @@ class MultiCurrencyCouponOrderItemPreprocessorTest extends BaseTestCase
         $usdCoupon = app()->make(CouponRepository::class)->findOrFail('usddiscount');
 
         $redeemedUsdCoupon = $usdCoupon->redeemFor($subscription);
-        $preprocessor = new CouponOrderItemPreprocessor();
+        $preprocessor = new CouponOrderItemPreprocessor;
 
         $this->assertEquals(0, Cashier::$appliedCouponModel::count());
         $this->assertEquals(1, $redeemedUsdCoupon->times_left);
@@ -42,7 +42,7 @@ class MultiCurrencyCouponOrderItemPreprocessorTest extends BaseTestCase
         $preprocessor->handle($item->toCollection());
 
         $redeemedUsdCoupon = $usdCoupon->redeemFor($subscriptionUsd);
-        $preprocessor = new CouponOrderItemPreprocessor();
+        $preprocessor = new CouponOrderItemPreprocessor;
 
         $this->assertEquals(0, Cashier::$appliedCouponModel::count());
         $this->assertEquals(1, $redeemedUsdCoupon->times_left);

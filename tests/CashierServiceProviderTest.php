@@ -8,7 +8,7 @@ use Laravel\Cashier\CashierServiceProvider;
 class CashierServiceProviderTest extends BaseTestCase
 {
     /** @test */
-    public function canOptionallySetCurrencyInConfig()
+    public function can_optionally_set_currency_in_config()
     {
         $this->assertEquals('INEXISTENT', config('cashier.currency', 'INEXISTENT'));
 
@@ -23,7 +23,7 @@ class CashierServiceProviderTest extends BaseTestCase
     }
 
     /** @test */
-    public function canOptionallySetCurrencyLocaleInConfig()
+    public function can_optionally_set_currency_locale_in_config()
     {
         $this->assertEquals('INEXISTENT', config('cashier.currency_locale', 'INEXISTENT'));
         $this->assertEquals('de_DE', Cashier::usesCurrencyLocale());

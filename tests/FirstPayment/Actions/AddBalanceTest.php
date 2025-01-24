@@ -13,7 +13,7 @@ use Money\Money;
 class AddBalanceTest extends BaseTestCase
 {
     /** @test */
-    public function canGetPayload()
+    public function can_get_payload()
     {
         $action = new AddBalance(
             $this->getMandatedUser(),
@@ -37,7 +37,7 @@ class AddBalanceTest extends BaseTestCase
     }
 
     /** @test */
-    public function canCreateFromPayload()
+    public function can_create_from_payload()
     {
         $action = AddBalance::createFromPayload([
             'subtotal' => [
@@ -57,7 +57,7 @@ class AddBalanceTest extends BaseTestCase
     }
 
     /** @test */
-    public function canExecute()
+    public function can_execute()
     {
         $user = User::factory()->create();
         $this->assertFalse($user->hasCredit());

@@ -17,8 +17,6 @@ class OrderInvoiceAvailable
 
     /**
      * Creates a new OrderInvoiceAvailable event.
-     *
-     * @param $order
      */
     public function __construct($order)
     {

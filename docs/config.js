@@ -23,8 +23,8 @@ module.exports = {
             },
             {
                 'name': 'Sander van Hooft',
-                'email': 'info@sandervanhooft.com',
-                'homepage': 'https://www.sandervanhooft.com',
+                'email': 'sander@sandorian.com',
+                'homepage': 'https://www.sandorian.com',
                 'role': 'Developer'
             }
         ],
@@ -52,7 +52,6 @@ module.exports = {
             '/10-webhook',
             '/11-testing',
             '/12-faq',
-            //'/13-upgrade',
         ]
     },
     base: '/',

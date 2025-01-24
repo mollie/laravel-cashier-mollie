@@ -12,9 +12,6 @@ class ChargebackReceived
 {
     use SerializesModels;
 
-    /**
-     * @var \Laravel\Cashier\Payment
-     */
     public Payment $payment;
 
     public Money $amountChargedBack;

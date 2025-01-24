@@ -11,10 +11,11 @@ class CreateMollieRefundTest extends BaseMollieInteraction
 {
     /**
      * @test
+     *
      * @group mollie_integration
      * @group requires_manual_intervention
      */
-    public function testExecute()
+    public function test_execute()
     {
         // Manually create a new refundable payment first before running this.
 

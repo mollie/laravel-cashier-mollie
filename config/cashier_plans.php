@@ -66,7 +66,7 @@ return [
             'interval' => [
                 'generator' => AdvancedIntervalGenerator::class,
                 'value' => 1,
-                'period' => 'month', /* day, month or year*/
+                'period' => 'month', /* day, month or year */
                 'monthOverflow' => true,
             ],
 
@@ -80,10 +80,10 @@ return [
          * OrderItem is processed into an OrderItem. You can use this for calculating variable costs a.k.a. metered
          * billing. Make sure the preprocessors extend the BaseOrderItemProcessor.
          */
-            //'order_item_preprocessors' => [
+            // 'order_item_preprocessors' => [
             //    ProcessCoupons::class,
             //    PersistOrderItems::class,
-            //],
+            // ],
         ],
     ],
 ];

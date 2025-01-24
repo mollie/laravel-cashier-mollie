@@ -11,9 +11,10 @@ class GetMollieMandateTest extends BaseMollieInteraction
 {
     /**
      * @test
+     *
      * @group mollie_integration
      */
-    public function testExecute()
+    public function test_execute()
     {
         /** @var \Laravel\Cashier\Mollie\GetMollieMandate $action */
         $action = $this->app->make(GetMollieMandate::class);

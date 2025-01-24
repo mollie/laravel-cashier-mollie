@@ -19,8 +19,6 @@ class RedirectToCheckoutResponse extends RedirectResponse
     protected $firstPaymentSubscriptionBuilder;
 
     /**
-     * @param  \Mollie\Api\Resources\Payment  $payment
-     * @param  array  $context
      * @return \Laravel\Cashier\SubscriptionBuilder\RedirectToCheckoutResponse
      */
     public static function forPayment(Payment $payment, array $context = [])
@@ -33,8 +31,6 @@ class RedirectToCheckoutResponse extends RedirectResponse
     }
 
     /**
-     * @param  \Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder  $builder
-     * @param  array  $context
      * @return \Laravel\Cashier\SubscriptionBuilder\RedirectToCheckoutResponse
      */
     public static function forFirstPaymentSubscriptionBuilder(FirstPaymentSubscriptionBuilder $builder, array $context = [])
@@ -64,7 +60,6 @@ class RedirectToCheckoutResponse extends RedirectResponse
     }
 
     /**
-     * @param  \Mollie\Api\Resources\Payment  $payment
      * @return \Laravel\Cashier\SubscriptionBuilder\RedirectToCheckoutResponse
      */
     protected function setPayment(Payment $payment)
@@ -75,7 +70,6 @@ class RedirectToCheckoutResponse extends RedirectResponse
     }
 
     /**
-     * @param  array  $context
      * @return $this
      */
     public function setContext(array $context)
@@ -86,7 +80,6 @@ class RedirectToCheckoutResponse extends RedirectResponse
     }
 
     /**
-     * @param  \Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder  $builder
      * @return $this
      */
     protected function setBuilder(FirstPaymentSubscriptionBuilder $builder)

@@ -9,8 +9,6 @@ use Laravel\Cashier\Events\OrderPaymentFailed;
 use Laravel\Cashier\Events\OrderPaymentPaid;
 use Laravel\Cashier\Events\SubscriptionCancelled;
 use Laravel\Cashier\Http\Controllers\WebhookController;
-use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
-use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
@@ -24,7 +22,7 @@ use Mollie\Api\Resources\Payment as MolliePayment;
 class WebhookControllerTest extends BaseTestCase
 {
     /** @test */
-    public function retrievesPaymentResource()
+    public function retrieves_payment_resource()
     {
         $payment = new MolliePayment(resolve(MollieApiClient::class));
         $payment->id = 'tr_123xyz';
@@ -35,7 +33,7 @@ class WebhookControllerTest extends BaseTestCase
     }
 
     /** @test **/
-    public function MollieApiExceptionIsCatchedWhenDebugDisabled()
+    public function mollie_api_exception_is_catched_when_debug_disabled()
     {
         $wrongId = 'sub_xxxxxxxxxxx';
         $this->withMockedGetMolliePaymentThrowingException(1, $wrongId);
@@ -45,7 +43,7 @@ class WebhookControllerTest extends BaseTestCase
     }
 
     /** @test **/
-    public function MollieApiExceptionIsThrownWhenDebugEnabled()
+    public function mollie_api_exception_is_thrown_when_debug_enabled()
     {
         $wrongId = 'sub_xxxxxxxxxxx';
         $this->withMockedGetMolliePaymentThrowingException(1, $wrongId);
@@ -57,7 +55,7 @@ class WebhookControllerTest extends BaseTestCase
     }
 
     /** @test **/
-    public function handlesUnexistingIdGracefully()
+    public function handles_unexisting_id_gracefully()
     {
         $wrongId = 'sub_xxxxxxxxxxx';
         $request = $this->getWebhookRequest($wrongId);
@@ -69,7 +67,7 @@ class WebhookControllerTest extends BaseTestCase
     }
 
     /** @test **/
-    public function handlesPaymentFailed()
+    public function handles_payment_failed()
     {
         $this->withConfiguredPlans();
         $this->withTestNow('2019-01-01');
@@ -141,7 +139,7 @@ class WebhookControllerTest extends BaseTestCase
     }
 
     /** @test **/
-    public function handlesPaymentPaid()
+    public function handles_payment_paid()
     {
         $this->withConfiguredPlans();
         Event::fake();
@@ -192,7 +190,7 @@ class WebhookControllerTest extends BaseTestCase
     }
 
     /** @test **/
-    public function skipsIfPaymentStatusUnchanged()
+    public function skips_if_payment_status_unchanged()
     {
         Event::fake();
 
@@ -226,7 +224,6 @@ class WebhookControllerTest extends BaseTestCase
     /**
      * Get a request that mimics Mollie calling the webhook.
      *
-     * @param $id
      * @return Request
      */
     protected function getWebhookRequest($id)

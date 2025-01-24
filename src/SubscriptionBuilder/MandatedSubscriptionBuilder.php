@@ -70,8 +70,6 @@ class MandatedSubscriptionBuilder implements Contract
      * Create a new subscription builder instance.
      *
      * @param  mixed  $owner
-     * @param  string  $name
-     * @param  string  $plan
      *
      * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
      */
@@ -87,7 +85,7 @@ class MandatedSubscriptionBuilder implements Contract
      * Create a new Cashier subscription.
      *
      * @return Subscription
-     * \Laravel\Cashier\Exceptions\CouponException
+     *                      \Laravel\Cashier\Exceptions\CouponException
      *
      * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
      */
@@ -141,7 +139,6 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Specify the number of days of the trial.
      *
-     * @param  int  $trialDays
      * @return $this
      */
     public function trialDays(int $trialDays)
@@ -152,7 +149,6 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Specify the ending date of the trial.
      *
-     * @param  Carbon  $trialUntil
      * @return $this
      */
     public function trialUntil(Carbon $trialUntil)
@@ -179,7 +175,6 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Specify the quantity of the subscription.
      *
-     * @param  int  $quantity
      * @return $this
      */
     public function quantity(int $quantity)
@@ -192,7 +187,6 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Specify a coupon.
      *
-     * @param  string  $coupon
      * @return $this|\Laravel\Cashier\SubscriptionBuilder\Contracts\SubscriptionBuilder
      *
      * @throws \Laravel\Cashier\Exceptions\CouponNotFoundException
@@ -209,7 +203,6 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Override the default next payment date. This is superseded by the trial end date.
      *
-     * @param  \Carbon\Carbon  $nextPaymentAt
      * @return MandatedSubscriptionBuilder
      */
     public function nextPaymentAt(Carbon $nextPaymentAt)

@@ -9,7 +9,7 @@ use Mollie\Api\Resources\Payment as MolliePayment;
 class PaymentTest extends BaseTestCase
 {
     /** @test */
-    public function canCreateFromBasicMolliePayment()
+    public function can_create_from_basic_mollie_payment()
     {
         $molliePayment = new MolliePayment(new MollieApiClient);
         $molliePayment->id = 'tr_dummy_payment_id';
@@ -36,7 +36,7 @@ class PaymentTest extends BaseTestCase
     }
 
     /** @test */
-    public function canCreateFromMolliePaymentWithRefundsAndChargebacks()
+    public function can_create_from_mollie_payment_with_refunds_and_chargebacks()
     {
         $molliePayment = new MolliePayment(new MollieApiClient);
         $molliePayment->id = 'tr_dummy_payment_id';

@@ -15,12 +15,12 @@ use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Mollie\GetMollieMethodMaximumAmount;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Mandate;
 use Mollie\Api\Resources\Payment;
 use Money\Currency;
 use Money\Money;
-use Mollie\Api\MollieApiClient;
 
 /**
  * @mixin \Laravel\Cashier\Tests\BaseTestCase
@@ -29,19 +29,18 @@ trait InteractsWithMocks
 {
     public function setUpInteractsWithMocks(): void
     {
-        if (!$this->interactWithMollieAPI) {
+        if (! $this->interactWithMollieAPI) {
             // Disable the Mollie API
             $this->mock(MollieApiClient::class, null);
         }
     }
 
     /**
-     * @param  \Laravel\Cashier\Coupon\Coupon  $coupon
      * @param  null  $couponHandler
      * @param  null  $context
      * @return CouponRepository The mocked coupon repository
      */
-    protected function withMockedCouponRepository(Coupon $coupon = null, $couponHandler = null, $context = null)
+    protected function withMockedCouponRepository(?Coupon $coupon = null, $couponHandler = null, $context = null)
     {
         if (is_null($couponHandler)) {
             $couponHandler = new FixedDiscountHandler;
@@ -71,12 +70,11 @@ trait InteractsWithMocks
     }
 
     /**
-     * @param  \Laravel\Cashier\Coupon\Coupon  $coupon
      * @param  null  $couponHandler
      * @param  null  $context
      * @return CouponRepository The mocked coupon repository
      */
-    protected function withMockedUsdCouponRepository(Coupon $coupon = null, $couponHandler = null, $context = null)
+    protected function withMockedUsdCouponRepository(?Coupon $coupon = null, $couponHandler = null, $context = null)
     {
         if (is_null($couponHandler)) {
             $couponHandler = new FixedDiscountHandler;
@@ -143,7 +141,7 @@ trait InteractsWithMocks
                 'mandateId' => 'mdt_unique_mandate_id',
                 'customerId' => 'cst_unique_customer_id',
                 'status' => 'pending',
-            ]
+            ],
         ]);
     }
 
@@ -154,7 +152,7 @@ trait InteractsWithMocks
                 'mandateId' => 'mdt_unique_mandate_id',
                 'customerId' => 'cst_unique_customer_id',
                 'status' => 'valid',
-            ]
+            ],
         ]
     ): void {
         $this->mock(GetMollieMandate::class, function ($mock) use ($times, $attributes) {

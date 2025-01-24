@@ -29,8 +29,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait Billable
 {
-    use PopulatesMollieCustomerFields;
     use ManagesCharges;
+    use PopulatesMollieCustomerFields;
 
     /**
      * Get all of the subscriptions for the billable model.
@@ -53,9 +53,9 @@ trait Billable
         return $this->subscriptions->sortByDesc(function ($value) {
             return $value->created_at->getTimestamp();
         })
-        ->first(function ($value) use ($subscription) {
-            return $value->name === $subscription;
-        });
+            ->first(function ($value) use ($subscription) {
+                return $value->name === $subscription;
+            });
     }
 
     /**
@@ -95,8 +95,6 @@ trait Billable
      * Begin creating a new subscription. The customer will always be redirected to Mollie's checkout to make the first
      * mandate payment.
      *
-     * @param $subscription
-     * @param $plan
      * @param  array  $firstPaymentOptions
      * @return \Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder
      *
@@ -157,7 +155,6 @@ trait Billable
     /**
      * Create a Mollie customer for the billable model.
      *
-     * @param  array  $override_options
      * @return Customer
      */
     public function createAsMollieCustomer(array $override_options = [])
@@ -261,8 +258,6 @@ trait Billable
 
     /**
      * Determine if the billable model has any active subscription.
-     *
-     * @return bool
      */
     public function hasActiveSubscription(): bool
     {
@@ -271,8 +266,8 @@ trait Billable
             ->whereActive()
             ->exists();
     }
+
     /**
-     * @param $plans
      * @param  string  $subscription
      * @return bool
      */
@@ -351,7 +346,6 @@ trait Billable
     /**
      * Retrieve the credit balance for the billable model for a specific currency.
      *
-     * @param $currency
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function credit($currency)
@@ -371,7 +365,6 @@ trait Billable
     /**
      * Add a credit amount for the billable model balance.
      *
-     * @param  \Money\Money  $amount
      * @return $this
      */
     public function addCredit(Money $amount)
@@ -384,7 +377,6 @@ trait Billable
     /**
      * Use this model's max amount of credit.
      *
-     * @param  \Money\Money  $amount
      * @return Money
      */
     public function maxOutCredit(Money $amount)
@@ -417,13 +409,11 @@ trait Billable
     /**
      * Create an invoice download response.
      *
-     * @param $orderId
      * @param  null|array  $data
      * @param  string  $view
-     * @param  \Dompdf\Options  $options
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function downloadInvoice($orderId, $data = [], $view = Invoice::DEFAULT_VIEW, Options $options = null)
+    public function downloadInvoice($orderId, $data = [], $view = Invoice::DEFAULT_VIEW, ?Options $options = null)
     {
         /** @var Order $order */
         $order = $this->orders()->where('id', $orderId)->firstOrFail();
@@ -507,7 +497,7 @@ trait Billable
     public function validateMollieMandate()
     {
         if ($this->pendingMollieMandate()) {
-            throw new MandateIsNotYetFinalizedException();
+            throw new MandateIsNotYetFinalizedException;
         }
 
         if ($this->validMollieMandate()) {
@@ -526,7 +516,7 @@ trait Billable
      */
     public function guardMollieMandate()
     {
-        throw_unless($this->validateMollieMandate(), new InvalidMandateException());
+        throw_unless($this->validateMollieMandate(), new InvalidMandateException);
 
         return true;
     }
@@ -607,7 +597,6 @@ trait Billable
     /**
      * Find an invoice using an order number.
      *
-     * @param $orderNumber
      * @return \Laravel\Cashier\Order\Invoice|null
      *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
@@ -631,7 +620,6 @@ trait Billable
     /**
      * Find an invoice using an order number or throw a NotFoundHttpException.
      *
-     * @param $orderNumber
      * @return \Laravel\Cashier\Order\Invoice
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -651,7 +639,6 @@ trait Billable
     /**
      * Find an invoice by order id.
      *
-     * @param $orderId
      * @return \Laravel\Cashier\Order\Invoice|null
      *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
@@ -673,7 +660,6 @@ trait Billable
     }
 
     /**
-     * @param $orderId
      * @return \Laravel\Cashier\Order\Invoice
      *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
