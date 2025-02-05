@@ -104,4 +104,34 @@ class SyncSubscriptionPlansTest extends BaseTestCase
         $this->assertEquals($oldPlanPrice->getAmount(), $orderItem->unit_price);
         $this->assertEquals($oldDescription, $orderItem->description);
     }
+
+    /** @test */
+    public function it_skips_non_subscription_order_items()
+    {
+        // Create a generic order item
+        $orderItem = OrderItem::create([
+            'process_at' => now(),
+            'orderable_type' => 'App\\Models\\Product', // Some non-subscription model
+            'orderable_id' => 1,
+            'owner_type' => 'App\\Models\\User',
+            'owner_id' => 1,
+            'currency' => 'EUR',
+            'unit_price' => 1000,
+            'quantity' => 1,
+            'tax_percentage' => 21.0,
+            'description' => 'Generic product',
+        ]);
+
+        $this->mock(\Laravel\Cashier\Plan\Contracts\PlanRepository::class)
+            ->shouldReceive('findOrFail')
+            ->never(); // Plan repository should never be called
+
+        // Run the command
+        $this->artisan(SyncSubscriptionPlans::class);
+
+        // Assert the order item was not updated
+        $orderItem->refresh();
+        $this->assertEquals(1000, $orderItem->unit_price);
+        $this->assertEquals('Generic product', $orderItem->description);
+    }
 }
