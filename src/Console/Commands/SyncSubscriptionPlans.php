@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Console\Commands;
 
 use Illuminate\Console\Command;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Plan\Contracts\PlanRepository;
 use Laravel\Cashier\Plan\Plan;
@@ -32,21 +33,15 @@ class SyncSubscriptionPlans extends Command
     public function handle(PlanRepository $planRepository)
     {
         $query = OrderItem::query()
+            ->unprocessed()
             ->with('orderable')
-            ->whereNull('processed_at')
-            ->whereNotNull('orderable_type') // Support default model overrides
-            ->whereNotNull('orderable_id');
+            ->whereHasMorph('orderable', Cashier::$subscriptionModel);
 
         $countUpdated = 0;
 
         $query->chunk(100, function ($items) use ($planRepository, &$countUpdated) {
             foreach ($items as $item) {
-
-                // Skip if not a subscription order item
-                if (!($item->orderable instanceof Subscription)) {
-                    continue;
-                }
-
+                /** @var Subscription $subscription */
                 $subscription = $item->orderable;
 
                 // Get the current plan price
