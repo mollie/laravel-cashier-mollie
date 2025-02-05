@@ -33,8 +33,8 @@ class SyncSubscriptionPlans extends Command
     public function handle(PlanRepository $planRepository)
     {
         $query = OrderItem::query()
+            ->with('orderable')    
             ->unprocessed()
-            ->with('orderable')
             ->whereHasMorph('orderable', Cashier::$subscriptionModel);
 
         $countUpdated = 0;
