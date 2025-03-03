@@ -589,4 +589,52 @@ class SubscriptionTest extends BaseTestCase
         $this->assertEquals(1, Subscription::whereRecurring()->count());
         $this->assertEquals(2, Subscription::whereNotRecurring()->count());
     }
+
+    /** @test */
+    public function halfwayThroughSubscriptionReturnsPositiveReimbursementAmount()
+    {
+        $this->withConfiguredPlans();
+
+        $subscriptionHalfWayThrough = SubscriptionFactory::new()
+            ->has(
+                OrderItemFactory::new(['unit_price' => 100])
+                    ->processed()
+                    ->withOrder()
+                    ->EUR(),
+                'scheduledOrderItem'
+            )
+            ->create([
+                'cycle_started_at' => now()->subDays(20),
+                'cycle_ends_at' => now()->addDays(20),
+            ]);
+
+        $this->assertEquals(
+            money('-50', 'EUR'),
+            $subscriptionHalfWayThrough->getReimbursableAmountForUnusedTime()
+        );
+    }
+
+    /** @test */
+    public function nonReimbursableSubscriptionReturnsNoReimbursementAmount()
+    {
+        $this->withConfiguredPlans();
+
+        $nonReimbursable = SubscriptionFactory::new()
+            ->has(
+                OrderItemFactory::new(['unit_price' => 100])
+                    ->processed()
+                    ->withOrder()
+                    ->EUR(),
+                'scheduledOrderItem'
+            )
+            ->create([
+                'cycle_started_at' => now()->subMonth(),
+                'cycle_ends_at' => now()->subDay(),
+            ]);
+
+        $this->assertEquals(
+            money(0, 'EUR'),
+            $nonReimbursable->getReimbursableAmountForUnusedTime()
+        );
+    }
 }
