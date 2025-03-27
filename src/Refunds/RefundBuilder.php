@@ -15,19 +15,10 @@ use Mollie\Api\Types\PaymentStatus;
 
 class RefundBuilder
 {
-    /**
-     * @var \Laravel\Cashier\Order\Order
-     */
     protected Order $order;
 
-    /**
-     * @var \Laravel\Cashier\Refunds\RefundItemCollection
-     */
     protected RefundItemCollection $items;
 
-    /**
-     * @var CreateMollieRefund
-     */
     protected CreateMollieRefund $createMollieRefund;
 
     public function __construct(Order $order)

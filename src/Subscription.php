@@ -46,8 +46,9 @@ use Money\Money;
  * @property float cycle_progress
  * @property float cycle_left
  * @property string $currency
+ * @property array|null metadata
  */
-class Subscription extends Model implements InteractsWithOrderItems, PreprocessesOrderItems, AcceptsCoupons, IsRefundable
+class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderItems, IsRefundable, PreprocessesOrderItems
 {
     use HasOwner;
 
@@ -68,6 +69,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
         'cycle_started_at' => 'datetime',
         'cycle_ends_at' => 'datetime',
         'ends_at' => 'datetime',
+        'metadata' => 'array',
     ];
 
     /**
@@ -168,7 +170,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public function ended()
     {
-        return $this->cancelled() && !$this->onGracePeriod();
+        return $this->cancelled() && ! $this->onGracePeriod();
     }
 
     /**
@@ -198,7 +200,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public function recurring()
     {
-        return !$this->onTrial() && !$this->cancelled();
+        return ! $this->onTrial() && ! $this->cancelled();
     }
 
     /**
@@ -208,7 +210,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public function cancelled()
     {
-        return !is_null($this->ends_at);
+        return ! is_null($this->ends_at);
     }
 
     /**
@@ -245,8 +247,6 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      * Helper function to determine the current billing cycle inverted progress ratio.
      * Ranging from 0 (completed) to 1 (not yet started).
      *
-     * @param  \Carbon\Carbon|null  $now
-     * @param  int|null  $precision
      * @return float
      */
     public function getCycleLeftAttribute(?Carbon $now = null, ?int $precision = 5)
@@ -258,7 +258,6 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      * Swap the subscription to another plan right now by ending the current billing cycle and starting a new one.
      * A new Order is processed along with the payment.
      *
-     * @param  string  $plan
      * @param  bool  $invoiceNow
      * @return $this
      */
@@ -298,7 +297,6 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     /**
      * Schedule this subscription to be swapped to another plan once the current cycle has completed.
      *
-     * @param  string  $plan
      * @return $this
      */
     public function swapNextCycle(string $plan)
@@ -346,7 +344,6 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     /**
      * Cancel the subscription at the date provided.
      *
-     * @param  \Carbon\Carbon  $endsAt
      * @param  string  $reason
      * @return $this
      */
@@ -412,11 +409,11 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public function resume()
     {
-        if (!$this->cancelled()) {
+        if (! $this->cancelled()) {
             throw new LogicException('Unable to resume a subscription that is not cancelled.');
         }
 
-        if (!$this->onGracePeriod()) {
+        if (! $this->onGracePeriod()) {
             throw new LogicException('Unable to resume a subscription that is not within grace period.');
         }
 
@@ -515,7 +512,6 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     /**
      * Called right before processing the order item into an order.
      *
-     * @param  OrderItem  $item
      * @return \Laravel\Cashier\Order\OrderItemCollection
      */
     public static function preprocessOrderItem(OrderItem $item)
@@ -529,7 +525,6 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     /**
      * Called after processing the order item into an order.
      *
-     * @param  OrderItem  $item
      * @return OrderItem The order item that's being processed
      */
     public static function processOrderItem(OrderItem $item)
@@ -541,7 +536,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
         $quantity_updated = false;
         $previous_quantity = null;
 
-        if (!empty($subscription->next_plan)) {
+        if (! empty($subscription->next_plan)) {
             $plan_swapped = true;
             $previousPlan = $subscription->plan;
             $subscription->plan = $subscription->next_plan;
@@ -634,9 +629,29 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     }
 
     /**
+     * Gets the amount to be reimbursed for the subscription's unused time.
+     *
+     * Result range value: (-X up to 0)
+     */
+    public function getReimbursableAmountForUnusedTime(?Carbon $now = null): Money
+    {
+        $now = $now ?: now();
+
+        if ($this->onTrial()) {
+            return $this->zero();
+        }
+        if (round($this->getCycleLeftAttribute($now), 5) == 0) {
+            return $this->zero();
+        }
+
+        return $this->reimbursableAmount()
+            ->negative()
+            ->multiply(sprintf('%.8F', $this->getCycleLeftAttribute($now)));
+    }
+
+    /**
      * Handle a failed payment.
      *
-     * @param  \Laravel\Cashier\Order\OrderItem  $item
      * @return void
      */
     public static function handlePaymentFailed(OrderItem $item)
@@ -651,7 +666,6 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     /**
      * Handle a paid payment.
      *
-     * @param  \Laravel\Cashier\Order\OrderItem  $item
      * @return void
      */
     public static function handlePaymentPaid(OrderItem $item)
@@ -686,7 +700,6 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     /**
      * Increment the quantity of the subscription.
      *
-     * @param  int  $count
      * @param  bool  $invoiceNow
      * @return \Laravel\Cashier\Subscription
      *
@@ -713,7 +726,6 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     /**
      * Decrement the quantity of the subscription.
      *
-     * @param  int  $count
      * @param  bool  $invoiceNow
      * @return \Laravel\Cashier\Subscription
      *
@@ -727,7 +739,6 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     /**
      * Update the quantity of the subscription.
      *
-     * @param  int  $quantity
      * @param  bool  $invoiceNow
      * @return $this
      *
@@ -800,8 +811,6 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     }
 
     /**
-     * @param  \Money\Money  $amount
-     * @param  array  $overrides
      * @return OrderItem
      */
     protected function reimburse(Money $amount, array $overrides = [])
@@ -823,12 +832,10 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     protected function reimbursableAmount()
     {
-        $zeroAmount = new Money('0.00', new Currency($this->currency));
-
         // Determine base amount eligible to reimburse
         $latestProcessedOrderItem = $this->latestProcessedOrderItem();
-        if (!$latestProcessedOrderItem) {
-            return $zeroAmount;
+        if (! $latestProcessedOrderItem) {
+            return $this->zero();
         }
 
         $reimbursableAmount = $latestProcessedOrderItem->getTotal()
@@ -862,14 +869,13 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
 
         // Guard against a negative value
         if ($reimbursableAmount->isNegative()) {
-            return $zeroAmount;
+            return $this->zero();
         }
 
         return $reimbursableAmount;
     }
 
     /**
-     * @param  \Carbon\Carbon|null  $now
      * @return null|\Laravel\Cashier\Order\OrderItem
      */
     protected function reimburseUnusedTime(?Carbon $now = null)
@@ -897,8 +903,6 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     /**
      * Wrap up the current billing cycle, apply modifications to this subscription and start a new cycle.
      *
-     * @param  \Closure  $applyNewSettings
-     * @param  \Carbon\Carbon|null  $now
      * @param  bool  $invoiceNow
      * @return \Laravel\Cashier\Subscription
      */
@@ -935,7 +939,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
 
             $this->save();
 
-            if (!$onTrial && $invoiceNow) {
+            if (! $onTrial && $invoiceNow) {
                 $order = Cashier::$orderModel::createFromItems($orderItems);
                 $order->processPayment();
             }
@@ -947,14 +951,12 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     /**
      * Wrap up the current billing cycle and start a new cycle.
      *
-     * @param  \Carbon\Carbon|null  $now
      * @param  bool  $invoiceNow
      * @return \Laravel\Cashier\Subscription
      */
     public function restartCycle(?Carbon $now = null, $invoiceNow = true)
     {
-        return $this->restartCycleWithModifications(function () {
-        }, $now, $invoiceNow);
+        return $this->restartCycleWithModifications(function () {}, $now, $invoiceNow);
     }
 
     /**
@@ -1001,5 +1003,10 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
     public function latestProcessedOrderItem()
     {
         return $this->orderItems()->processed()->orderByDesc('process_at')->first();
+    }
+
+    private function zero(): Money
+    {
+        return new Money('0.00', new Currency($this->currency));
     }
 }

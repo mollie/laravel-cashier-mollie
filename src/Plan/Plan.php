@@ -85,8 +85,6 @@ class Plan implements PlanContract
 
     /**
      * Plan constructor.
-     *
-     * @param  string  $name
      */
     public function __construct(string $name)
     {
@@ -103,7 +101,6 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  string  $name
      * @return $this
      */
     public function setName(string $name)
@@ -122,7 +119,6 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  \Money\Money  $amount
      * @return $this
      */
     public function setAmount(Money $amount)
@@ -141,7 +137,6 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  string  $description
      * @return $this
      */
     public function setDescription(string $description)
@@ -181,7 +176,6 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  \Money\Money  $firstPaymentAmount
      * @return $this
      */
     public function setFirstPaymentAmount(Money $firstPaymentAmount)
@@ -202,7 +196,6 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  string  $firstPaymentDescription
      * @return $this
      */
     public function setFirstPaymentDescription(string $firstPaymentDescription)
@@ -240,7 +233,6 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  string  $redirectUrl
      * @return $this
      */
     public function setFirstPaymentRedirectUrl(string $redirectUrl)
@@ -259,7 +251,6 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  string  $webhookUrl
      * @return PlanContract
      */
     public function setFirstPaymentWebhookUrl(string $webhookUrl)
@@ -278,7 +269,6 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  \Laravel\Cashier\Order\OrderItemPreprocessorCollection  $preprocessors
      * @return \Laravel\Cashier\Plan\Contracts\Plan
      */
     public function setOrderItemPreprocessors(OrderItemPreprocessorCollection $preprocessors)

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSubscriptionsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -28,6 +28,7 @@ class CreateSubscriptionsTable extends Migration
             $table->datetime('cycle_started_at');
             $table->datetime('cycle_ends_at')->nullable();
             $table->unsignedBigInteger('scheduled_order_item_id')->nullable();
+            $table->text('metadata')->nullable();
             $table->timestamps();
         });
     }
@@ -41,4 +42,4 @@ class CreateSubscriptionsTable extends Migration
     {
         Schema::dropIfExists('subscriptions');
     }
-}
+};

@@ -45,9 +45,6 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     /**
      * Create a new subscription builder instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
-     * @param  string  $name
-     * @param  string  $plan
      *
      * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
      */
@@ -67,8 +64,6 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     }
 
     /**
-     * @param  array  $payload
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @return static
      *
      * @throws \Exception
@@ -207,7 +202,6 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     /**
      * Specify the number of days of the trial.
      *
-     * @param  int  $trialDays
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
@@ -225,7 +219,6 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     /**
      * Specify the ending date of the trial.
      *
-     * @param  Carbon  $trialUntil
      * @return $this
      */
     public function trialUntil(Carbon $trialUntil)
@@ -255,7 +248,6 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     /**
      * Specify the quantity of the subscription.
      *
-     * @param  int  $quantity
      * @return $this
      *
      * @throws \Throwable|\LogicException
@@ -280,7 +272,6 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     /**
      * Specify and validate the coupon code.
      *
-     * @param  string  $coupon
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\CouponNotFoundException
@@ -297,7 +288,6 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
     /**
      * Override the default next payment date.
      *
-     * @param  \Carbon\Carbon  $nextPaymentAt
      * @return $this
      */
     public function nextPaymentAt(Carbon $nextPaymentAt)

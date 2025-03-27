@@ -74,4 +74,11 @@ class OrderItemFactory extends Factory
             'currency' => 'USD',
         ]);
     }
+
+    public function withOrder(): self
+    {
+        return $this->state(fn () => [
+            'order_id' => OrderFactory::new(),
+        ]);
+    }
 }

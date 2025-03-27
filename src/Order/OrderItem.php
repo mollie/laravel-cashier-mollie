@@ -25,15 +25,16 @@ use Laravel\Cashier\Traits\HasOwner;
  * @property mixed $id
  * @property Order $order
  * @property mixed $order_id
+ * @property array|null metadata
  *
  * @method static create(array $array)
  * @method static make(array $array)
  */
 class OrderItem extends Model implements InvoicableItem
 {
-    use HasOwner;
-    use FormatsAmount;
     use ConvertsToMoney;
+    use FormatsAmount;
+    use HasOwner;
 
     /**
      * The attributes that should be cast to native types.
@@ -47,6 +48,7 @@ class OrderItem extends Model implements InvoicableItem
         'tax_percentage' => 'float',
         'orderable_id' => 'int',
         'process_at' => 'datetime',
+        'metadata' => 'array',
     ];
 
     protected $guarded = [];
@@ -110,13 +112,12 @@ class OrderItem extends Model implements InvoicableItem
     /**
      * Scope the query to only include unprocessed order items.
      *
-     * @param $query
      * @param  bool  $processed
      * @return Builder
      */
     public function scopeProcessed($query, $processed = true)
     {
-        if (!$processed) {
+        if (! $processed) {
             return $query->whereNull('order_id');
         }
 
@@ -124,22 +125,31 @@ class OrderItem extends Model implements InvoicableItem
     }
 
     /**
+     * Scope the query to only include scheduled order items.
+     *
+     * @param  bool  $processed
+     * @return Builder
+     */
+    public function scopeScheduled($query)
+    {
+        return $query->processed(false);
+    }
+
+    /**
      * Scope the query to only include unprocessed order items.
      *
-     * @param $query
      * @param  bool  $unprocessed
      * @return Builder
      */
     public function scopeUnprocessed($query, $unprocessed = true)
     {
-        return $query->processed(!$unprocessed);
+        return $query->processed(! $unprocessed);
     }
 
     /**
      * Limits the query to Order Items that are past the process_at date.
      * This includes both processed and unprocessed items.
      *
-     * @param $query
      * @return mixed
      */
     public function scopeDue($query)
@@ -151,7 +161,6 @@ class OrderItem extends Model implements InvoicableItem
      * Limits the query to Order Items that are ready to be processed.
      * This includes items that are both unprocessed and due.
      *
-     * @param $query
      * @return mixed
      */
     public function scopeShouldProcess($query)
@@ -162,7 +171,6 @@ class OrderItem extends Model implements InvoicableItem
     /**
      * Create a new Eloquent Collection instance.
      *
-     * @param  array  $models
      * @return OrderItemCollection
      */
     public function newCollection(array $models = [])
@@ -324,7 +332,6 @@ class OrderItem extends Model implements InvoicableItem
      * Handle a payment refund on the order item.
      * Invokes handlePaymentRefunded on the orderable model.
      *
-     * @param  \Laravel\Cashier\Refunds\RefundItem  $refundItem
      * @return $this
      */
     public function handlePaymentRefunded(RefundItem $refundItem)
@@ -343,7 +350,6 @@ class OrderItem extends Model implements InvoicableItem
      * Handle a failed payment refund on the order item.
      * Invokes handlePaymentRefundFailed on the orderable model.
      *
-     * @param  \Laravel\Cashier\Refunds\RefundItem  $refundItem
      * @return $this
      */
     public function handlePaymentRefundFailed(RefundItem $refundItem)

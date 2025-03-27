@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier\Tests\Coupon;
 
-use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\Coupon\Coupon;
 use Laravel\Cashier\Coupon\CouponOrderItemPreprocessor;
@@ -15,7 +14,7 @@ use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 class PercentageCouponTest extends BaseTestCase
 {
     /** @test */
-    public function couponCalculatesTheRightPrice()
+    public function coupon_calculates_the_right_price()
     {
         $couponHandler = new PercentageDiscountHandler;
 
@@ -40,7 +39,7 @@ class PercentageCouponTest extends BaseTestCase
         /** @var \Laravel\Cashier\Coupon\Coupon $coupon */
         $coupon = app()->make(CouponRepository::class)->findOrFail('percentage-coupon');
         $redeemedCoupon = $coupon->redeemFor($subscription);
-        $preprocessor = new CouponOrderItemPreprocessor();
+        $preprocessor = new CouponOrderItemPreprocessor;
 
         $result = $preprocessor->handle($item->toCollection());
 

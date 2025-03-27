@@ -23,8 +23,6 @@ class FirstPaymentHandler
 
     /**
      * FirstPaymentHandler constructor.
-     *
-     * @param  \Mollie\Api\Resources\Payment  $molliePayment
      */
     public function __construct(MolliePayment $molliePayment)
     {
@@ -119,7 +117,7 @@ class FirstPaymentHandler
      */
     protected function executeActions()
     {
-        $orderItems = new OrderItemCollection();
+        $orderItems = new OrderItemCollection;
 
         $this->actions->each(function (BaseAction $action) use (&$orderItems) {
             $orderItems = $orderItems->concat($action->execute());
