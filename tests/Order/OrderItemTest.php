@@ -139,4 +139,12 @@ class OrderItemTest extends BaseTestCase
         $this->assertTrue($processedItem->isProcessed());
         $this->assertFalse($processedItem->isProcessed(false));
     }
+
+    public function test_scope_scheduled()
+    {
+        OrderItemFactory::new()->times(3)->create(['order_id' => null]);
+        OrderItemFactory::new()->times(3)->create(['order_id' => 1]);
+
+        $this->assertEquals(3, Cashier::$orderItemModel::scheduled()->count());
+    }
 }

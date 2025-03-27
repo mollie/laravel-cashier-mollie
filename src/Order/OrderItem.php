@@ -125,6 +125,17 @@ class OrderItem extends Model implements InvoicableItem
     }
 
     /**
+     * Scope the query to only include scheduled order items.
+     *
+     * @param  bool  $processed
+     * @return Builder
+     */
+    public function scopeScheduled($query)
+    {
+        return $query->processed(false);
+    }
+
+    /**
      * Scope the query to only include unprocessed order items.
      *
      * @param  bool  $unprocessed
