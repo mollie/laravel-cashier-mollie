@@ -467,12 +467,10 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
      *
      * @param  Carbon|null  $process_at
      * @param  array  $item_overrides
-     * @param  bool  $fill_link Indicates whether scheduled_order_item_id field should be filled to point to the newly scheduled order item
-     * @param  \Laravel\Cashier\Plan\Contracts\Plan  $plan
-     * @param  int $quantity
+     * @param  bool  $fill_link  Indicates whether scheduled_order_item_id field should be filled to point to the newly scheduled order item
      * @return \Illuminate\Database\Eloquent\Model|\Laravel\Cashier\Order\OrderItem
      */
-    public function scheduleNewOrderItemAt(Carbon $process_at, $item_overrides = [], $fill_link = true, Plan $plan = null, int $quantity = null)
+    public function scheduleNewOrderItemAt(Carbon $process_at, $item_overrides = [], $fill_link = true, ?Plan $plan = null, ?int $quantity = null)
     {
         if ($this->scheduled_order_item_id) {
             throw new LogicException('Cannot schedule a new subscription order item if there is already one scheduled.');
@@ -482,7 +480,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
             $plan = $this->plan();
         }
 
-        if (!$quantity) {
+        if (! $quantity) {
             $quantity = $this->quantity;
         }
 
@@ -543,7 +541,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
             $subscription->next_plan = null;
         }
 
-        if (!empty($subscription->next_quantity)) {
+        if (! empty($subscription->next_quantity)) {
             $quantity_updated = true;
             $previous_quantity = $subscription->quantity;
             $subscription->quantity = $subscription->next_quantity;
@@ -767,7 +765,6 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
     /**
      * Schedule this subscription's quantity to be changed once the current cycle has completed.
      *
-     * @param  int  $quantity
      * @return $this
      */
     public function updateQuantityNextCycle(int $quantity)
@@ -776,6 +773,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
             $quantity < 1,
             new LogicException('Subscription quantity must be at least 1.')
         );
+
         return DB::transaction(function () use ($quantity) {
             if ($this->cancelled()) {
                 $this->cycle_ends_at = $this->ends_at;

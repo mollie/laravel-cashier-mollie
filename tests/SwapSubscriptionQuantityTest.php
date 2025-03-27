@@ -21,7 +21,7 @@ class SwapSubscriptionQuantityTest extends BaseTestCase
     }
 
     /** @test */
-    public function canChangeQuantityNextCycle()
+    public function can_change_quantity_next_cycle()
     {
         $user = $this->getUserWithZeroBalance();
         $subscription = $this->getSubscriptionForUser($user);
@@ -69,7 +69,7 @@ class SwapSubscriptionQuantityTest extends BaseTestCase
     }
 
     /** @test */
-    public function canChangeQuantityAndPlanNextCycle()
+    public function can_change_quantity_and_plan_next_cycle()
     {
         $user = $this->getUserWithZeroBalance();
         $subscription = $this->getSubscriptionForUser($user);
@@ -110,7 +110,6 @@ class SwapSubscriptionQuantityTest extends BaseTestCase
         Event::assertNotDispatched(SubscriptionQuantityUpdated::class);
         Event::assertNotDispatched(SubscriptionPlanSwapped::class);
 
-
         Subscription::processOrderItem($new_order_item);
 
         $subscription = $subscription->fresh();
@@ -137,7 +136,7 @@ class SwapSubscriptionQuantityTest extends BaseTestCase
     }
 
     /** @test */
-    public function canSwapPlanAndChangeQuantityNextCycle()
+    public function can_swap_plan_and_change_quantity_next_cycle()
     {
         $user = $this->getUserWithZeroBalance();
         $subscription = $this->getSubscriptionForUser($user);
@@ -178,7 +177,6 @@ class SwapSubscriptionQuantityTest extends BaseTestCase
         Event::assertNotDispatched(SubscriptionQuantityUpdated::class);
         Event::assertNotDispatched(SubscriptionPlanSwapped::class);
 
-
         Subscription::processOrderItem($new_order_item);
 
         $subscription = $subscription->fresh();
@@ -205,7 +203,7 @@ class SwapSubscriptionQuantityTest extends BaseTestCase
     }
 
     /** @test */
-    public function changeQuantityNextCycleIllegalArguments()
+    public function change_quantity_next_cycle_illegal_arguments()
     {
         $user = $this->getUserWithZeroBalance();
         $subscription = $this->getSubscriptionForUser($user);
@@ -214,7 +212,7 @@ class SwapSubscriptionQuantityTest extends BaseTestCase
         $this->assertTrue($subscription->scheduledOrderItem->is($original_order_item));
 
         // Swap to new plan
-        $this->assertThrows(fn() => $subscription->updateQuantityNextCycle(0)->fresh(), LogicException::class);
+        $this->assertThrows(fn () => $subscription->updateQuantityNextCycle(0)->fresh(), LogicException::class);
 
         $this->assertEquals(1, $subscription->quantity);
         $this->assertNull($subscription->next_quantity);
@@ -244,7 +242,6 @@ class SwapSubscriptionQuantityTest extends BaseTestCase
     }
 
     /**
-     * @param $user
      * @return Subscription
      */
     protected function getSubscriptionForUser($user)
@@ -259,4 +256,3 @@ class SwapSubscriptionQuantityTest extends BaseTestCase
         ]));
     }
 }
-
