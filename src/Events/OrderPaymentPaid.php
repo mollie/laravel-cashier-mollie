@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier\Events;
 
-
 class OrderPaymentPaid extends BaseEvent
 {
     /**

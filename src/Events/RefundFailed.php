@@ -8,7 +8,6 @@ use Laravel\Cashier\Refunds\Refund;
 
 class RefundFailed extends BaseEvent
 {
-
     public Refund $refund;
 
     public function __construct(Refund $refund)

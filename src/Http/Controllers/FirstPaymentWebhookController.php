@@ -13,9 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 class FirstPaymentWebhookController extends BaseWebhookController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return Response
-     *
      * @throws \Mollie\Api\Exceptions\ApiException Only in debug mode
      */
     public function handleWebhook(Request $request): Response

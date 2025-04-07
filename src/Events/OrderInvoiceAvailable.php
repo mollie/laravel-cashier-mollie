@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier\Events;
 
-
 class OrderInvoiceAvailable extends BaseEvent
 {
     /**

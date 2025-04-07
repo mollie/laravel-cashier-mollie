@@ -61,6 +61,7 @@ abstract class BaseTestCase extends TestCase
             self::MIGRATIONS_PATH.'/create_payments_table.php.stub',
             self::MIGRATIONS_PATH.'/create_refund_items_table.php.stub',
             self::MIGRATIONS_PATH.'/create_refunds_table.php.stub',
+            self::MIGRATIONS_PATH.'/create_event_log_table.php.stub',
         ]);
 
         $migrations->each(function ($file_path) {

@@ -13,9 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 class WebhookController extends BaseWebhookController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return Response
-     *
      * @throws \Mollie\Api\Exceptions\ApiException Only in debug mode
      */
     public function handleWebhook(Request $request): Response
@@ -49,10 +46,6 @@ class WebhookController extends BaseWebhookController
         return new Response(null, 200);
     }
 
-    /**
-     * @param \Mollie\Api\Resources\Payment $payment
-     * @return \Laravel\Cashier\Order\Order|null
-     */
     protected function getOrder(Payment $payment): ?Order
     {
         /** @var Order $order */

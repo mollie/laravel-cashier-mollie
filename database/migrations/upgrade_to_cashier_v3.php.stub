@@ -55,8 +55,8 @@ return new class extends Migration
             $table->string('cashier_version');
             $table->string('orderable_type')->nullable();
             $table->unsignedBigInteger('orderable_id')->nullable();
-            $table->string('owner_type')->nullable();
-            $table->unsignedBigInteger('owner_id')->nullable();
+            $table->string('billable_type')->nullable();
+            $table->unsignedBigInteger('billable_id')->nullable();
             $table->text('context')->nullable();
             $table->timestamps();
         });

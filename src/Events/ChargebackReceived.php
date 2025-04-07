@@ -9,7 +9,6 @@ use Money\Money;
 
 class ChargebackReceived extends BaseEvent
 {
-
     public Payment $payment;
 
     public Money $amountChargedBack;

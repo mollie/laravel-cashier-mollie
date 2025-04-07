@@ -6,6 +6,7 @@ namespace Laravel\Cashier\EventLog;
 
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\EventLog\Contracts\Loggable;
+
 use function json_encode;
 use function optional;
 
@@ -21,13 +22,14 @@ use function optional;
 class EventLog extends Model
 {
     protected $table = 'event_log';
+
     protected $guarded = [];
 
     protected $casts = [
         'context' => 'array',
     ];
 
-    static public function log(Loggable $event): void
+    public static function log(Loggable $event): void
     {
         $result = new static;
 

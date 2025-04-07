@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Laravel\Cashier\EventLog;
 
 use Illuminate\Support\Facades\Log;
-use Laravel\Cashier\EventLog\Contracts\Loggable;
 use Laravel\Cashier\EventLog\Contracts\EventLogger;
+use Laravel\Cashier\EventLog\Contracts\Loggable;
 
 class FacadeLogger implements EventLogger
 {

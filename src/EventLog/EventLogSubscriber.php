@@ -43,7 +43,7 @@ class EventLogSubscriber
 
     public function handle(Loggable $event): void
     {
-        /** @var  $logger \Laravel\Cashier\EventLog\Contracts\EventLogger */
+        /** @var $logger \Laravel\Cashier\EventLog\Contracts\EventLogger */
         $logger = app(EventLogger::class);
 
         $logger->log($event);

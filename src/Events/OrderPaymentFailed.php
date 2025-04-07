@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier\Events;
 
-
 class OrderPaymentFailed extends BaseEvent
 {
     /**
