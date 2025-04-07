@@ -4,6 +4,7 @@ namespace Laravel\Cashier;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Cashier\EventLog\EventLogSubscriber;
 use Laravel\Cashier\Order\OrderInvoiceSubscriber;
 
 class EventServiceProvider extends ServiceProvider
@@ -14,6 +15,7 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $subscribe = [
+        EventLogSubscriber::class,
         OrderInvoiceSubscriber::class,
     ];
 

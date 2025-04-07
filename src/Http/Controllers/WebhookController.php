@@ -5,6 +5,7 @@ namespace Laravel\Cashier\Http\Controllers;
 use Illuminate\Http\Request;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
+use Laravel\Cashier\Order\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentStatus;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,11 +13,12 @@ use Symfony\Component\HttpFoundation\Response;
 class WebhookController extends BaseWebhookController
 {
     /**
+     * @param \Illuminate\Http\Request $request
      * @return Response
      *
      * @throws \Mollie\Api\Exceptions\ApiException Only in debug mode
      */
-    public function handleWebhook(Request $request)
+    public function handleWebhook(Request $request): Response
     {
         $payment = $this->getMolliePaymentById($request->get('id'));
 
@@ -48,13 +50,15 @@ class WebhookController extends BaseWebhookController
     }
 
     /**
+     * @param \Mollie\Api\Resources\Payment $payment
      * @return \Laravel\Cashier\Order\Order|null
      */
-    protected function getOrder(Payment $payment)
+    protected function getOrder(Payment $payment): ?Order
     {
+        /** @var Order $order */
         $order = Cashier::$orderModel::findByMolliePaymentId($payment->id);
 
-        if (! $order && isset($payment->metadata, $payment->metadata->temporary_mollie_payment_id)) {
+        if (! $order && isset($payment->metadata->temporary_mollie_payment_id)) {
             $order = Cashier::$orderModel::findByMolliePaymentId($payment->metadata->temporary_mollie_payment_id);
 
             if ($order) {

@@ -26,6 +26,7 @@ return new class extends Migration
     public function up(): void
     {
         $this->addMetadataFieldToTables(self::METADATA_FIELD_TABLES);
+        $this->createEventLogTable();
     }
 
     /**
@@ -36,6 +37,7 @@ return new class extends Migration
     public function down(): void
     {
         $this->dropMetadataFieldFromTables(self::METADATA_FIELD_TABLES);
+        $this->dropEventLogTable();
     }
 
     protected function addMetadataFieldToTables(array $tables): void
@@ -45,10 +47,30 @@ return new class extends Migration
         }));
     }
 
+    protected function createEventLogTable(): void
+    {
+        Schema::create('event_log', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('event');
+            $table->string('cashier_version');
+            $table->string('orderable_type')->nullable();
+            $table->unsignedBigInteger('orderable_id')->nullable();
+            $table->string('owner_type')->nullable();
+            $table->unsignedBigInteger('owner_id')->nullable();
+            $table->text('context')->nullable();
+            $table->timestamps();
+        });
+    }
+
     protected function dropMetadataFieldFromTables(array $tables): void
     {
         collect($tables)->each(fn($table) => Schema::table($table, function (Blueprint $table) {
             $table->dropColumn('metadata');
         }));
+    }
+
+    protected function dropEventLogTable(): void
+    {
+        Schema::dropIfExists('event_log');
     }
 };

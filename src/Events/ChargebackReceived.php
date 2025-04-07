@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Laravel\Cashier\Events;
 
-use Illuminate\Queue\SerializesModels;
 use Laravel\Cashier\Payment;
 use Money\Money;
 
-class ChargebackReceived
+class ChargebackReceived extends BaseEvent
 {
-    use SerializesModels;
 
     public Payment $payment;
 

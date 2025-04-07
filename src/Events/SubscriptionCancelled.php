@@ -2,13 +2,10 @@
 
 namespace Laravel\Cashier\Events;
 
-use Illuminate\Queue\SerializesModels;
 use Laravel\Cashier\Subscription;
 
-class SubscriptionCancelled
+class SubscriptionCancelled extends BaseEvent
 {
-    use SerializesModels;
-
     /**
      * The canceled subscription.
      *

@@ -9,10 +9,7 @@ class RedirectToCheckoutResponse extends RedirectResponse
 {
     protected Payment $payment;
 
-    /**
-     * @return \Laravel\Cashier\Http\RedirectToCheckoutResponse
-     */
-    public static function forPayment(Payment $payment, array $context = [])
+    public static function forPayment(Payment $payment, array $context = []): static
     {
         $response = new static($payment->getCheckoutUrl());
 
@@ -20,18 +17,12 @@ class RedirectToCheckoutResponse extends RedirectResponse
             ->setPayment($payment);
     }
 
-    /**
-     * @return \Mollie\Api\Resources\Payment
-     */
-    public function payment()
+    public function payment(): Payment
     {
         return $this->payment;
     }
 
-    /**
-     * @return \Laravel\Cashier\Http\RedirectToCheckoutResponse
-     */
-    protected function setPayment(Payment $payment)
+    protected function setPayment(Payment $payment): self
     {
         $this->payment = $payment;
 

@@ -2,13 +2,10 @@
 
 namespace Laravel\Cashier\Events;
 
-use Illuminate\Queue\SerializesModels;
 use Mollie\Api\Resources\Payment;
 
-class FirstPaymentFailed
+class FirstPaymentFailed extends BaseEvent
 {
-    use SerializesModels;
-
     /**
      * @var \Mollie\Api\Resources\Payment
      */

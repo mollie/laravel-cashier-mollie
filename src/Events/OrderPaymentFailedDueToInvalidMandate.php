@@ -2,12 +2,8 @@
 
 namespace Laravel\Cashier\Events;
 
-use Illuminate\Queue\SerializesModels;
-
-class OrderPaymentFailedDueToInvalidMandate
+class OrderPaymentFailedDueToInvalidMandate extends BaseEvent
 {
-    use SerializesModels;
-
     /**
      * The failed order.
      *

@@ -3,13 +3,10 @@
 namespace Laravel\Cashier\Events;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Queue\SerializesModels;
 use Mollie\Api\Resources\Payment;
 
-class MandateUpdated
+class MandateUpdated extends BaseEvent
 {
-    use SerializesModels;
-
     /** @var \Illuminate\Database\Eloquent\Model */
     public $owner;
 
