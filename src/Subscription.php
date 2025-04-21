@@ -147,7 +147,7 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      */
     public function valid()
     {
-        return $this->active() || $this->onTrial() || $this->onGracePeriod();
+        return $this->active();
     }
 
     /**
