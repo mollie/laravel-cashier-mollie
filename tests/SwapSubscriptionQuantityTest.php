@@ -238,7 +238,6 @@ class SwapSubscriptionQuantityTest extends BaseTestCase
         $subscription->cancel();
         $this->assertThrows(fn () => $subscription->updateQuantityNextCycle(3)->fresh(), LogicException::class);
 
-
         $cycle_should_have_started_at = now()->subWeeks(2);
         $cycle_should_end_at = $cycle_should_have_started_at->copy()->addMonth();
         $this->assertCarbon($cycle_should_have_started_at, $subscription->cycle_started_at);
