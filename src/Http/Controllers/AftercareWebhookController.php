@@ -40,7 +40,9 @@ class AftercareWebhookController extends BaseWebhookController
         }
 
         if ($molliePayment && $molliePayment->hasChargebacks()) {
+            /** @var \Laravel\Cashier\Payment|null $localPayment */
             $localPayment = Cashier::$paymentModel::findByPaymentId($molliePayment->id);
+
             if (!$localPayment) {
                 return $this->getNotFoundResponseBasedOnDebugMode();
             }
