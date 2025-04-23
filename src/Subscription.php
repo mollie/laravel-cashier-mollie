@@ -774,6 +774,11 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
             new LogicException('Subscription quantity must be at least 1.')
         );
 
+        throw_if(
+            $this->cancelled(),
+            new LogicException('Cannot update quantity of a cancelled subscription.')
+        );
+
         return DB::transaction(function () use ($quantity) {
             if ($this->cancelled()) {
                 $this->cycle_ends_at = $this->ends_at;
