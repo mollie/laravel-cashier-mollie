@@ -229,6 +229,27 @@ class SwapSubscriptionQuantityTest extends BaseTestCase
         Event::assertNotDispatched(SubscriptionQuantityUpdated::class);
     }
 
+    public function cannot_change_quantity_of_cancelled_subscription()
+    {
+        $user = $this->getUserWithZeroBalance();
+        $subscription = $this->getSubscriptionForUser($user);
+        $original_order_item = $subscription->scheduleNewOrderItemAt(now()->subWeeks(2));
+
+        $subscription->cancel();
+        $this->assertThrows(fn () => $subscription->updateQuantityNextCycle(3)->fresh(), LogicException::class);
+
+
+        $cycle_should_have_started_at = now()->subWeeks(2);
+        $cycle_should_end_at = $cycle_should_have_started_at->copy()->addMonth();
+        $this->assertCarbon($cycle_should_have_started_at, $subscription->cycle_started_at);
+        $this->assertCarbon($cycle_should_end_at, $subscription->cycle_ends_at);
+
+        // And assert that another OrderItem was scheduled for the new subscription quantity
+        $this->assertTrue(Cashier::$orderItemModel::whereId($original_order_item->id)->exists());
+
+        Event::assertNotDispatched(SubscriptionQuantityUpdated::class);
+    }
+
     protected function getUserWithZeroBalance()
     {
         $user = $this->getMandatedUser(true, [
