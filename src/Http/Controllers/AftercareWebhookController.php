@@ -29,13 +29,21 @@ class AftercareWebhookController extends BaseWebhookController
         $molliePayment = $this->getMolliePaymentById($request->get('id'));
 
         if ($molliePayment && $molliePayment->hasRefunds()) {
+            /** @var Order|null $order */
             $order = Cashier::$orderModel::findByMolliePaymentId($molliePayment->id);
+
+            if (!$order) {
+                return $this->getNotFoundResponseBasedOnDebugMode();
+            }
 
             $this->handleRefunds($order, $molliePayment);
         }
 
         if ($molliePayment && $molliePayment->hasChargebacks()) {
             $localPayment = Cashier::$paymentModel::findByPaymentId($molliePayment->id);
+            if (!$localPayment) {
+                return $this->getNotFoundResponseBasedOnDebugMode();
+            }
 
             $molliePaymentAmountChargedBackTotal = mollie_object_to_money($molliePayment->amountChargedBack);
             $locallyKnownAmountChargedBack = $localPayment->getAmountChargedBack();
@@ -99,5 +107,14 @@ class AftercareWebhookController extends BaseWebhookController
         return $mollieRefunds->first(function (MollieRefund $mollieRefund) use ($localRefund) {
             return $mollieRefund->id === $localRefund->mollie_refund_id;
         });
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function getNotFoundResponseBasedOnDebugMode(): Response
+    {
+        // Prevent leaking system info when debugging is disabled
+        return new Response(null, config('app.debug') ? 200 : 404);
     }
 }
