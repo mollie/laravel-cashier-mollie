@@ -29,13 +29,23 @@ class AftercareWebhookController extends BaseWebhookController
         $molliePayment = $this->getMolliePaymentById($request->get('id'));
 
         if ($molliePayment && $molliePayment->hasRefunds()) {
+            /** @var Order|null $order */
             $order = Cashier::$orderModel::findByMolliePaymentId($molliePayment->id);
+
+            if (!$order) {
+                return new Response(null, config('app.debug') ? 404 : 200);
+            }
 
             $this->handleRefunds($order, $molliePayment);
         }
 
         if ($molliePayment && $molliePayment->hasChargebacks()) {
+            /** @var \Laravel\Cashier\Payment|null $localPayment */
             $localPayment = Cashier::$paymentModel::findByPaymentId($molliePayment->id);
+
+            if (!$localPayment) {
+                return new Response(null, config('app.debug') ? 404 : 200);
+            }
 
             $molliePaymentAmountChargedBackTotal = mollie_object_to_money($molliePayment->amountChargedBack);
             $locallyKnownAmountChargedBack = $localPayment->getAmountChargedBack();
