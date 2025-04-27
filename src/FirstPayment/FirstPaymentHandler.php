@@ -97,18 +97,17 @@ class FirstPaymentHandler
     {
         $payment = Cashier::$paymentModel::findByPaymentId($this->molliePayment->id);
 
-        if (isset($payment) && ! is_null($payment->first_payment_actions)) {
-            $actions = $payment->first_payment_actions;
-        } else {
-            $actions = $this->molliePayment->metadata->actions;
+        if (! $payment || empty($payment->first_payment_actions)) {
+            return collect();
         }
 
-        return collect($actions)->map(function ($actionMeta) {
-            return $actionMeta->handler::createFromPayload(
-                object_to_array_recursive($actionMeta),
-                $this->owner
-            );
-        });
+        return collect($payment->first_payment_actions)
+            ->map(function ($actionMeta) {
+                return $actionMeta->handler::createFromPayload(
+                    object_to_array_recursive($actionMeta),
+                    $this->owner
+                );
+            });
     }
 
     /**
