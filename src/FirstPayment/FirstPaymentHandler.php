@@ -96,15 +96,16 @@ class FirstPaymentHandler
     protected function extractActions()
     {
         $payment = Cashier::$paymentModel::findByPaymentId($this->molliePayment->id);
+        $actions = $payment?->first_payment_actions;
 
-        if (! $payment || empty($payment->first_payment_actions)) {
-            return collect();
-        }
-
-        return collect($payment->first_payment_actions)
-            ->map(function ($actionMeta) {
-                return $actionMeta->handler::createFromPayload(
-                    object_to_array_recursive($actionMeta),
+        /*
+         * For legacy reasons, the first_payment_actions value is (de)serialized on the Payment model as an object
+         * instead of an array. This is handled by `collect()` just fine.
+         */
+        return collect($actions)
+            ->map(function ($action) {
+                return $action->handler::createFromPayload(
+                    object_to_array_recursive($action),
                     $this->owner
                 );
             });

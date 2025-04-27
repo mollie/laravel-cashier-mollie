@@ -24,7 +24,7 @@ use Money\Money;
  * @property int amount
  * @property int amount_refunded
  * @property int amount_charged_back
- * @property string first_payment_actions
+ * @property object first_payment_actions // An object for legacy reasons
  * @property string mollie_mandate_id
  * @property \Laravel\Cashier\Order\Order order
  *
