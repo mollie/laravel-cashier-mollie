@@ -47,6 +47,7 @@ use Money\Money;
  * @property \Carbon\Carbon|null processed_at
  * @property int amount_refunded
  * @property int amount_charged_back
+ * @property array|null metadata
  * @property \Laravel\Cashier\Order\OrderItemCollection items
  * @property \Laravel\Cashier\Refunds\RefundCollection refunds
  *
@@ -54,8 +55,8 @@ use Money\Money;
  */
 class Order extends Model
 {
-    use HasOwner;
     use ConvertsToMoney;
+    use HasOwner;
 
     /**
      * The attributes that should be cast to native types.
@@ -72,6 +73,7 @@ class Order extends Model
         'credit_used' => 'int',
         'total_due' => 'int',
         'processed_at' => 'datetime',
+        'metadata' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -89,7 +91,6 @@ class Order extends Model
     /**
      * Creates an order from a collection of OrderItems
      *
-     * @param  \Laravel\Cashier\Order\OrderItemCollection  $items
      * @param  array  $overrides
      * @param  bool  $process_items
      * @return Order
@@ -144,7 +145,6 @@ class Order extends Model
     /**
      * Creates a processed order from a collection of OrderItems
      *
-     * @param  \Laravel\Cashier\Order\OrderItemCollection  $items
      * @param  array  $overrides
      * @return Order
      */
@@ -164,7 +164,6 @@ class Order extends Model
     }
 
     /**
-     * @param $item
      * @param  array  $overrides
      * @return \Laravel\Cashier\Order\Order
      */
@@ -182,7 +181,7 @@ class Order extends Model
      */
     public function processPayment()
     {
-        $this->update(['mollie_payment_id' => 'temp_' . Str::uuid()]);
+        $this->update(['mollie_payment_id' => 'temp_'.Str::uuid()]);
 
         DB::transaction(function () {
             $owner = $this->owner;
@@ -212,7 +211,7 @@ class Order extends Model
                 });
                 $this->delete();
 
-                throw new AmountExceedsMolliePaymentMethodLimit();
+                throw new AmountExceedsMolliePaymentMethodLimit;
             }
 
             switch (true) {
@@ -228,9 +227,9 @@ class Order extends Model
                     $this->mollie_payment_id = null;
 
                     // Add credit to the owner's balance
-                    $credit = Cashier::$creditModel::addAmountForOwner($owner, new Money(- ($this->total_due), new Currency($this->currency)));
+                    $credit = Cashier::$creditModel::addAmountForOwner($owner, new Money(-($this->total_due), new Currency($this->currency)));
 
-                    if (!$owner->hasActiveSubscriptionWithCurrency($this->currency)) {
+                    if (! $owner->hasActiveSubscriptionWithCurrency($this->currency)) {
                         Event::dispatch(new BalanceTurnedStale($credit));
                     }
 
@@ -291,7 +290,6 @@ class Order extends Model
     /**
      * Create a new Eloquent Collection instance.
      *
-     * @param  array  $models
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function newCollection(array $models = [])
@@ -325,10 +323,10 @@ class Order extends Model
         if (method_exists($owner, 'getExtraBillingInformation')) {
             $extra_information = $owner->getExtraBillingInformation();
 
-            if (!empty($extra_information)) {
+            if (! empty($extra_information)) {
                 $extra_information = explode("\n", $extra_information);
 
-                if (is_array($extra_information) && !empty($extra_information)) {
+                if (is_array($extra_information) && ! empty($extra_information)) {
                     $invoice->setExtraInformation($extra_information);
                 }
             }
@@ -344,13 +342,12 @@ class Order extends Model
      */
     public function isProcessed()
     {
-        return !empty($this->processed_at);
+        return ! empty($this->processed_at);
     }
 
     /**
      * Scope the query to only include processed orders.
      *
-     * @param $query
      * @param  bool  $processed
      * @return Builder
      */
@@ -366,19 +363,17 @@ class Order extends Model
     /**
      * Scope the query to only include unprocessed orders.
      *
-     * @param $query
      * @param  bool  $unprocessed
      * @return Builder
      */
     public function scopeUnprocessed($query, $unprocessed = true)
     {
-        return $query->processed(!$unprocessed);
+        return $query->processed(! $unprocessed);
     }
 
     /**
      * Scope the query to only include orders with a specific Mollie payment status.
      *
-     * @param $query
      * @param  string  $status
      * @return Builder
      */
@@ -390,7 +385,6 @@ class Order extends Model
     /**
      * Scope the query to only include paid orders.
      *
-     * @param $query
      * @return Builder
      */
     public function scopePaid($query)
@@ -403,7 +397,6 @@ class Order extends Model
     /**
      * Retrieve an Order by the Mollie Payment id.
      *
-     * @param $id
      * @return ?static
      */
     public static function findByMolliePaymentId($id)
@@ -414,7 +407,6 @@ class Order extends Model
     /**
      * Retrieve an Order by the Mollie Payment id or throw an Exception if not found.
      *
-     * @param $id
      * @return static
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
@@ -440,7 +432,6 @@ class Order extends Model
      * Restores any credit used to the customer's balance and resets the credits applied to the Order.
      * Invokes handlePaymentFailed() on each related OrderItem.
      *
-     * @param  \Mollie\Api\Resources\Payment  $molliePayment
      * @return $this
      */
     public function handlePaymentFailed(MolliePayment $molliePayment)
@@ -500,7 +491,6 @@ class Order extends Model
                 'processed_at' => now(),
             ]);
 
-
             $this->items->each(function (OrderItem $item) {
                 $item->handlePaymentFailed();
             });
@@ -517,7 +507,6 @@ class Order extends Model
      * Handles a paid payment for this order.
      * Invokes handlePaymentPaid() on each related OrderItem.
      *
-     * @param  \Mollie\Api\Resources\Payment  $molliePayment
      * @return $this
      */
     public function handlePaymentPaid(MolliePayment $molliePayment)
@@ -676,14 +665,12 @@ class Order extends Model
     }
 
     /**
-     * @param  \Mollie\Api\Resources\Mandate  $mandate
-     *
      * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
      */
     protected function guardMandate(?Mandate $mandate)
     {
-        if (empty($mandate) || !$mandate->isValid()) {
-            throw new InvalidMandateException('Cannot process payment without valid mandate for order id ' . $this->id);
+        if (empty($mandate) || ! $mandate->isValid()) {
+            throw new InvalidMandateException('Cannot process payment without valid mandate for order id '.$this->id);
         }
     }
 
@@ -696,8 +683,6 @@ class Order extends Model
     }
 
     /**
-     * @return \Money\Money
-     *
      * @throws InvalidMandateException
      */
     private function ensureValidMandateAndMinimumPaymentAmountWhenTotalDuePositive(): \Money\Money
@@ -715,8 +700,6 @@ class Order extends Model
     }
 
     /**
-     * @return \Money\Money
-     *
      * @throws InvalidMandateException
      */
     private function ensureValidMandateAndMaximumPaymentAmountWhenTotalDuePositive(): ?\Money\Money
@@ -735,8 +718,6 @@ class Order extends Model
 
     /**
      * The payments for this order.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function payments(): HasMany
     {
@@ -750,11 +731,11 @@ class Order extends Model
     public function retryNow()
     {
         if ($this->mollie_payment_status != 'failed') {
-            throw new OrderRetryRequiresStatusFailedException();
+            throw new OrderRetryRequiresStatusFailedException;
         }
 
-        if (!$this->owner->validMollieMandate()) {
-            throw new InvalidMandateException();
+        if (! $this->owner->validMollieMandate()) {
+            throw new InvalidMandateException;
         }
 
         return DB::transaction(function () {

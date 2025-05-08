@@ -18,7 +18,7 @@ class FirstPaymentChargeBuilderTest extends BaseTestCase
     }
 
     /** @test */
-    public function redirectToCheckoutResponse()
+    public function redirect_to_checkout_response()
     {
         $this->withMockedCreateMolliePayment(1, '3.00');
         $owner = User::factory()->create();

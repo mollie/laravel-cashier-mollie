@@ -15,7 +15,7 @@ use Mollie\Api\Resources\Payment;
 class UpdatePaymentMethodTest extends BaseTestCase
 {
     /** @test */
-    public function canUpdatePaymentMethod()
+    public function can_update_payment_method()
     {
         $owner = User::factory()->create([
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
@@ -67,7 +67,7 @@ class UpdatePaymentMethodTest extends BaseTestCase
 
     protected function getNewMandatePaymentStub(): Payment
     {
-        $newPayment = new Payment(new MollieApiClient());
+        $newPayment = new Payment(new MollieApiClient);
         $newPayment->sequenceType = 'first';
         $newPayment->id = 'new_tr_unique_mandate_payment_id';
         $newPayment->customerId = 'cst_unique_customer_id';

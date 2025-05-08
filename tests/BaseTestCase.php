@@ -3,7 +3,6 @@
 namespace Laravel\Cashier\Tests;
 
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
 use Laravel\Cashier\CashierServiceProvider;
 use Laravel\Cashier\Coupon\CouponOrderItemPreprocessor;
 use Laravel\Cashier\Plan\AdvancedIntervalGenerator;
@@ -17,6 +16,8 @@ use Orchestra\Testbench\TestCase;
 abstract class BaseTestCase extends TestCase
 {
     use InteractsWithMocks;
+
+    private const MIGRATIONS_PATH = __DIR__.'/../database/migrations';
 
     protected $interactWithMollieAPI = false;
 
@@ -49,81 +50,27 @@ abstract class BaseTestCase extends TestCase
 
     protected function setupDatabase(): void
     {
-        $migrations_dir = __DIR__ . '/../database/migrations';
+        $migrations = collect([
+            __DIR__.'/Database/Migrations/create_users_table.php',
+            self::MIGRATIONS_PATH.'/create_subscriptions_table.php.stub',
+            self::MIGRATIONS_PATH.'/create_order_items_table.php.stub',
+            self::MIGRATIONS_PATH.'/create_orders_table.php.stub',
+            self::MIGRATIONS_PATH.'/create_credits_table.php.stub',
+            self::MIGRATIONS_PATH.'/create_redeemed_coupons_table.php.stub',
+            self::MIGRATIONS_PATH.'/create_applied_coupons_table.php.stub',
+            self::MIGRATIONS_PATH.'/create_payments_table.php.stub',
+            self::MIGRATIONS_PATH.'/create_refund_items_table.php.stub',
+            self::MIGRATIONS_PATH.'/create_refunds_table.php.stub',
+        ]);
 
-        $this->runMigrations(
-            collect(
-                [
-                    [
-                        'class' => \Laravel\Cashier\Tests\Database\Migrations\CreateUsersTable::class,
-                        'file_path' => __DIR__ . '/Database/Migrations/create_users_table.php'
-                    ],
-                    [
-                        'class' => '\CreateSubscriptionsTable',
-                        'file_path' => $migrations_dir . '/create_subscriptions_table.php.stub',
-                    ],
-                    [
-                        'class' => '\CreateOrderItemsTable',
-                        'file_path' => $migrations_dir . '/create_order_items_table.php.stub',
-                    ],
-                    [
-                        'class' => '\CreateOrdersTable',
-                        'file_path' => $migrations_dir . '/create_orders_table.php.stub',
-                    ],
-                    [
-                        'class' => '\CreateCreditsTable',
-                        'file_path' => $migrations_dir . '/create_credits_table.php.stub',
-                    ],
-                    [
-                        'class' => '\CreateRedeemedCouponsTable',
-                        'file_path' => $migrations_dir . '/create_redeemed_coupons_table.php.stub',
-                    ],
-                    [
-                        'class' => '\CreateAppliedCouponsTable',
-                        'file_path' => $migrations_dir . '/create_applied_coupons_table.php.stub',
-                    ],
-                    [
-                        'class' => '\CreatePaymentsTable',
-                        'file_path' => $migrations_dir . '/create_payments_table.php.stub',
-                    ],
-                    [
-                        'class' => '\CreateRefundItemsTable',
-                        'file_path' => $migrations_dir . '/create_refund_items_table.php.stub',
-                    ],
-                    [
-                        'class' => '\CreateRefundsTable',
-                        'file_path' => $migrations_dir . '/create_refunds_table.php.stub',
-                    ],
-                ]
-            )
-        );
-    }
-    /**
-     * Runs a collection of migrations.
-     *
-     * @param  Collection  $migrations
-     */
-    protected function runMigrations(Collection $migrations)
-    {
-        $migrations->each(fn ($info) => $this->runMigration($info['class'], $info['file_path']));
-    }
-
-    /**
-     * @param  string  $class
-     * @param  string  $file_path
-     */
-    protected function runMigration(string $className, string $file_path)
-    {
-        require_once $file_path;
-        (new $className)->up();
+        $migrations->each(function ($file_path) {
+            $migration = include $file_path;
+            $migration->up();
+        });
     }
 
     /**
      * Assert that a Carbon datetime is approximately equal to another Carbon datetime.
-     *
-     * @param  \Carbon\Carbon  $expected
-     * @param  \Carbon\Carbon  $actual
-     * @param  int  $precision_seconds
      */
     protected function assertCarbon(Carbon $expected, Carbon $actual, int $precision_seconds = 5)
     {
@@ -329,11 +276,6 @@ abstract class BaseTestCase extends TestCase
         return env('MANDATED_CUSTOMER_DIRECTDEBIT_MANDATE_ID');
     }
 
-    /**
-     * @param  int  $value
-     * @param  string  $currency
-     * @param  \Money\Money  $money
-     */
     protected function assertMoney(int $value, string $currency, Money $money)
     {
         $this->assertEquals($currency, $money->getCurrency()->getCode());
@@ -341,10 +283,6 @@ abstract class BaseTestCase extends TestCase
         $this->assertTrue((new Money($value, new Currency($currency)))->equals($money));
     }
 
-    /**
-     * @param  int  $value
-     * @param  \Money\Money  $money
-     */
     protected function assertMoneyEURCents(int $value, Money $money)
     {
         $this->assertMoney($value, 'EUR', $money);

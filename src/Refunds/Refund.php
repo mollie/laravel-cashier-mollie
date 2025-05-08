@@ -28,6 +28,7 @@ use Mollie\Api\Types\RefundStatus;
  * @property \Laravel\Cashier\Refunds\RefundItemCollection items
  * @property Order order
  * @property Order originalOrder
+ * @property array|null metadata
  */
 class Refund extends Model
 {
@@ -37,12 +38,12 @@ class Refund extends Model
 
     protected $casts = [
         'total' => 'int',
+        'metadata' => 'array',
     ];
 
     /**
      * Create a new Refund Collection instance.
      *
-     * @param  array  $models
      * @return \Laravel\Cashier\Refunds\RefundCollection
      */
     public function newCollection(array $models = [])
@@ -53,7 +54,6 @@ class Refund extends Model
     /**
      * Scope the query to only include unprocessed refunds.
      *
-     * @param $query
      * @return Builder
      */
     public function scopeWhereUnprocessed(Builder $query)
@@ -92,8 +92,7 @@ class Refund extends Model
             $refundItems->each(function (RefundItem $refundItem) {
                 $originalOrderItem = $refundItem->originalOrderItem;
 
-                if( $originalOrderItem && method_exists($originalOrderItem, 'handlePaymentRefunded') )
-                {
+                if ($originalOrderItem && method_exists($originalOrderItem, 'handlePaymentRefunded')) {
                     $originalOrderItem->handlePaymentRefunded($refundItem);
                 }
             });

@@ -9,12 +9,6 @@ class AddGenericOrderItem extends BaseAction
 {
     /**
      * AddGenericOrderItem constructor.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
-     * @param  \Money\Money  $unitPrice
-     * @param  int  $quantity
-     * @param  string  $description
-     * @param  int  $roundingMode
      */
     public function __construct(Model $owner, Money $unitPrice, int $quantity, string $description, int $roundingMode = Money::ROUND_HALF_UP)
     {
@@ -28,8 +22,6 @@ class AddGenericOrderItem extends BaseAction
     }
 
     /**
-     * @param  array  $payload
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @return self
      */
     public static function createFromPayload(array $payload, Model $owner)

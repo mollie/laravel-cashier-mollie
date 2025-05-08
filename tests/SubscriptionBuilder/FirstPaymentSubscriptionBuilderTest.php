@@ -36,7 +36,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     /** @test */
-    public function createsAFirstPaymentForSubscription()
+    public function creates_a_first_payment_for_subscription()
     {
         $firstPayment = config('cashier_plans.defaults.first_payment');
         $firstPayment['redirect_url'] = 'https://foo-redirect-bar.com';
@@ -98,7 +98,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     /** @test */
-    public function handlesQuantity()
+    public function handles_quantity()
     {
         config(['cashier.locale' => 'nl_NL']);
 
@@ -125,7 +125,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     /** @test */
-    public function handlesAPaidFirstPayment()
+    public function handles_a_paid_first_payment()
     {
         $this->withoutExceptionHandling();
 
@@ -208,7 +208,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     /** @test */
-    public function testWithCouponNoTrialValidatesCoupon()
+    public function test_with_coupon_no_trial_validates_coupon()
     {
         $this->expectException(CouponException::class);
         $this->withMockedCouponRepository(null, new InvalidatingCouponHandler);
@@ -216,7 +216,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     /** @test */
-    public function testWithCouponWithTrialValidatesCoupon()
+    public function test_with_coupon_with_trial_validates_coupon()
     {
         $this->expectException(CouponException::class);
         $this->withMockedCouponRepository(null, new InvalidatingCouponHandler);
@@ -224,7 +224,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     /** @test */
-    public function testWithCouponNoTrialModifiesThePaymentAmount()
+    public function test_with_coupon_no_trial_modifies_the_payment_amount()
     {
         $this->withMockedCouponRepository();
         $this->withMockedCreateMolliePayment();
@@ -240,7 +240,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     /** @test */
-    public function testHandlesTrialDays()
+    public function test_handles_trial_days()
     {
         $this->withMockedCreateMolliePayment();
         $this->withMockedGetMollieCustomer(2);
@@ -255,7 +255,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     /** @test */
-    public function testHandlesNoTrialMode()
+    public function test_handles_no_trial_mode()
     {
         $this->withMockedCreateMolliePayment();
         $this->withMockedGetMollieCustomer(2);

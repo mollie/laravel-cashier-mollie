@@ -24,7 +24,7 @@ class FirstPaymentSubscriptionBuilderApplyCorrectTaxTest extends BaseTestCase
     }
 
     /** @test */
-    public function handlesTrialDaysAndFirstPaymentWithTaxAppliedCorrectly()
+    public function handles_trial_days_and_first_payment_with_tax_applied_correctly()
     {
         $firstPaymentAmounts = collect(['10.00', '11.00', '21.00', '24.00', '280.00']);
 
@@ -44,9 +44,9 @@ class FirstPaymentSubscriptionBuilderApplyCorrectTaxTest extends BaseTestCase
     }
 
     /** @test */
-    public function roundingModeReturnCorrectValue()
+    public function rounding_mode_return_correct_value()
     {
-        $down = $this->getBuilder()->roundingMode(Money::EUR(1000), 0.21); //total is 1001
+        $down = $this->getBuilder()->roundingMode(Money::EUR(1000), 0.21); // total is 1001
         $equals = $this->getBuilder()->roundingMode(Money::EUR(1100), 0.21); // total is 1100
         $up = $this->getBuilder()->roundingMode(Money::EUR(2100), 0.21); // total is 2099
 

@@ -51,7 +51,7 @@ class CashierTest extends BaseTestCase
     }
 
     /** @test */
-    public function cashierUsesPredefinedModels()
+    public function cashier_uses_predefined_models()
     {
         $this->assertEquals(Cashier::$subscriptionModel, CashierSubscription::class);
         $this->assertEquals(Cashier::$orderModel, CashierOrder::class);
@@ -65,7 +65,7 @@ class CashierTest extends BaseTestCase
     }
 
     /** @test */
-    public function cashierUsesConfiguredModels()
+    public function cashier_uses_configured_models()
     {
         Cashier::useSubscriptionModel(FixtureSubscription::class);
         Cashier::useOrderModel(FixtureOrder::class);
@@ -89,7 +89,7 @@ class CashierTest extends BaseTestCase
     }
 
     /** @test */
-    public function testRunningCashierProcessesOpenOrderItems()
+    public function test_running_cashier_processes_open_order_items()
     {
         $this->withMockedGetMollieCustomer(2);
         $this->withMockedGetMollieMandateAccepted(2);
@@ -116,7 +116,7 @@ class CashierTest extends BaseTestCase
     }
 
     /** @test */
-    public function testRunningCashierProcessesUnprocessedOrderItemsAndSchedulesNext()
+    public function test_running_cashier_processes_unprocessed_order_items_and_schedules_next()
     {
         $this->withMockedGetMollieCustomer(2, [
             'cst_unique_customer_id_1',
@@ -192,7 +192,7 @@ class CashierTest extends BaseTestCase
     }
 
     /** @test */
-    public function canSwapSubscriptionPlan()
+    public function can_swap_subscription_plan()
     {
         $this->withTestNow('2019-01-01');
         $user = $this->getMandatedUser(true, [
@@ -254,7 +254,7 @@ class CashierTest extends BaseTestCase
     }
 
     /** @test */
-    public function canSwapSubscriptionPlanAndReimburseUnusedTime()
+    public function can_swap_subscription_plan_and_reimburse_unused_time()
     {
         $this->withTestNow('2019-01-01');
         $user = $this->getMandatedUser(true, [
@@ -294,17 +294,12 @@ class CashierTest extends BaseTestCase
     }
 
     /** @test */
-    public function testFormatAmount()
+    public function test_format_amount()
     {
         $this->assertEquals('1.000,00 €', Cashier::formatAmount(new Money(100000, new Currency('EUR'))));
         $this->assertEquals('-9.123,45 €', Cashier::formatAmount(new Money(-912345, new Currency('EUR'))));
     }
 
-    /**
-     * @param  \Illuminate\Database\Eloquent\Model  $user
-     * @param  int  $processed
-     * @param  int  $unprocessed
-     */
     protected function assertOrderItemCounts(Model $user, int $processed, int $unprocessed)
     {
         $this->assertEquals(
@@ -325,7 +320,7 @@ class CashierTest extends BaseTestCase
     }
 
     /** @test */
-    public function canOverrideDefaultCurrencySymbol()
+    public function can_override_default_currency_symbol()
     {
         $this->assertEquals('€', Cashier::usesCurrencySymbol());
         $this->assertEquals('eur', Cashier::usesCurrency());
@@ -337,7 +332,7 @@ class CashierTest extends BaseTestCase
     }
 
     /** @test */
-    public function canOverrideDefaultCurrencyLocale()
+    public function can_override_default_currency_locale()
     {
         $this->assertEquals('de_DE', Cashier::usesCurrencyLocale());
 
@@ -347,7 +342,7 @@ class CashierTest extends BaseTestCase
     }
 
     /** @test */
-    public function canOverrideFirstPaymentWebhookUrl()
+    public function can_override_first_payment_webhook_url()
     {
         $this->assertEquals('mandate-webhook', Cashier::firstPaymentWebhookUrl());
 
@@ -361,7 +356,7 @@ class CashierTest extends BaseTestCase
     }
 
     /** @test */
-    public function canOverrideWebhookUrl()
+    public function can_override_webhook_url()
     {
         $this->assertEquals('webhook', Cashier::webhookUrl());
 

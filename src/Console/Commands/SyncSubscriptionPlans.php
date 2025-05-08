@@ -33,7 +33,7 @@ class SyncSubscriptionPlans extends Command
     public function handle(PlanRepository $planRepository)
     {
         $query = OrderItem::query()
-            ->with('orderable')    
+            ->with('orderable')
             ->unprocessed()
             ->whereHasMorph('orderable', Cashier::$subscriptionModel);
 
@@ -74,7 +74,7 @@ class SyncSubscriptionPlans extends Command
                         $item->unit_price,
                         $planAmount,
                         $planCurrency,
-                        $descriptionChanged ? ' and from "' . $item->description . '" to "' . $planDescription . '"' : '',
+                        $descriptionChanged ? ' and from "'.$item->description.'" to "'.$planDescription.'"' : '',
                     ));
                 }
             }

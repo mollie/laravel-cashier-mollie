@@ -24,7 +24,7 @@ use Mollie\Api\Types\RefundStatus as MollieRefundStatus;
 class AftercareWebhookControllerTest extends BaseTestCase
 {
     /** @test */
-    public function itDetectsNewChargebacks()
+    public function it_detects_new_chargebacks()
     {
         Event::fake();
 
@@ -65,7 +65,7 @@ class AftercareWebhookControllerTest extends BaseTestCase
     }
 
     /** @test */
-    public function itDetectsNewRefunds()
+    public function it_detects_new_refunds()
     {
         Event::fake();
         $this->withConfiguredPlans();
@@ -170,7 +170,6 @@ class AftercareWebhookControllerTest extends BaseTestCase
     /**
      * Get a request that mimics Mollie calling the webhook.
      *
-     * @param $id
      * @return Request
      */
     protected function getWebhookRequest($id)

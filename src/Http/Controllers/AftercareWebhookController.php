@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 class AftercareWebhookController extends BaseWebhookController
 {
     /**
-     * @param  Request  $request
      * @return Response
      *
      * @throws \Mollie\Api\Exceptions\ApiException Only in debug mode
@@ -100,8 +99,6 @@ class AftercareWebhookController extends BaseWebhookController
     }
 
     /**
-     * @param  \Laravel\Cashier\Refunds\Refund  $localRefund
-     * @param  \Illuminate\Support\Collection  $mollieRefunds
      * @return MollieRefund|null
      */
     protected function extractMatchingMollieRefundForLocalRefund(Refund $localRefund, Collection $mollieRefunds)

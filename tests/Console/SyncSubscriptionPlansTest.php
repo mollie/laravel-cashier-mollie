@@ -20,11 +20,11 @@ class SyncSubscriptionPlansTest extends BaseTestCase
         $subscription = SubscriptionFactory::new()->create([
             'owner_id' => $owner->id,
             'owner_type' => get_class($owner),
-            'plan' => 'monthly-10-1'
+            'plan' => 'monthly-10-1',
         ]);
         $oldPlanPrice = Money::EUR(1000);
         $oldDescription = 'Old plan description';
-        
+
         $orderItem = OrderItem::create([
             'process_at' => now(),
             'orderable_type' => get_class($subscription),
@@ -66,11 +66,11 @@ class SyncSubscriptionPlansTest extends BaseTestCase
         $subscription = SubscriptionFactory::new()->create([
             'owner_id' => $owner->id,
             'owner_type' => get_class($owner),
-            'plan' => 'monthly-10-1'
+            'plan' => 'monthly-10-1',
         ]);
         $oldPlanPrice = Money::EUR(1000);
         $oldDescription = 'Old plan description';
-        
+
         $orderItem = OrderItem::create([
             'process_at' => now(),
             'orderable_type' => get_class($subscription),

@@ -13,7 +13,7 @@ use Money\Money;
 class AddGenericOrderItemTest extends BaseTestCase
 {
     /** @test */
-    public function canGetPayload()
+    public function can_get_payload()
     {
         $action = new AddGenericOrderItem(
             $this->getMandatedUser(true, ['tax_percentage' => 20]),
@@ -37,7 +37,7 @@ class AddGenericOrderItemTest extends BaseTestCase
     }
 
     /** @test */
-    public function canCreateFromPayload()
+    public function can_create_from_payload()
     {
         $action = AddGenericOrderItem::createFromPayload([
             'subtotal' => [
@@ -56,7 +56,7 @@ class AddGenericOrderItemTest extends BaseTestCase
     }
 
     /** @test */
-    public function canCreateFromPayloadWithoutTaxPercentage()
+    public function can_create_from_payload_without_tax_percentage()
     {
         $action = AddGenericOrderItem::createFromPayload([
             'subtotal' => [
@@ -74,7 +74,7 @@ class AddGenericOrderItemTest extends BaseTestCase
     }
 
     /** @test */
-    public function canExecute()
+    public function can_execute()
     {
         $user = User::factory()->create(['tax_percentage' => 20]);
         $this->assertFalse($user->hasCredit());
