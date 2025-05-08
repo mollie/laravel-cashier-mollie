@@ -149,7 +149,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
      */
     public function valid()
     {
-        return $this->active() || $this->onTrial() || $this->onGracePeriod();
+        return $this->active();
     }
 
     /**
