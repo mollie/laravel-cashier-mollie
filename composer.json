@@ -33,7 +33,7 @@
     "php": "^8.1",
     "ext-json": "*",
     "ext-intl": "*",
-    "dompdf/dompdf": "^2.0",
+    "dompdf/dompdf": "^2.0|^3.0",
     "illuminate/database": "^10|^11|^12",
     "illuminate/support": "^10|^11|^12",
     "mollie/laravel-mollie": "^3.0",
