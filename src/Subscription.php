@@ -327,7 +327,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
      * @param  string|null  $reason
      * @return $this
      */
-    public function cancel($reason = SubscriptionCancellationReason::UNKNOWN)
+    public function cancel($reason = SubscriptionCancellationReason::UNKNOWN): self
     {
         // If the user was on trial, we will set the grace period to end when the trial
         // would have ended. Otherwise, we'll retrieve the end of the billing cycle
@@ -344,14 +344,15 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
      * @param  string  $reason
      * @return $this
      */
-    public function cancelAt(Carbon $endsAt, $reason = SubscriptionCancellationReason::UNKNOWN)
+    public function cancelAt(Carbon $endsAt, string $reason = SubscriptionCancellationReason::UNKNOWN): self
     {
-        DB::transaction(function () use ($endsAt) {
+        DB::transaction(function () use ($reason, $endsAt) {
             $this->removeScheduledOrderItem();
 
             $this->fill([
                 'ends_at' => $endsAt,
                 'cycle_ends_at' => null,
+                'cancellation_reason' => $reason,
             ])->save();
         });
 
@@ -366,7 +367,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
      * @param  string  $reason
      * @return $this
      */
-    public function cancelNow($reason = SubscriptionCancellationReason::UNKNOWN)
+    public function cancelNow(string $reason = SubscriptionCancellationReason::UNKNOWN): self
     {
         return $this->cancelAt(now(), $reason);
     }
