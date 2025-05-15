@@ -325,7 +325,6 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
     /**
      * Cancel the subscription at the end of the billing period.
      *
-     * @param string $reason
      * @return $this
      */
     public function cancel(string $reason = SubscriptionCancellationReason::REQUESTED): self
@@ -342,8 +341,6 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
     /**
      * Cancel the subscription at the date provided.
      *
-     * @param \Carbon\Carbon $endsAt
-     * @param string $reason
      * @return $this
      */
     public function cancelAt(Carbon $endsAt, string $reason = SubscriptionCancellationReason::REQUESTED): self
@@ -366,7 +363,6 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
     /**
      * Cancel the subscription immediately.
      *
-     * @param  string  $reason
      * @return $this
      */
     public function cancelNow(string $reason = SubscriptionCancellationReason::REQUESTED): self

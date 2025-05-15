@@ -16,6 +16,7 @@ class SubscriptionCancellationReason
 
     /**
      * The reason for cancelling the subscription is unknown - legacy behavior.
+     *
      * @deprecated since v3.
      */
     public const string UNKNOWN = 'unknown';
