@@ -19,11 +19,9 @@ use Symfony\Component\HttpFoundation\Response;
 class AftercareWebhookController extends BaseWebhookController
 {
     /**
-     * @return Response
-     *
      * @throws \Mollie\Api\Exceptions\ApiException Only in debug mode
      */
-    public function handleWebhook(Request $request)
+    public function handleWebhook(Request $request): Response
     {
         $molliePayment = $this->getMolliePaymentById($request->get('id'));
 
@@ -66,7 +64,7 @@ class AftercareWebhookController extends BaseWebhookController
         return new Response(null, 200);
     }
 
-    protected function handleRefunds(Order $order, MolliePayment $molliePayment)
+    protected function handleRefunds(Order $order, MolliePayment $molliePayment): void
     {
         /** @var \Laravel\Cashier\Refunds\RefundCollection $localRefunds */
         $localRefunds = $order->refunds()->whereUnprocessed()->get();
@@ -98,10 +96,7 @@ class AftercareWebhookController extends BaseWebhookController
         }
     }
 
-    /**
-     * @return MollieRefund|null
-     */
-    protected function extractMatchingMollieRefundForLocalRefund(Refund $localRefund, Collection $mollieRefunds)
+    protected function extractMatchingMollieRefundForLocalRefund(Refund $localRefund, Collection $mollieRefunds): ?MollieRefund
     {
         return $mollieRefunds->first(function (MollieRefund $mollieRefund) use ($localRefund) {
             return $mollieRefund->id === $localRefund->mollie_refund_id;

@@ -2,12 +2,8 @@
 
 namespace Laravel\Cashier\Events;
 
-use Illuminate\Queue\SerializesModels;
-
-class OrderPaymentPaid
+class OrderPaymentPaid extends BaseEvent
 {
-    use SerializesModels;
-
     /**
      * The paid order.
      *

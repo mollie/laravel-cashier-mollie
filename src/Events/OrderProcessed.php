@@ -2,13 +2,10 @@
 
 namespace Laravel\Cashier\Events;
 
-use Illuminate\Queue\SerializesModels;
 use Laravel\Cashier\Order\Order;
 
-class OrderProcessed
+class OrderProcessed extends BaseEvent
 {
-    use SerializesModels;
-
     /**
      * The processed order.
      *

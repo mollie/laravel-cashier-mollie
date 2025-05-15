@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Laravel\Cashier\Events;
 
-use Illuminate\Queue\SerializesModels;
 use Laravel\Cashier\Refunds\Refund;
 
-class RefundFailed
+class RefundFailed extends BaseEvent
 {
-    use SerializesModels;
-
     public Refund $refund;
 
     public function __construct(Refund $refund)

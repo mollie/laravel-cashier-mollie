@@ -2,12 +2,8 @@
 
 namespace Laravel\Cashier\Events;
 
-use Illuminate\Queue\SerializesModels;
-
-class MandateClearedFromBillable
+class MandateClearedFromBillable extends BaseEvent
 {
-    use SerializesModels;
-
     /**
      * @var \Illuminate\Database\Eloquent\Model
      */

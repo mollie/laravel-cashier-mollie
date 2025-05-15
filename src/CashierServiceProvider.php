@@ -10,6 +10,8 @@ use Laravel\Cashier\Console\Commands\CashierUpdate;
 use Laravel\Cashier\Console\Commands\SyncSubscriptionPlans;
 use Laravel\Cashier\Coupon\ConfigCouponRepository;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
+use Laravel\Cashier\EventLog\Contracts\EventLogger;
+use Laravel\Cashier\EventLog\EloquentEventLogger;
 use Laravel\Cashier\Mollie\RegistersMollieInteractions;
 use Laravel\Cashier\Order\Contracts\MaximumPayment as MaximumPaymentContract;
 use Laravel\Cashier\Order\Contracts\MinimumPayment as MinimumPaymentContract;
@@ -49,16 +51,20 @@ class CashierServiceProvider extends ServiceProvider
         $this->mergeConfig();
 
         $this->registerMollieInteractions($this->app);
+
         $this->app->bind(PlanRepository::class, ConfigPlanRepository::class);
+
         $this->app->singleton(CouponRepository::class, function () {
             return new ConfigCouponRepository(
                 config('cashier_coupons.defaults'),
                 config('cashier_coupons.coupons')
             );
         });
+
         $this->app->bind(MinimumPaymentContract::class, MinimumPayment::class);
         $this->app->bind(MaximumPaymentContract::class, MaximumPayment::class);
 
+        $this->app->bind(EventLogger::class, EloquentEventLogger::class);
         $this->app->register(EventServiceProvider::class);
     }
 

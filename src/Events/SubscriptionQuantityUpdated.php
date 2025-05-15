@@ -2,13 +2,10 @@
 
 namespace Laravel\Cashier\Events;
 
-use Illuminate\Queue\SerializesModels;
 use Laravel\Cashier\Subscription;
 
-class SubscriptionQuantityUpdated
+class SubscriptionQuantityUpdated extends BaseEvent
 {
-    use SerializesModels;
-
     /**
      * @var \Laravel\Cashier\Subscription
      */

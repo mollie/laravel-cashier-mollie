@@ -2,12 +2,8 @@
 
 namespace Laravel\Cashier\Events;
 
-use Illuminate\Queue\SerializesModels;
-
-class OrderInvoiceAvailable
+class OrderInvoiceAvailable extends BaseEvent
 {
-    use SerializesModels;
-
     /**
      * The created order.
      *

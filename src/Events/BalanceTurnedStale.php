@@ -2,13 +2,10 @@
 
 namespace Laravel\Cashier\Events;
 
-use Illuminate\Queue\SerializesModels;
 use Laravel\Cashier\Credit\Credit;
 
-class BalanceTurnedStale
+class BalanceTurnedStale extends BaseEvent
 {
-    use SerializesModels;
-
     /**
      * @var \Laravel\Cashier\Credit\Credit
      */

@@ -2,13 +2,10 @@
 
 namespace Laravel\Cashier\Events;
 
-use Illuminate\Queue\SerializesModels;
 use Laravel\Cashier\Order\Order;
 
-class FirstPaymentPaid
+class FirstPaymentPaid extends BaseEvent
 {
-    use SerializesModels;
-
     /**
      * @var \Mollie\Api\Resources\Payment
      */
