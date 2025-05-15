@@ -197,3 +197,7 @@ resolve(PlanRepository::class)->find("test");
 
 Cashier Mollie will now use your implementation of the PlanRepository. For coupons this is basically the same,
 make sure you implement the CouponRepository contract and bind the contract to your own implementation.
+
+## I have enabled iDEAL and/or Bancontact on my Mollie dashboard but the checkout only lists creditcard. Why?
+
+Ensure to also enable `directdebit` on your Mollie dashboard if you want to allow iDEAL and/or Bancontact on your checkout.

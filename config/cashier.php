@@ -57,6 +57,7 @@ return [
         /**
          * Array of allowed Mollie payment methods for the first payment. Make sure the methods are
          * enabled in the Mollie dashboard. Set to [] to let Mollie handle this for you. Can be overridden per plan.
+         * For iDEAL and Bancontact, ensure `directdebit` is also enabled in your Mollie dashboard.
          *
          * @example ['ideal', 'creditcard']
          */
