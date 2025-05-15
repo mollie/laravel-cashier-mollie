@@ -44,8 +44,9 @@ use Money\Money;
  * @property \Carbon\Carbon trial_ends_at
  * @property float cycle_progress
  * @property float cycle_left
- * @property string $currency
+ * @property string currency
  * @property array|null metadata
+ * @property string|null cancellation_reason
  */
 class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderItems, IsRefundable, PreprocessesOrderItems
 {
