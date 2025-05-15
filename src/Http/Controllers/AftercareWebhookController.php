@@ -31,7 +31,7 @@ class AftercareWebhookController extends BaseWebhookController
             /** @var Order|null $order */
             $order = Cashier::$orderModel::findByMolliePaymentId($molliePayment->id);
 
-            if (!$order) {
+            if (! $order) {
                 return new Response(null, config('app.debug') ? 404 : 200);
             }
 
@@ -42,7 +42,7 @@ class AftercareWebhookController extends BaseWebhookController
             /** @var \Laravel\Cashier\Payment|null $localPayment */
             $localPayment = Cashier::$paymentModel::findByPaymentId($molliePayment->id);
 
-            if (!$localPayment) {
+            if (! $localPayment) {
                 return new Response(null, config('app.debug') ? 404 : 200);
             }
 

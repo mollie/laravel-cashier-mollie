@@ -44,8 +44,9 @@ use Money\Money;
  * @property \Carbon\Carbon trial_ends_at
  * @property float cycle_progress
  * @property float cycle_left
- * @property string $currency
+ * @property string currency
  * @property array|null metadata
+ * @property string|null cancellation_reason
  */
 class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderItems, IsRefundable, PreprocessesOrderItems
 {
@@ -324,10 +325,9 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
     /**
      * Cancel the subscription at the end of the billing period.
      *
-     * @param  string|null  $reason
      * @return $this
      */
-    public function cancel($reason = SubscriptionCancellationReason::UNKNOWN)
+    public function cancel(string $reason = SubscriptionCancellationReason::REQUESTED): self
     {
         // If the user was on trial, we will set the grace period to end when the trial
         // would have ended. Otherwise, we'll retrieve the end of the billing cycle
@@ -341,17 +341,17 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
     /**
      * Cancel the subscription at the date provided.
      *
-     * @param  string  $reason
      * @return $this
      */
-    public function cancelAt(Carbon $endsAt, $reason = SubscriptionCancellationReason::UNKNOWN)
+    public function cancelAt(Carbon $endsAt, string $reason = SubscriptionCancellationReason::REQUESTED): self
     {
-        DB::transaction(function () use ($endsAt) {
+        DB::transaction(function () use ($reason, $endsAt) {
             $this->removeScheduledOrderItem();
 
             $this->fill([
                 'ends_at' => $endsAt,
                 'cycle_ends_at' => null,
+                'cancellation_reason' => $reason,
             ])->save();
         });
 
@@ -363,10 +363,9 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
     /**
      * Cancel the subscription immediately.
      *
-     * @param  string  $reason
      * @return $this
      */
-    public function cancelNow($reason = SubscriptionCancellationReason::UNKNOWN)
+    public function cancelNow(string $reason = SubscriptionCancellationReason::REQUESTED): self
     {
         return $this->cancelAt(now(), $reason);
     }

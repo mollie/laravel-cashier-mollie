@@ -28,6 +28,7 @@ return new class extends Migration
             $table->datetime('cycle_ends_at')->nullable();
             $table->unsignedBigInteger('scheduled_order_item_id')->nullable();
             $table->text('metadata')->nullable();
+            $table->string('cancellation_reason')->nullable();
             $table->timestamps();
         });
     }
