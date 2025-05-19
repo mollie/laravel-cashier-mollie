@@ -37,6 +37,7 @@ use Money\Money;
  * @property string owner_type
  * @property string next_plan
  * @property string plan
+ * @property int next_quantity
  * @property int quantity
  * @property mixed scheduled_order_item_id
  * @property OrderItem scheduledOrderItem
@@ -312,9 +313,11 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
 
             $this->next_plan = $plan;
 
+            $quantity = $this->next_quantity ? $this->next_quantity : $this->quantity;
+
             $this->removeScheduledOrderItem();
 
-            $this->scheduleNewOrderItemAt($this->cycle_ends_at, [], true, $newPlan);
+            $this->scheduleNewOrderItemAt($this->cycle_ends_at, [], true, $newPlan, $quantity);
 
             $this->save();
 
@@ -466,7 +469,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
      * @param  bool  $fill_link  Indicates whether scheduled_order_item_id field should be filled to point to the newly scheduled order item
      * @return \Illuminate\Database\Eloquent\Model|\Laravel\Cashier\Order\OrderItem
      */
-    public function scheduleNewOrderItemAt(Carbon $process_at, $item_overrides = [], $fill_link = true, ?Plan $plan = null)
+    public function scheduleNewOrderItemAt(Carbon $process_at, $item_overrides = [], $fill_link = true, ?Plan $plan = null, ?int $quantity = null)
     {
         if ($this->scheduled_order_item_id) {
             throw new LogicException('Cannot schedule a new subscription order item if there is already one scheduled.');
@@ -476,6 +479,10 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
             $plan = $this->plan();
         }
 
+        if (! $quantity) {
+            $quantity = $this->quantity;
+        }
+
         $item = $this->orderItems()->create(array_merge(
             [
                 'owner_id' => $this->owner_id,
@@ -483,7 +490,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
                 'process_at' => $process_at,
                 'currency' => $plan->amount()->getCurrency()->getCode(),
                 'unit_price' => (int) $plan->amount()->getAmount(),
-                'quantity' => $this->quantity ?: 1,
+                'quantity' => $quantity ?: 1,
                 'tax_percentage' => $this->tax_percentage,
                 'description' => $plan->description(),
             ],
@@ -523,12 +530,21 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
         $subscription = $item->orderable;
         $plan_swapped = false;
         $previousPlan = null;
+        $quantity_updated = false;
+        $previous_quantity = null;
 
         if (! empty($subscription->next_plan)) {
             $plan_swapped = true;
             $previousPlan = $subscription->plan;
             $subscription->plan = $subscription->next_plan;
             $subscription->next_plan = null;
+        }
+
+        if (! empty($subscription->next_quantity)) {
+            $quantity_updated = true;
+            $previous_quantity = $subscription->quantity;
+            $subscription->quantity = $subscription->next_quantity;
+            $subscription->next_quantity = null;
         }
 
         $item = DB::transaction(function () use (&$subscription, $item) {
@@ -552,6 +568,10 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
 
         if ($plan_swapped) {
             Event::dispatch(new SubscriptionPlanSwapped($subscription, $previousPlan));
+        }
+
+        if ($quantity_updated) {
+            Event::dispatch(new SubscriptionQuantityUpdated($subscription, $previous_quantity));
         }
 
         return $item;
@@ -739,6 +759,43 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
         Event::dispatch(new SubscriptionQuantityUpdated($this, $oldQuantity));
 
         return $this;
+    }
+
+    /**
+     * Schedule this subscription's quantity to be changed once the current cycle has completed.
+     *
+     * @return $this
+     */
+    public function updateQuantityNextCycle(int $quantity)
+    {
+        throw_if(
+            $quantity < 1,
+            new LogicException('Subscription quantity must be at least 1.')
+        );
+
+        throw_if(
+            $this->cancelled(),
+            new LogicException('Cannot update quantity of a cancelled subscription.')
+        );
+
+        return DB::transaction(function () use ($quantity) {
+            if ($this->cancelled()) {
+                $this->cycle_ends_at = $this->ends_at;
+                $this->ends_at = null;
+            }
+
+            $this->next_quantity = $quantity;
+
+            $this->removeScheduledOrderItem();
+
+            $plan = $this->next_plan ? app(PlanRepository::class)::findOrFail($this->next_plan) : $this->plan();
+
+            $this->scheduleNewOrderItemAt($this->cycle_ends_at, [], true, $plan, $quantity);
+
+            $this->save();
+
+            return $this;
+        });
     }
 
     /**
