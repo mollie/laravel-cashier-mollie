@@ -423,7 +423,7 @@ trait Billable
      * @param  \Dompdf\Options  $options
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function downloadInvoice($orderId, $data = [], $view = Invoice::DEFAULT_VIEW, Options $options = null)
+    public function downloadInvoice($orderId, $data = [], $view = Invoice::DEFAULT_VIEW, ?Options $options = null)
     {
         /** @var Order $order */
         $order = $this->orders()->where('id', $orderId)->firstOrFail();
