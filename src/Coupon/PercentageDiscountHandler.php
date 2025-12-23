@@ -22,7 +22,8 @@ class PercentageDiscountHandler extends BaseCouponHandler
         /** @var OrderItem $firstItem */
         $firstItem = $items->first();
 
-        $unitPrice = $this->unitPrice($firstItem->getTotal());
+        // Calculate discount from subtotal (excluding tax)
+        $unitPrice = $this->unitPrice($firstItem->getSubtotal());
 
         return $this->makeOrderItem([
             'process_at' => now(),
