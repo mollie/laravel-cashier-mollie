@@ -468,10 +468,10 @@ class Subscription extends Model implements InteractsWithOrderItems, Preprocesse
      * @param  Carbon|null  $process_at
      * @param  array  $item_overrides
      * @param  bool  $fill_link Indicates whether scheduled_order_item_id field should be filled to point to the newly scheduled order item
-     * @param  \Laravel\Cashier\Plan\Contracts\Plan  $plan
+     * @param  \Laravel\Cashier\Plan\Contracts\Plan|null  $plan
      * @return \Illuminate\Database\Eloquent\Model|\Laravel\Cashier\Order\OrderItem
      */
-    public function scheduleNewOrderItemAt(Carbon $process_at, $item_overrides = [], $fill_link = true, Plan $plan = null)
+    public function scheduleNewOrderItemAt(Carbon $process_at, $item_overrides = [], $fill_link = true, ?Plan $plan = null)
     {
         if ($this->scheduled_order_item_id) {
             throw new LogicException('Cannot schedule a new subscription order item if there is already one scheduled.');
