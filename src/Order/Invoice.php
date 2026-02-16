@@ -461,7 +461,7 @@ class Invoice
      * @param  \Dompdf\Options  $options
      * @return string
      */
-    public function pdf(array $data = [], string $view = self::DEFAULT_VIEW, Options $options = null)
+    public function pdf(array $data = [], string $view = self::DEFAULT_VIEW, ?Options $options = null)
     {
         if (!defined('DOMPDF_ENABLE_AUTOLOAD')) {
             define('DOMPDF_ENABLE_AUTOLOAD', false);
@@ -482,7 +482,7 @@ class Invoice
      * @param  \Dompdf\Options  $options
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function download(array $data = [], string $view = self::DEFAULT_VIEW, Options $options = null)
+    public function download(array $data = [], string $view = self::DEFAULT_VIEW, ?Options $options = null)
     {
         $filename = implode('_', [
             $this->id,
