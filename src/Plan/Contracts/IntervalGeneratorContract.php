@@ -10,5 +10,5 @@ interface IntervalGeneratorContract
      * @param  \Laravel\Cashier\Subscription  $subscription
      * @return \Carbon\Carbon
      */
-    public function getEndOfNextSubscriptionCycle(Subscription $subscription = null);
+    public function getEndOfNextSubscriptionCycle(?Subscription $subscription = null);
 }

@@ -14,7 +14,7 @@ class OrderRetryRequiresStatusFailedException extends Exception
      * @param  int  $code
      * @param  Throwable|null  $previous
      */
-    public function __construct(string $message = 'The order status is not failed', int $code = 500, Throwable $previous = null)
+    public function __construct(string $message = 'The order status is not failed', int $code = 500, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

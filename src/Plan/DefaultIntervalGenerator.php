@@ -23,7 +23,7 @@ class DefaultIntervalGenerator extends BaseIntervalGenerator implements Interval
      * @param  \Laravel\Cashier\Subscription|null  $subscription
      * @return \Carbon\Carbon|\Carbon\Traits\Modifiers
      */
-    public function getEndOfNextSubscriptionCycle(Subscription $subscription = null)
+    public function getEndOfNextSubscriptionCycle(?Subscription $subscription = null)
     {
         $cycle_ends_at = $subscription->cycle_ends_at ?? now();
         $subscription_date = $this->startOfTheSubscription($subscription);
