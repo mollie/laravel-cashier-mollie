@@ -41,7 +41,7 @@ trait InteractsWithMocks
      * @param  null  $context
      * @return CouponRepository The mocked coupon repository
      */
-    protected function withMockedCouponRepository(Coupon $coupon = null, $couponHandler = null, $context = null)
+    protected function withMockedCouponRepository(?Coupon $coupon = null, $couponHandler = null, $context = null)
     {
         if (is_null($couponHandler)) {
             $couponHandler = new FixedDiscountHandler;
@@ -76,7 +76,7 @@ trait InteractsWithMocks
      * @param  null  $context
      * @return CouponRepository The mocked coupon repository
      */
-    protected function withMockedUsdCouponRepository(Coupon $coupon = null, $couponHandler = null, $context = null)
+    protected function withMockedUsdCouponRepository(?Coupon $coupon = null, $couponHandler = null, $context = null)
     {
         if (is_null($couponHandler)) {
             $couponHandler = new FixedDiscountHandler;

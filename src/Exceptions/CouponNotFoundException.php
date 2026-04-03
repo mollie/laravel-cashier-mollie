@@ -13,7 +13,7 @@ class CouponNotFoundException extends CouponException
      * @param  int  $code
      * @param  Throwable|null  $previous
      */
-    public function __construct(string $message = 'Coupon not found', int $code = 404, Throwable $previous = null)
+    public function __construct(string $message = 'Coupon not found', int $code = 404, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
