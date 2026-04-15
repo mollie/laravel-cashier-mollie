@@ -36,8 +36,8 @@
     "dompdf/dompdf": "^2.0|^3.0",
     "illuminate/database": "^10|^11|^12|^13",
     "illuminate/support": "^10|^11|^12|^13",
-    "mollie/laravel-mollie": "^3.0",
-    "mollie/mollie-api-php": "^2.76",
+    "mollie/laravel-mollie": "^4.0",
+    "mollie/mollie-api-php": "^3.9",
     "moneyphp/money": "^4.1",
     "nesbot/carbon": "^2.72|^3.0"
   },
@@ -45,7 +45,7 @@
     "guzzlehttp/guzzle": "^7.0",
     "mockery/mockery": "^1.4",
     "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
-    "phpunit/phpunit": "^10.0|^11.5"
+    "phpunit/phpunit": "^10.5|^11.5.50|^12.0|^13.0"
   },
   "autoload": {
     "files": [
