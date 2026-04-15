@@ -8,6 +8,7 @@ use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\OrderNumberGenerator;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
+use PHPUnit\Framework\Attributes\Test;
 
 class OrderNumberGeneratorTest extends BaseTestCase
 {
@@ -19,13 +20,13 @@ class OrderNumberGeneratorTest extends BaseTestCase
         $this->generator = new OrderNumberGenerator;
     }
 
-    /** @test */
+    #[Test]
     public function canGenerateANumber()
     {
         $this->assertNotNull($this->generator->generate());
     }
 
-    /** @test */
+    #[Test]
     public function numberStartsWithCurrentYear()
     {
         Carbon::setTestNow(Carbon::parse('1 jul 2018'));
@@ -33,7 +34,7 @@ class OrderNumberGeneratorTest extends BaseTestCase
         $this->assertTrue(Str::startsWith($number = $this->generator->generate(), '2018-'));
     }
 
-    /** @test */
+    #[Test]
     public function usesConfiguredOffsetAndModelCount()
     {
         config(['cashier.order_number_generator.offset' => 15]);
@@ -45,7 +46,7 @@ class OrderNumberGeneratorTest extends BaseTestCase
         $this->assertTrue(Str::endsWith($this->generator->generate(), '19'));
     }
 
-    /** @test */
+    #[Test]
     public function hasAReadableFormat()
     {
         Carbon::setTestNow(Carbon::parse(('1 jul 2018')));

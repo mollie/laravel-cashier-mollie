@@ -7,6 +7,7 @@ use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Money\Currency;
 use Money\Money;
+use PHPUnit\Framework\Attributes\Test;
 
 class FirstPaymentChargeBuilderTest extends BaseTestCase
 {
@@ -17,7 +18,7 @@ class FirstPaymentChargeBuilderTest extends BaseTestCase
         $this->withMockedCreateMollieCustomer();
     }
 
-    /** @test */
+    #[Test]
     public function redirectToCheckoutResponse()
     {
         $this->withMockedCreateMolliePayment(1, '3.00');

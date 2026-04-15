@@ -6,10 +6,11 @@ use Laravel\Cashier\Order\Invoice;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
+use PHPUnit\Framework\Attributes\Test;
 
 class OrderCollectionTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function canGetInvoices()
     {
         $user = User::factory()->create();

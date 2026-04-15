@@ -6,10 +6,11 @@ use Laravel\Cashier\Charge\FirstPaymentChargeBuilder;
 use Laravel\Cashier\Charge\MandatedChargeBuilder;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
+use PHPUnit\Framework\Attributes\Test;
 
 class ManageChargesTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function usingMandatedChargeBuilderWhenValidMandate()
     {
         $owner = User::factory()->create();
@@ -17,7 +18,7 @@ class ManageChargesTest extends BaseTestCase
         $this->assertInstanceOf(FirstPaymentChargeBuilder::class, $owner->newCharge());
     }
 
-    /** @test */
+    #[Test]
     public function useNewMandatedCharge()
     {
         $this->withMockedGetMollieCustomer(2);

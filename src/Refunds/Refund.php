@@ -58,7 +58,7 @@ class Refund extends Model
      */
     public function scopeWhereUnprocessed(Builder $query)
     {
-        return $query->where('mollie_refund_status', RefundStatus::STATUS_PENDING);
+        return $query->where('mollie_refund_status', RefundStatus::PENDING);
     }
 
     public function items(): HasMany
@@ -85,7 +85,7 @@ class Refund extends Model
             $order = Cashier::$orderModel::createProcessedFromItems($orderItems);
 
             $this->order_id = $order->id;
-            $this->mollie_refund_status = RefundStatus::STATUS_REFUNDED;
+            $this->mollie_refund_status = RefundStatus::REFUNDED;
 
             $this->save();
 
@@ -111,7 +111,7 @@ class Refund extends Model
         $refundItems = $this->items;
 
         DB::transaction(function () use ($refundItems) {
-            $this->mollie_refund_status = RefundStatus::STATUS_FAILED;
+            $this->mollie_refund_status = RefundStatus::FAILED;
 
             $this->save();
 

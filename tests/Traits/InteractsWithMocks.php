@@ -291,7 +291,18 @@ trait InteractsWithMocks
             return $mock->shouldReceive('execute')
                 ->with($wrongId, [])
                 ->times($times)
-                ->andThrow(new ApiException);
+                ->andThrow(new ApiException(
+                    \Mockery::mock(\Mollie\Api\Http\Response::class, [
+                        'json' => (object) ['status' => 404, 'title' => 'Not Found', '_links' => (object) []],
+                        'getPsrRequest' => \Mockery::mock(\Psr\Http\Message\RequestInterface::class, [
+                            'getBody' => \Mockery::mock(\Psr\Http\Message\StreamInterface::class, [
+                                '__toString' => '',
+                            ]),
+                        ]),
+                    ]),
+                    'Test exception',
+                    404,
+                ));
         });
     }
 

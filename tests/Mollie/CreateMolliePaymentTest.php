@@ -6,13 +6,13 @@ namespace Laravel\Cashier\Tests\Mollie;
 
 use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
 use Mollie\Api\Resources\Payment;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 
 class CreateMolliePaymentTest extends BaseMollieInteraction
 {
-    /**
-     * @test
-     * @group mollie_integration
-     */
+    #[Test]
+    #[Group('mollie_integration')]
     public function testExecute()
     {
         /** @var CreateMolliePayment $action */

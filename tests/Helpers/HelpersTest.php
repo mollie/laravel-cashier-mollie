@@ -5,10 +5,11 @@ namespace Laravel\Cashier\Tests\Helpers;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class HelpersTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function testMoney()
     {
         $money = money(1234, 'EUR');
@@ -17,14 +18,14 @@ class HelpersTest extends TestCase
         $this->assertTrue(Money::EUR(1234)->equals($money));
     }
 
-    /** @test */
+    #[Test]
     public function testDecimalToMoney()
     {
         $money = decimal_to_money('12.34', 'EUR');
         $this->assertTrue(Money::EUR(1234)->equals($money));
     }
 
-    /** @test */
+    #[Test]
     public function testMoneyToMollieArray()
     {
         $moneyEUR = Money::EUR(1234);
@@ -44,7 +45,7 @@ class HelpersTest extends TestCase
         ], $arrayUSD);
     }
 
-    /** @test */
+    #[Test]
     public function testMollieArrayToMoney()
     {
         $arrayEUR = [
@@ -64,7 +65,7 @@ class HelpersTest extends TestCase
         $this->assertTrue(Money::USD(9876)->equals($moneyUSD));
     }
 
-    /** @test */
+    #[Test]
     public function testMollieObjectToMoney()
     {
         $objectEUR = (object) [

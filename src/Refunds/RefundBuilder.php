@@ -79,7 +79,7 @@ class RefundBuilder
     protected static function guardOrderIsPaid(Order $order)
     {
         throw_unless(
-            $order->mollie_payment_status === PaymentStatus::STATUS_PAID,
+            $order->mollie_payment_status === PaymentStatus::PAID,
             new LogicException('Only paid orders can be refunded')
         );
     }

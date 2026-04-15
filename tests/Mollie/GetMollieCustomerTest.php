@@ -6,13 +6,13 @@ namespace Laravel\Cashier\Tests\Mollie;
 
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Mollie\Api\Resources\Customer;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 
 class GetMollieCustomerTest extends BaseMollieInteraction
 {
-    /**
-     * @test
-     * @group mollie_integration
-     */
+    #[Test]
+    #[Group('mollie_integration')]
     public function testExecute()
     {
         /** @var GetMollieCustomer $action */

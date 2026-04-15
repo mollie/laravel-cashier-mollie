@@ -7,6 +7,7 @@ use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\Coupon\Coupon;
 use Laravel\Cashier\Exceptions\CouponNotFoundException;
 use Laravel\Cashier\Tests\BaseTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ConfigCouponRepositoryTest extends BaseTestCase
 {
@@ -39,39 +40,39 @@ class ConfigCouponRepositoryTest extends BaseTestCase
         $this->repository = new ConfigCouponRepository($defaults, $coupons);
     }
 
-    /** @test */
+    #[Test]
     public function ItIsContainerBound()
     {
         $repository = app()->make(CouponRepository::class);
         $this->assertInstanceOf(ConfigCouponRepository::class, $repository);
     }
 
-    /** @test */
+    #[Test]
     public function findReturnsNullWhenNotFound()
     {
         $this->assertNull($this->repository->find('some_wrong_name'));
     }
 
-    /** @test */
+    #[Test]
     public function findReturnsCouponWhenFound()
     {
         $this->assertInstanceOf(Coupon::class, $this->repository->find('test-coupon'));
     }
 
-    /** @test */
+    #[Test]
     public function findOrFailCorrect()
     {
         $this->assertInstanceOf(Coupon::class, $this->repository->findOrFail('test-coupon'));
     }
 
-    /** @test */
+    #[Test]
     public function findOrFailWrong()
     {
         $this->expectException(CouponNotFoundException::class);
         $this->repository->findOrFail('some_wrong_name');
     }
 
-    /** @test */
+    #[Test]
     public function findOrFailIsCaseInsensitive()
     {
         $lowercaseCoupon = $this->repository->find('test-coupon');
@@ -81,7 +82,7 @@ class ConfigCouponRepositoryTest extends BaseTestCase
         $this->assertEquals($lowercaseCoupon, $uppercaseCoupon);
     }
 
-    /** @test */
+    #[Test]
     public function itHandlesTimesAttribute()
     {
         $coupon = $this->repository->findOrFail('test-coupon');

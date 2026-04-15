@@ -12,10 +12,11 @@ use Laravel\Cashier\Tests\Fixtures\User;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
+use PHPUnit\Framework\Attributes\Test;
 
 class FirstPaymentHandlerTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function handlesMolliePayments()
     {
         Event::fake();
@@ -92,7 +93,7 @@ class FirstPaymentHandlerTest extends BaseTestCase
         $payment->customerId = 'cst_unique_customer_id';
         $payment->mandateId = 'mdt_unique_mandate_id';
         $payment->amount = (object) ['value' => '10.00', 'currency' => 'EUR'];
-        $payment->status = PaymentStatus::STATUS_PAID;
+        $payment->status = PaymentStatus::PAID;
         $payment->metadata = json_decode(json_encode([
             'owner' => [
                 'type' => User::class,

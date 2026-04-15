@@ -8,13 +8,13 @@ use Illuminate\Support\Str;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Mollie\Api\Resources\Payment;
 use Mollie\Laravel\Facades\Mollie;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 
 class UpdateMolliePaymentTest extends BaseMollieInteraction
 {
-    /**
-     * @test
-     * @group mollie_integration
-     */
+    #[Test]
+    #[Group('mollie_integration')]
     public function testExecute()
     {
         /** @var UpdateMolliePayment $action */

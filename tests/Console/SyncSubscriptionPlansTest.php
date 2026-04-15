@@ -9,10 +9,11 @@ use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Money\Money;
+use PHPUnit\Framework\Attributes\Test;
 
 class SyncSubscriptionPlansTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function it_updates_unprocessed_subscription_order_items_with_current_plan_values()
     {
         // Create an owner and subscription
@@ -58,7 +59,7 @@ class SyncSubscriptionPlansTest extends BaseTestCase
         $this->assertEquals($newDescription, $orderItem->description);
     }
 
-    /** @test */
+    #[Test]
     public function it_skips_processed_subscription_order_items()
     {
         // Create an owner and subscription with a processed order item
@@ -105,7 +106,7 @@ class SyncSubscriptionPlansTest extends BaseTestCase
         $this->assertEquals($oldDescription, $orderItem->description);
     }
 
-    /** @test */
+    #[Test]
     public function it_skips_non_subscription_order_items()
     {
         // Create a generic order item

@@ -6,14 +6,14 @@ namespace Laravel\Cashier\Tests\Mollie;
 
 use Laravel\Cashier\Mollie\Contracts\CreateMollieRefund;
 use Mollie\Api\Resources\Refund;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 
 class CreateMollieRefundTest extends BaseMollieInteraction
 {
-    /**
-     * @test
-     * @group mollie_integration
-     * @group requires_manual_intervention
-     */
+    #[Test]
+    #[Group('mollie_integration')]
+    #[Group('requires_manual_intervention')]
     public function testExecute()
     {
         // Manually create a new refundable payment first before running this.

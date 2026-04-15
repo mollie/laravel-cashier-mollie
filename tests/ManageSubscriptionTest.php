@@ -9,6 +9,7 @@ use Laravel\Cashier\Events\SubscriptionQuantityUpdated;
 use Laravel\Cashier\Events\SubscriptionResumed;
 use Laravel\Cashier\Events\SubscriptionStarted;
 use Laravel\Cashier\Tests\Fixtures\User;
+use PHPUnit\Framework\Attributes\Test;
 
 class ManageSubscriptionTest extends BaseTestCase
 {
@@ -21,8 +22,10 @@ class ManageSubscriptionTest extends BaseTestCase
     /**
      * Assert that a new subscription and its order items can be created and processed.
      *
-     * @test
+
+
      */
+    #[Test]
     public function canCreateDirectDebitSubscriptionForMandatedCustomer()
     {
         $this->withMockedGetMollieCustomer(10);

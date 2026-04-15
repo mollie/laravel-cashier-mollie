@@ -5,6 +5,7 @@ namespace Laravel\Cashier\Tests\FirstPayment\Actions;
 use Carbon\Carbon;
 use Laravel\Cashier\FirstPayment\Actions\StartSubscription;
 use Laravel\Cashier\Tests\BaseTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class StartSubscriptionWithPlanIntervalArrayTest extends BaseTestCase
 {
@@ -16,7 +17,7 @@ class StartSubscriptionWithPlanIntervalArrayTest extends BaseTestCase
             ->withTestNow('2019-01-29');
     }
 
-    /** @test */
+    #[Test]
     public function canStartSubscriptionWithFixedIntervalTest()
     {
         $this->withMockedGetMollieCustomer(2);
@@ -43,7 +44,7 @@ class StartSubscriptionWithPlanIntervalArrayTest extends BaseTestCase
         $this->assertCarbon(Carbon::parse('2019-02-28'), $subscription->cycle_ends_at);
     }
 
-    /** @test */
+    #[Test]
     public function canStartSubscriptionWithoutFixedInterval()
     {
         $this->withMockedGetMollieCustomer(2);

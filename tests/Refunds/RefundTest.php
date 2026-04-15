@@ -14,10 +14,11 @@ use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Database\Factories\RefundFactory;
 use Mollie\Api\Types\RefundStatus as MollieRefundStatus;
+use PHPUnit\Framework\Attributes\Test;
 
 class RefundTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function canHandleProcessedMollieRefund()
     {
         Event::fake();
@@ -36,12 +37,12 @@ class RefundTest extends BaseTestCase
         $refund->items()->saveMany(
             RefundItemCollection::makeFromOrderItemCollection($originalOrderItems)
         );
-        $this->assertEquals(MollieRefundStatus::STATUS_PENDING, $refund->mollie_refund_status);
+        $this->assertEquals(MollieRefundStatus::PENDING, $refund->mollie_refund_status);
 
         $refund = $refund->handleProcessed();
 
         $this->assertNotNull($refund->order_id);
-        $this->assertEquals(MollieRefundStatus::STATUS_REFUNDED, $refund->mollie_refund_status);
+        $this->assertEquals(MollieRefundStatus::REFUNDED, $refund->mollie_refund_status);
         $this->assertMoneyEURCents(29524, $originalOrder->refresh()->getAmountRefunded());
 
         $order = $refund->order;
@@ -55,7 +56,7 @@ class RefundTest extends BaseTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function canHandleFailedMollieRefund()
     {
         Event::fake();
@@ -74,12 +75,12 @@ class RefundTest extends BaseTestCase
         $refund->items()->saveMany(
             RefundItemCollection::makeFromOrderItemCollection($originalOrderItems)
         );
-        $this->assertEquals(MollieRefundStatus::STATUS_PENDING, $refund->mollie_refund_status);
+        $this->assertEquals(MollieRefundStatus::PENDING, $refund->mollie_refund_status);
 
         $refund = $refund->handleFailed();
 
         $this->assertNull($refund->order_id);
-        $this->assertEquals(MollieRefundStatus::STATUS_FAILED, $refund->mollie_refund_status);
+        $this->assertEquals(MollieRefundStatus::FAILED, $refund->mollie_refund_status);
         $this->assertMoneyEURCents(0, $originalOrder->refresh()->getAmountRefunded());
 
         $this->assertNull($refund->order);

@@ -7,6 +7,7 @@ use Laravel\Cashier\Cashier;
 use Laravel\Cashier\FirstPayment\Actions\StartSubscription;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class StartSubscriptionTest extends BaseTestCase
 {
@@ -18,8 +19,7 @@ class StartSubscriptionTest extends BaseTestCase
             ->withTestNow('2019-01-01');
     }
 
-    /** @test
-     */
+    #[Test]
     public function canGetBasicPayload()
     {
         $action = new StartSubscription(
@@ -44,7 +44,7 @@ class StartSubscriptionTest extends BaseTestCase
         ], $payload);
     }
 
-    /** @test */
+    #[Test]
     public function canGetPayloadWithTrialDays()
     {
         $action = new StartSubscription(
@@ -72,7 +72,7 @@ class StartSubscriptionTest extends BaseTestCase
         ], $payload);
     }
 
-    /** @test */
+    #[Test]
     public function canGetPayloadWithTrialUntil()
     {
         $action = new StartSubscription(
@@ -100,7 +100,7 @@ class StartSubscriptionTest extends BaseTestCase
         ], $payload);
     }
 
-    /** @test */
+    #[Test]
     public function canGetPayloadWithSkipTrial()
     {
         $action = new StartSubscription(
@@ -128,7 +128,7 @@ class StartSubscriptionTest extends BaseTestCase
         ], $payload);
     }
 
-    /** @test */
+    #[Test]
     public function canGetPayloadWithCoupon()
     {
         $this->withMockedCouponRepository();
@@ -158,13 +158,13 @@ class StartSubscriptionTest extends BaseTestCase
         ], $payload);
     }
 
-    /** @test */
+    #[Test]
     public function canCreateFromBasicPayload()
     {
         $this->assertFromPayloadToPayload();
     }
 
-    /** @test */
+    #[Test]
     public function canCreateFromPayloadWithTrialUntil()
     {
         $this->assertFromPayloadToPayload([
@@ -176,7 +176,7 @@ class StartSubscriptionTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function canCreateFromPayloadWithTrialDays()
     {
         $this->assertFromPayloadToPayload([
@@ -188,7 +188,7 @@ class StartSubscriptionTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function canCreateFromPayloadWithSkipTrial()
     {
         $this->assertFromPayloadToPayload([
@@ -200,7 +200,7 @@ class StartSubscriptionTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function canCreateFromPayloadWithQuantity()
     {
         $this->assertFromPayloadToPayload([
@@ -212,7 +212,7 @@ class StartSubscriptionTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function canCreateFromPayloadWithTrialAndQuantity()
     {
         $this->assertFromPayloadToPayload([
@@ -225,7 +225,7 @@ class StartSubscriptionTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function canCreateFromPayloadWithCouponNoTrial()
     {
         $this->withMockedCouponRepository();
@@ -238,7 +238,7 @@ class StartSubscriptionTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function canCreateFromPayloadWithCouponAndTrial()
     {
         $this->withMockedCouponRepository();
@@ -252,7 +252,7 @@ class StartSubscriptionTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function canCreateFromPayloadWithoutTaxPercentage()
     {
         $this->withMockedCouponRepository();
@@ -267,7 +267,7 @@ class StartSubscriptionTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function canStartDefaultSubscription()
     {
         Carbon::setTestNow('2019-01-29');
@@ -311,7 +311,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertEquals(1000, $scheduledItem->total);
     }
 
-    /** @test */
+    #[Test]
     public function canStartSubscriptionWithTrialDays()
     {
         $user = $this->getMandatedUser(true, ['tax_percentage' => 20]);
@@ -361,7 +361,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertEquals(20, $scheduledItem->tax_percentage);
     }
 
-    /** @test */
+    #[Test]
     public function canStartSubscriptionWithTrialUntil()
     {
         $this->withMockedGetMollieCustomer(2);
@@ -408,7 +408,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertEquals(1000, $scheduledItem->total);
     }
 
-    /** @test */
+    #[Test]
     public function canStartSubscriptionWithQuantityNoTrial()
     {
         $this->withMockedGetMollieCustomer(2);
@@ -456,7 +456,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertEquals(5 * 1000, $scheduledItem->total);
     }
 
-    /** @test */
+    #[Test]
     public function canStartSubscriptionWithQuantityAndTrialUntil()
     {
         $this->withMockedGetMollieCustomer(2);
@@ -506,7 +506,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertEquals(5 * 1000, $scheduledItem->total);
     }
 
-    /** @test */
+    #[Test]
     public function canStartSubscriptionUsingNextPaymentAt()
     {
         $this->withMockedGetMollieCustomer(2);
@@ -545,7 +545,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertCarbon(now()->addWeeks(2), $scheduledItem->process_at);
     }
 
-    /** @test */
+    #[Test]
     public function canStartSubscriptionWithCouponNoTrial()
     {
         $this->withMockedCouponRepository();
@@ -598,7 +598,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertEquals(-500, $couponItem->total);
     }
 
-    /** @test */
+    #[Test]
     public function canStartSubscriptionWithCouponAndTrial()
     {
         $this->withMockedCouponRepository();

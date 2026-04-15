@@ -27,6 +27,7 @@ use Laravel\Cashier\Tests\Fixtures\Subscription as FixtureSubscription;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Money\Currency;
 use Money\Money;
+use PHPUnit\Framework\Attributes\Test;
 
 class CashierTest extends BaseTestCase
 {
@@ -50,7 +51,7 @@ class CashierTest extends BaseTestCase
         Cashier::useCurrency('eur');
     }
 
-    /** @test */
+    #[Test]
     public function cashierUsesPredefinedModels()
     {
         $this->assertEquals(Cashier::$subscriptionModel, CashierSubscription::class);
@@ -64,7 +65,7 @@ class CashierTest extends BaseTestCase
         $this->assertEquals(Cashier::$refundItemModel, CashierRefundItem::class);
     }
 
-    /** @test */
+    #[Test]
     public function cashierUsesConfiguredModels()
     {
         Cashier::useSubscriptionModel(FixtureSubscription::class);
@@ -88,7 +89,7 @@ class CashierTest extends BaseTestCase
         $this->assertEquals(Cashier::$refundItemModel, FixtureRefundItem::class);
     }
 
-    /** @test */
+    #[Test]
     public function testRunningCashierProcessesOpenOrderItems()
     {
         $this->withMockedGetMollieCustomer(2);
@@ -115,7 +116,7 @@ class CashierTest extends BaseTestCase
         $this->assertOrderItemCounts($user, 2, 0);
     }
 
-    /** @test */
+    #[Test]
     public function testRunningCashierProcessesUnprocessedOrderItemsAndSchedulesNext()
     {
         $this->withMockedGetMollieCustomer(2, [
@@ -191,7 +192,7 @@ class CashierTest extends BaseTestCase
         $this->assertOrderItemCounts($user2, 1, 1); // processed 1, scheduled 1
     }
 
-    /** @test */
+    #[Test]
     public function canSwapSubscriptionPlan()
     {
         $this->withTestNow('2019-01-01');
@@ -253,7 +254,7 @@ class CashierTest extends BaseTestCase
         $this->assertOrderItemCounts($user, 4, 1);
     }
 
-    /** @test */
+    #[Test]
     public function canSwapSubscriptionPlanAndReimburseUnusedTime()
     {
         $this->withTestNow('2019-01-01');
@@ -293,7 +294,7 @@ class CashierTest extends BaseTestCase
         $this->assertEquals(1000, $user->orders()->latest()->first()->total);
     }
 
-    /** @test */
+    #[Test]
     public function testFormatAmount()
     {
         $this->assertEquals('1.000,00 €', Cashier::formatAmount(new Money(100000, new Currency('EUR'))));
@@ -324,7 +325,7 @@ class CashierTest extends BaseTestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function canOverrideDefaultCurrencySymbol()
     {
         $this->assertEquals('€', Cashier::usesCurrencySymbol());
@@ -336,7 +337,7 @@ class CashierTest extends BaseTestCase
         $this->assertEquals('$', Cashier::usesCurrencySymbol());
     }
 
-    /** @test */
+    #[Test]
     public function canOverrideDefaultCurrencyLocale()
     {
         $this->assertEquals('de_DE', Cashier::usesCurrencyLocale());
@@ -346,7 +347,7 @@ class CashierTest extends BaseTestCase
         $this->assertEquals('nl_NL', Cashier::usesCurrencyLocale());
     }
 
-    /** @test */
+    #[Test]
     public function canOverrideFirstPaymentWebhookUrl()
     {
         $this->assertEquals('mandate-webhook', Cashier::firstPaymentWebhookUrl());
@@ -360,7 +361,7 @@ class CashierTest extends BaseTestCase
         $this->assertEquals('webhook/cashier', Cashier::firstPaymentWebhookUrl());
     }
 
-    /** @test */
+    #[Test]
     public function canOverrideWebhookUrl()
     {
         $this->assertEquals('webhook', Cashier::webhookUrl());

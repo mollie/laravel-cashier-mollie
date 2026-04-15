@@ -11,10 +11,11 @@ use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
+use PHPUnit\Framework\Attributes\Test;
 
 class MultiCurrencyCouponOrderItemPreprocessorTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function appliesCoupon()
     {
         $this->withMockedUsdCouponRepository();

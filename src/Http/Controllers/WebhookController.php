@@ -26,7 +26,7 @@ class WebhookController extends BaseWebhookController
 
             if ($order && $order->mollie_payment_status !== $payment->status) {
                 switch ($payment->status) {
-                    case PaymentStatus::STATUS_PAID:
+                    case PaymentStatus::PAID:
                         $order->handlePaymentPaid($payment);
                         $payment->webhookUrl = route('webhooks.mollie.aftercare');
 
@@ -35,7 +35,7 @@ class WebhookController extends BaseWebhookController
                         $updateMolliePayment->execute($payment);
 
                         break;
-                    case PaymentStatus::STATUS_FAILED:
+                    case PaymentStatus::FAILED:
                         $order->handlePaymentFailed($payment);
 
                         break;
