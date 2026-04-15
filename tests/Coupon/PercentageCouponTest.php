@@ -11,10 +11,11 @@ use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
+use PHPUnit\Framework\Attributes\Test;
 
 class PercentageCouponTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function couponCalculatesTheRightPrice()
     {
         $couponHandler = new PercentageDiscountHandler;
@@ -50,7 +51,7 @@ class PercentageCouponTest extends BaseTestCase
         $this->assertEquals(-2430, $result[1]->unit_price);
     }
 
-    /** @test */
+    #[Test]
     public function percentageCouponWithNoTaxCalculatesDiscountFromSubtotalNotTotal()
     {
         // 50% coupon on €150 item with 21% VAT
@@ -124,7 +125,7 @@ class PercentageCouponTest extends BaseTestCase
         $this->assertEquals(10650, $finalTotal);
     }
 
-    /** @test */
+    #[Test]
     public function percentageCouponWithTaxCalculatesDiscountFromSubtotalNotTotal()
     {
         // 50% coupon on €150 item with 21% VAT, no_tax = false

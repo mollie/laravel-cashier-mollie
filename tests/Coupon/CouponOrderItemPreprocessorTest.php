@@ -10,10 +10,11 @@ use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
+use PHPUnit\Framework\Attributes\Test;
 
 class CouponOrderItemPreprocessorTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function appliesCoupon()
     {
         $this->withMockedCouponRepository();
@@ -38,7 +39,7 @@ class CouponOrderItemPreprocessorTest extends BaseTestCase
         $this->assertEquals(0, $redeemedCoupon->refresh()->times_left);
     }
 
-    /** @test */
+    #[Test]
     public function passesThroughWhenNoRedeemedCoupon()
     {
         $preprocessor = new CouponOrderItemPreprocessor();

@@ -9,10 +9,11 @@ use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Money\Currency;
 use Money\Money;
+use PHPUnit\Framework\Attributes\Test;
 
 class AddBalanceTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function canGetPayload()
     {
         $action = new AddBalance(
@@ -36,7 +37,7 @@ class AddBalanceTest extends BaseTestCase
         ], $payload);
     }
 
-    /** @test */
+    #[Test]
     public function canCreateFromPayload()
     {
         $action = AddBalance::createFromPayload([
@@ -56,7 +57,7 @@ class AddBalanceTest extends BaseTestCase
         $this->assertEquals(0, $action->getTaxPercentage());
     }
 
-    /** @test */
+    #[Test]
     public function canExecute()
     {
         $user = User::factory()->create();

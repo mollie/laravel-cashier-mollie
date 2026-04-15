@@ -7,10 +7,11 @@ use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\OrderInvoiceAvailable;
 use Laravel\Cashier\Events\OrderPaymentPaid;
 use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
+use PHPUnit\Framework\Attributes\Test;
 
 class EventServiceProviderTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function itIsWiredUpAndFiring()
     {
         Event::fake(OrderInvoiceAvailable::class);

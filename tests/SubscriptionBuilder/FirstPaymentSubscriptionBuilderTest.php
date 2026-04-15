@@ -18,6 +18,7 @@ use Laravel\Cashier\SubscriptionBuilder\RedirectToCheckoutResponse;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
+use PHPUnit\Framework\Attributes\Test;
 
 class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
 {
@@ -35,7 +36,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function createsAFirstPaymentForSubscription()
     {
         $firstPayment = config('cashier_plans.defaults.first_payment');
@@ -97,7 +98,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         $this->assertEquals(20, $localPayment->first_payment_actions[1]->taxPercentage);
     }
 
-    /** @test */
+    #[Test]
     public function handlesQuantity()
     {
         config(['cashier.locale' => 'nl_NL']);
@@ -124,7 +125,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         ], $payload['amount']);
     }
 
-    /** @test */
+    #[Test]
     public function handlesAPaidFirstPayment()
     {
         $this->withoutExceptionHandling();
@@ -207,7 +208,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         $this->assertSame(Order::first()->items->first()->description_extra_lines[0], 'From 2019-01-01 to 2019-02-01');
     }
 
-    /** @test */
+    #[Test]
     public function testWithCouponNoTrialValidatesCoupon()
     {
         $this->expectException(CouponException::class);
@@ -215,7 +216,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         $this->getBuilder()->withCoupon('test-coupon')->create();
     }
 
-    /** @test */
+    #[Test]
     public function testWithCouponWithTrialValidatesCoupon()
     {
         $this->expectException(CouponException::class);
@@ -223,7 +224,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         $this->getBuilder()->trialDays(5)->withCoupon('test-coupon')->create();
     }
 
-    /** @test */
+    #[Test]
     public function testWithCouponNoTrialModifiesThePaymentAmount()
     {
         $this->withMockedCouponRepository();
@@ -239,7 +240,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         $this->assertEquals('EUR', $amount['currency']);
     }
 
-    /** @test */
+    #[Test]
     public function testHandlesTrialDays()
     {
         $this->withMockedCreateMolliePayment();
@@ -254,7 +255,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function testHandlesNoTrialMode()
     {
         $this->withMockedCreateMolliePayment();

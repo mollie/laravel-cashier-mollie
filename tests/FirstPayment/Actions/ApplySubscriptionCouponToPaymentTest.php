@@ -9,6 +9,7 @@ use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
+use PHPUnit\Framework\Attributes\Test;
 
 class ApplySubscriptionCouponToPaymentTest extends BaseTestCase
 {
@@ -35,32 +36,32 @@ class ApplySubscriptionCouponToPaymentTest extends BaseTestCase
         $this->action = new Action($this->owner, $this->coupon, $orderItems);
     }
 
-    /** @test */
+    #[Test]
     public function testGetTotalReturnsDiscountSubtotal()
     {
         $this->assertMoneyEURCents(-500, $this->action->getTotal());
     }
 
-    /** @test */
+    #[Test]
     public function testTaxDefaultsToZero()
     {
         $this->assertEquals(0, $this->action->getTaxPercentage());
         $this->assertMoneyEURCents(0, $this->action->getTax());
     }
 
-    /** @test */
+    #[Test]
     public function testCreateFromPayloadReturnsNull()
     {
         $this->assertNull(Action::createFromPayload(['foo' => 'bar'], User::factory()->make()));
     }
 
-    /** @test */
+    #[Test]
     public function testGetPayloadReturnsNull()
     {
         $this->assertNull($this->action->getPayload());
     }
 
-    /** @test */
+    #[Test]
     public function testExecuteReturnsEmptyOrderItemCollection()
     {
         $result = $this->action->execute();

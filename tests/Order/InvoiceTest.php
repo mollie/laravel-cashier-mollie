@@ -10,10 +10,11 @@ use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Money\Currency;
 use Money\Money;
+use PHPUnit\Framework\Attributes\Test;
 
 class InvoiceTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function canAddItemsToInvoice()
     {
         $itemA = OrderItemFactory::new()->make([
@@ -68,7 +69,7 @@ class InvoiceTest extends BaseTestCase
         $this->assertMoneyEURCents(7050, $invoice->rawTotal());
     }
 
-    /** @test */
+    #[Test]
     public function canSetReceiverAddress()
     {
         $invoice = new Invoice('EUR');
@@ -86,7 +87,7 @@ class InvoiceTest extends BaseTestCase
         $this->assertEquals('John Doe<br>john@example.com', $invoice->receiverAddress('<br>'));
     }
 
-    /** @test */
+    #[Test]
     public function canSetDate()
     {
         $now = Carbon::parse('Feb 14 2016');
@@ -102,7 +103,7 @@ class InvoiceTest extends BaseTestCase
         $this->assertCarbon($now->addYears(2), $invoice->date());
     }
 
-    /** @test */
+    #[Test]
     public function canReceiveDateInDifferentLanguages()
     {
         $invoice = new Invoice('EUR', null, Carbon::parse('May 15 2023'));
@@ -112,7 +113,7 @@ class InvoiceTest extends BaseTestCase
         $this->assertEquals('Mai 15, 2023', $invoice->isoFormattedDate());
     }
 
-    /** @test */
+    #[Test]
     public function canAddExtraInformation()
     {
         $invoice = new Invoice('EUR');
@@ -125,7 +126,7 @@ class InvoiceTest extends BaseTestCase
         $this->assertEquals('This is some nice extra information', $invoice->extraInformation(''));
     }
 
-    /** @test */
+    #[Test]
     public function canSetInvoiceId()
     {
         $invoice = new Invoice('EUR', '2018-1234567890');
@@ -135,7 +136,7 @@ class InvoiceTest extends BaseTestCase
         $this->assertEquals('2018-0987654321', $invoice->id());
     }
 
-    /** @test */
+    #[Test]
     public function canSetStartingBalance()
     {
         $invoice = new Invoice('EUR');
@@ -149,7 +150,7 @@ class InvoiceTest extends BaseTestCase
         $this->assertEquals('15,25 €', $invoice->startingBalance());
     }
 
-    /** @test */
+    #[Test]
     public function canSetCompletedBalance()
     {
         $invoice = new Invoice('EUR');
@@ -161,7 +162,7 @@ class InvoiceTest extends BaseTestCase
         $this->assertEquals('15,25 €', $invoice->completedBalance());
     }
 
-    /** @test */
+    #[Test]
     public function canSetUsedBalance()
     {
         $invoice = new Invoice('EUR');
@@ -173,7 +174,7 @@ class InvoiceTest extends BaseTestCase
         $this->assertEquals('15,25 €', $invoice->usedBalance());
     }
 
-    /** @test */
+    #[Test]
     public function canGetAsView()
     {
         $items = OrderItemFactory::new()->times(2)->make();
@@ -192,7 +193,7 @@ class InvoiceTest extends BaseTestCase
         $this->assertTrue($item2->is($items[1]));
     }
 
-    /** @test */
+    #[Test]
     public function canGetAsPdf()
     {
         $items = OrderItemFactory::new()->times(2)->make();
@@ -205,7 +206,7 @@ class InvoiceTest extends BaseTestCase
         $this->assertNotNull($pdf);
     }
 
-    /** @test */
+    #[Test]
     public function canGetAsDownloadResponse()
     {
         Carbon::setTestNow(Carbon::parse('2018-12-31'));

@@ -18,12 +18,14 @@ use Laravel\Cashier\Tests\Fixtures\User;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Resources\Refund as MollieRefund;
+use Mollie\Api\Resources\RefundCollection;
 use Mollie\Api\Types\PaymentStatus as MolliePaymentStatus;
 use Mollie\Api\Types\RefundStatus as MollieRefundStatus;
+use PHPUnit\Framework\Attributes\Test;
 
 class AftercareWebhookControllerTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function itDetectsNewChargebacks()
     {
         Event::fake();
@@ -64,7 +66,7 @@ class AftercareWebhookControllerTest extends BaseTestCase
         Event::assertDispatched(ChargebackReceived::class);
     }
 
-    /** @test */
+    #[Test]
     public function itDetectsNewRefunds()
     {
         Event::fake();
@@ -94,7 +96,7 @@ class AftercareWebhookControllerTest extends BaseTestCase
             'owner_id' => $user->id,
             'owner_type' => get_class($user),
             'mollie_refund_id' => $mollieRefundId,
-            'mollie_refund_status' => MollieRefundStatus::STATUS_PENDING,
+            'mollie_refund_status' => MollieRefundStatus::PENDING,
             'total' => 1000,
             'currency' => 'EUR',
         ]);
@@ -107,7 +109,7 @@ class AftercareWebhookControllerTest extends BaseTestCase
 
         $mollieRefund = new MollieRefund(new MollieApiClient);
         $mollieRefund->id = $mollieRefundId;
-        $mollieRefund->status = MollieRefundStatus::STATUS_REFUNDED;
+        $mollieRefund->status = MollieRefundStatus::REFUNDED;
 
         $molliePayment = $this->getMockBuilder(MolliePayment::class)
             ->setConstructorArgs([new MollieApiClient])
@@ -116,10 +118,13 @@ class AftercareWebhookControllerTest extends BaseTestCase
 
         $molliePayment
             ->method('refunds')
-            ->willReturn([$mollieRefund]);
+            ->willReturn(new RefundCollection(
+                $this->createMock(\Mollie\Api\Contracts\Connector::class),
+                [$mollieRefund],
+            ));
 
         $molliePayment->id = $molliePaymentId;
-        $molliePayment->status = MolliePaymentStatus::STATUS_PAID;
+        $molliePayment->status = MolliePaymentStatus::PAID;
         $molliePayment->amount = (object) [
             'currency' => 'EUR',
             'value' => '10.00',

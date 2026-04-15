@@ -20,10 +20,11 @@ use Laravel\Cashier\Types\SubscriptionCancellationReason;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
+use PHPUnit\Framework\Attributes\Test;
 
 class WebhookControllerTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function retrievesPaymentResource()
     {
         $payment = new MolliePayment(resolve(MollieApiClient::class));
@@ -34,7 +35,7 @@ class WebhookControllerTest extends BaseTestCase
         $this->assertInstanceOf(MolliePayment::class, $this->getController()->getMolliePaymentById($payment->id));
     }
 
-    /** @test **/
+    #[Test]
     public function MollieApiExceptionIsCatchedWhenDebugDisabled()
     {
         $wrongId = 'sub_xxxxxxxxxxx';
@@ -44,7 +45,7 @@ class WebhookControllerTest extends BaseTestCase
         $this->assertNull($this->getController()->getMolliePaymentById($wrongId));
     }
 
-    /** @test **/
+    #[Test]
     public function MollieApiExceptionIsThrownWhenDebugEnabled()
     {
         $wrongId = 'sub_xxxxxxxxxxx';
@@ -56,7 +57,7 @@ class WebhookControllerTest extends BaseTestCase
         $this->assertNull($this->getController()->getMolliePaymentById($wrongId));
     }
 
-    /** @test **/
+    #[Test]
     public function handlesUnexistingIdGracefully()
     {
         $wrongId = 'sub_xxxxxxxxxxx';
@@ -68,7 +69,7 @@ class WebhookControllerTest extends BaseTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    /** @test **/
+    #[Test]
     public function handlesPaymentFailed()
     {
         $this->withConfiguredPlans();
@@ -140,7 +141,7 @@ class WebhookControllerTest extends BaseTestCase
         });
     }
 
-    /** @test **/
+    #[Test]
     public function handlesPaymentPaid()
     {
         $this->withConfiguredPlans();
@@ -191,7 +192,7 @@ class WebhookControllerTest extends BaseTestCase
         });
     }
 
-    /** @test **/
+    #[Test]
     public function skipsIfPaymentStatusUnchanged()
     {
         Event::fake();

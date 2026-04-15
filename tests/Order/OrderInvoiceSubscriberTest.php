@@ -11,6 +11,7 @@ use Laravel\Cashier\Order\OrderInvoiceSubscriber;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
 use Mollie\Api\Resources\Payment;
+use PHPUnit\Framework\Attributes\Test;
 
 class OrderInvoiceSubscriberTest extends BaseTestCase
 {
@@ -23,7 +24,7 @@ class OrderInvoiceSubscriberTest extends BaseTestCase
         $this->subscriber = new OrderInvoiceSubscriber;
     }
 
-    /** @test */
+    #[Test]
     public function itHandlesTheFirstPaymentPaidEvent()
     {
         $this->assertItHandlesEvent(
@@ -32,7 +33,7 @@ class OrderInvoiceSubscriberTest extends BaseTestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function itHandlesTheOrderPaymentPaidEvent()
     {
         $this->assertItHandlesEvent(

@@ -5,10 +5,11 @@ namespace Laravel\Cashier\Tests;
 use Laravel\Cashier\Cashier;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
+use PHPUnit\Framework\Attributes\Test;
 
 class PaymentTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function canCreateFromBasicMolliePayment()
     {
         $molliePayment = new MolliePayment(new MollieApiClient);
@@ -35,7 +36,7 @@ class PaymentTest extends BaseTestCase
         $this->assertTrue($localPayment->owner->is($user));
     }
 
-    /** @test */
+    #[Test]
     public function canCreateFromMolliePaymentWithRefundsAndChargebacks()
     {
         $molliePayment = new MolliePayment(new MollieApiClient);

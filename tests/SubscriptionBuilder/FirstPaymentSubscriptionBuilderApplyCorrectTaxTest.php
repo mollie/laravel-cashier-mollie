@@ -6,6 +6,7 @@ use Laravel\Cashier\Cashier;
 use Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Money\Money;
+use PHPUnit\Framework\Attributes\Test;
 
 class FirstPaymentSubscriptionBuilderApplyCorrectTaxTest extends BaseTestCase
 {
@@ -23,7 +24,7 @@ class FirstPaymentSubscriptionBuilderApplyCorrectTaxTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function handlesTrialDaysAndFirstPaymentWithTaxAppliedCorrectly()
     {
         $firstPaymentAmounts = collect(['10.00', '11.00', '21.00', '24.00', '280.00']);
@@ -43,7 +44,7 @@ class FirstPaymentSubscriptionBuilderApplyCorrectTaxTest extends BaseTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function roundingModeReturnCorrectValue()
     {
         $down = $this->getBuilder()->roundingMode(Money::EUR(1000), 0.21); //total is 1001

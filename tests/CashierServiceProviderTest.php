@@ -4,10 +4,11 @@ namespace Laravel\Cashier\Tests;
 
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\CashierServiceProvider;
+use PHPUnit\Framework\Attributes\Test;
 
 class CashierServiceProviderTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function canOptionallySetCurrencyInConfig()
     {
         $this->assertEquals('INEXISTENT', config('cashier.currency', 'INEXISTENT'));
@@ -22,7 +23,7 @@ class CashierServiceProviderTest extends BaseTestCase
         $this->assertEquals('$', Cashier::usesCurrencySymbol());
     }
 
-    /** @test */
+    #[Test]
     public function canOptionallySetCurrencyLocaleInConfig()
     {
         $this->assertEquals('INEXISTENT', config('cashier.currency_locale', 'INEXISTENT'));
