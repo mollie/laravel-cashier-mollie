@@ -21,9 +21,6 @@ class ManageSubscriptionTest extends BaseTestCase
 
     /**
      * Assert that a new subscription and its order items can be created and processed.
-     *
-
-
      */
     #[Test]
     public function canCreateDirectDebitSubscriptionForMandatedCustomer()

@@ -55,10 +55,8 @@ class ConfigPlanRepositoryTest extends BaseTestCase
         $this->assertInstanceOf(Plan::class, ConfigPlanRepository::find('Test'));
     }
 
-    /**     * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
-     
-
-
+    /**
+     * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
      */
     #[Test]
     public function findOrFailCorrect()
