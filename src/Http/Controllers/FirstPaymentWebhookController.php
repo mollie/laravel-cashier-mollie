@@ -24,7 +24,13 @@ class FirstPaymentWebhookController extends BaseWebhookController
 
         if ($payment) {
             if ($payment->isPaid()) {
-                $order = (new FirstPaymentHandler($payment))->execute();
+                $handler = new FirstPaymentHandler($payment);
+                $order = $handler->execute();
+
+                if ($handler->wasAlreadyProcessed()) {
+                    return new Response(null, 200);
+                }
+
                 $payment->webhookUrl = route('webhooks.mollie.aftercare');
 
                 /** @var UpdateMolliePayment $updateMolliePayment */
