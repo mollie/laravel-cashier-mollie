@@ -70,7 +70,7 @@ class AftercareWebhookController extends BaseWebhookController
 
                 $locallyKnownAmountChargedBack = $localPayment->getAmountChargedBack();
 
-                if (! $locallyKnownAmountChargedBack->lessThan($molliePaymentAmountChargedBackTotal)) {
+                if ($locallyKnownAmountChargedBack->greaterThanOrEqual($molliePaymentAmountChargedBackTotal)) {
                     return;
                 }
 
