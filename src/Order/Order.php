@@ -78,6 +78,9 @@ class Order extends Model
 
     protected $guarded = [];
 
+    /** @var bool */
+    protected $paymentStatusHandled = false;
+
     /**
      * @return int
      */
@@ -445,35 +448,50 @@ class Order extends Model
      */
     public function handlePaymentFailed(MolliePayment $molliePayment)
     {
-        $localPayment = DB::transaction(function () use ($molliePayment) {
-            if ($this->creditApplied()) {
-                $this->owner->addCredit($this->getCreditUsed());
+        $this->paymentStatusHandled = false;
+        $handled = false;
+        $localPayment = DB::transaction(function () use ($molliePayment, &$handled) {
+            /** @var static $order */
+            $order = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
+
+            if ($order->mollie_payment_status === PaymentStatus::FAILED) {
+                return null;
             }
 
-            $this->update([
-                'mollie_payment_status' => 'failed',
+            if ($order->creditApplied()) {
+                $order->owner->addCredit($order->getCreditUsed());
+            }
+
+            $order->update([
+                'mollie_payment_status' => PaymentStatus::FAILED,
                 'balance_before' => 0,
                 'credit_used' => 0,
             ]);
 
             // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
             // In that case we create a record here.
-            $localPayment = Cashier::$paymentModel::findByMolliePaymentOrCreate($molliePayment, $this->owner);
+            $localPayment = Cashier::$paymentModel::findByMolliePaymentOrCreate($molliePayment, $order->owner);
             $localPayment->update([
-                'mollie_payment_status' => 'failed',
-                'order_id' => $this->id,
+                'mollie_payment_status' => PaymentStatus::FAILED,
+                'order_id' => $order->id,
             ]);
 
-            $this->items->each(function (OrderItem $item) {
+            $order->items->each(function (OrderItem $item) {
                 $item->handlePaymentFailed();
             });
 
-            $this->owner->validateMollieMandate();
+            $order->owner->validateMollieMandate();
 
+            $handled = true;
             return $localPayment;
         });
 
-        Event::dispatch(new OrderPaymentFailed($this, $localPayment));
+        $this->refresh();
+        $this->paymentStatusHandled = $handled;
+
+        if ($handled) {
+            Event::dispatch(new OrderPaymentFailed($this, $localPayment));
+        }
 
         return $this;
     }
@@ -522,27 +540,52 @@ class Order extends Model
      */
     public function handlePaymentPaid(MolliePayment $molliePayment)
     {
-        $localPayment = DB::transaction(function () use ($molliePayment) {
-            $this->update(['mollie_payment_status' => 'paid']);
+        $this->paymentStatusHandled = false;
+        $handled = false;
+        $localPayment = DB::transaction(function () use ($molliePayment, &$handled) {
+            /** @var static $order */
+            $order = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
+
+            if ($order->mollie_payment_status === PaymentStatus::PAID) {
+                return null;
+            }
+
+            $order->update(['mollie_payment_status' => PaymentStatus::PAID]);
 
             // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
             // In that case we create a record here.
-            $localPayment = Cashier::$paymentModel::findByMolliePaymentOrCreate($molliePayment, $this->owner);
+            $localPayment = Cashier::$paymentModel::findByMolliePaymentOrCreate($molliePayment, $order->owner);
             $localPayment->update([
-                'mollie_payment_status' => 'paid',
-                'order_id' => $this->id,
+                'mollie_payment_status' => PaymentStatus::PAID,
+                'order_id' => $order->id,
             ]);
 
-            $this->items->each(function (OrderItem $item) {
+            $order->items->each(function (OrderItem $item) {
                 $item->handlePaymentPaid();
             });
 
+            $handled = true;
             return $localPayment;
         });
 
-        Event::dispatch(new OrderPaymentPaid($this, $localPayment));
+        $this->refresh();
+        $this->paymentStatusHandled = $handled;
+
+        if ($handled) {
+            Event::dispatch(new OrderPaymentPaid($this, $localPayment));
+        }
 
         return $this;
+    }
+
+    /**
+     * Determine if the last payment status handler changed this order.
+     *
+     * @return bool
+     */
+    public function wasPaymentStatusHandled()
+    {
+        return $this->paymentStatusHandled;
     }
 
     /**

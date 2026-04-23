@@ -111,17 +111,26 @@ class AftercareWebhookControllerTest extends BaseTestCase
         $mollieRefund->id = $mollieRefundId;
         $mollieRefund->status = MollieRefundStatus::REFUNDED;
 
-        $molliePayment = $this->getMockBuilder(MolliePayment::class)
-            ->setConstructorArgs([new MollieApiClient])
-            ->onlyMethods(['refunds'])
-            ->getMock();
+        $mollieRefunds = new RefundCollection(
+            $this->createStub(\Mollie\Api\Contracts\Connector::class),
+            [$mollieRefund],
+        );
 
-        $molliePayment
-            ->method('refunds')
-            ->willReturn(new RefundCollection(
-                $this->createMock(\Mollie\Api\Contracts\Connector::class),
-                [$mollieRefund],
-            ));
+        $molliePayment = new class(new MollieApiClient, $mollieRefunds) extends MolliePayment {
+            private RefundCollection $refunds;
+
+            public function __construct(MollieApiClient $client, RefundCollection $refunds)
+            {
+                parent::__construct($client);
+
+                $this->refunds = $refunds;
+            }
+
+            public function refunds(): RefundCollection
+            {
+                return $this->refunds;
+            }
+        };
 
         $molliePayment->id = $molliePaymentId;
         $molliePayment->status = MolliePaymentStatus::PAID;

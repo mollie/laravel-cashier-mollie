@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\ChargebackReceived;
@@ -48,18 +49,32 @@ class AftercareWebhookController extends BaseWebhookController
             }
 
             $molliePaymentAmountChargedBackTotal = mollie_object_to_money($molliePayment->amountChargedBack);
-            $locallyKnownAmountChargedBack = $localPayment->getAmountChargedBack();
+            $chargeback = DB::transaction(function () use ($localPayment, $molliePaymentAmountChargedBackTotal) {
+                /** @var \Laravel\Cashier\Payment|null $localPayment */
+                $localPayment = Cashier::$paymentModel::whereKey($localPayment->getKey())->lockForUpdate()->first();
 
-            if ($locallyKnownAmountChargedBack->lessThan($molliePaymentAmountChargedBackTotal)) {
+                if (! $localPayment) {
+                    return null;
+                }
+
+                $locallyKnownAmountChargedBack = $localPayment->getAmountChargedBack();
+
+                if (! $locallyKnownAmountChargedBack->lessThan($molliePaymentAmountChargedBackTotal)) {
+                    return null;
+                }
+
                 $localPayment->amount_charged_back = (int) $molliePaymentAmountChargedBackTotal->getAmount();
                 $localPayment->save();
 
-                $amountChargedBackNow = $molliePaymentAmountChargedBackTotal->subtract(
-                    $locallyKnownAmountChargedBack
-                );
+                return [
+                    $localPayment,
+                    $molliePaymentAmountChargedBackTotal->subtract($locallyKnownAmountChargedBack),
+                ];
+            });
 
+            if ($chargeback) {
                 Event::dispatch(
-                    new ChargebackReceived($localPayment, $amountChargedBackNow)
+                    new ChargebackReceived($chargeback[0], $chargeback[1])
                 );
             }
         }
