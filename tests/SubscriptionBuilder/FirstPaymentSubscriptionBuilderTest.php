@@ -132,45 +132,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
 
         Event::fake();
 
-        $molliePayment = new MolliePayment(new MollieApiClient);
-        $molliePayment->id = 'tr_unique_payment_id';
-        $molliePayment->paidAt = Carbon::now()->toIso8601String();
-        $molliePayment->mandateId = 'mdt_unique_mandate_id';
-        $molliePayment->amount = (object) [
-            'currency' => 'EUR',
-            'value' => '0.05',
-        ];
-        $molliePayment->metadata = json_decode(json_encode([
-            'owner' => [
-                'type' => get_class($this->user),
-                'id' => 1,
-            ],
-            'actions' => [
-                [
-                    'handler' => StartSubscription::class,
-                    'description' => 'Monthly payment',
-                    'subtotal' => [
-                        'value' => '0.00',
-                        'currency' => 'EUR',
-                    ],
-                    'taxPercentage' => 20,
-                    'plan' => 'monthly-10-1',
-                    'name' => 'default',
-                    'quantity' => 1,
-                    'nextPaymentAt' => now()->addDays(12)->toIso8601String(),
-                    'trialUntil' => now()->addDays(5)->toIso8601String(),
-                ],
-                [
-                    'handler' => AddGenericOrderItem::class,
-                    'description' => 'Test mandate payment',
-                    'subtotal' => [
-                        'value' => '0.04',
-                        'currency' => 'EUR',
-                    ],
-                    'taxPercentage' => 20,
-                ],
-            ],
-        ]));
+        $molliePayment = $this->getPaidFirstPayment();
 
         Cashier::$paymentModel::createFromMolliePayment($molliePayment, $this->user);
 
@@ -206,6 +168,41 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
             return true;
         });
         $this->assertSame(Order::first()->items->first()->description_extra_lines[0], 'From 2019-01-01 to 2019-02-01');
+    }
+
+    #[Test]
+    public function ignoresADuplicatePaidFirstPaymentWebhook()
+    {
+        Event::fake();
+
+        $molliePayment = $this->getPaidFirstPayment();
+
+        Cashier::$paymentModel::createFromMolliePayment($molliePayment, $this->user);
+
+        $this->withMockedGetMolliePayment(2, $molliePayment);
+        $this->withMockedGetMollieMandateAccepted(2);
+        $this->withMockedGetMollieCustomer(2);
+        $this->withMockedUpdateMolliePayment();
+
+        $firstResponse = $this->post(route('webhooks.mollie.first_payment', [
+            'id' => 'tr_unique_payment_id',
+        ]));
+
+        $secondResponse = $this->post(route('webhooks.mollie.first_payment', [
+            'id' => 'tr_unique_payment_id',
+        ]));
+
+        $firstResponse->assertStatus(200);
+        $secondResponse->assertStatus(200);
+
+        $this->assertSame(1, Order::count());
+        $this->assertSame(1, Order::query()->where('mollie_payment_id', 'tr_unique_payment_id')->count());
+        $this->assertSame(1, Cashier::$paymentModel::count());
+        $this->assertNotNull(Cashier::$paymentModel::first()->order_id);
+
+        Event::assertDispatched(OrderProcessed::class, 1);
+        Event::assertDispatched(FirstPaymentPaid::class, 1);
+        Event::assertDispatched(SubscriptionStarted::class, 1);
     }
 
     #[Test]
@@ -268,6 +265,51 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
             '12.00',
             $skipTrialBuilder->getMandatePaymentBuilder()->getMolliePayload()['amount']['value']
         );
+    }
+
+    protected function getPaidFirstPayment(): MolliePayment
+    {
+        $molliePayment = new MolliePayment(new MollieApiClient);
+        $molliePayment->id = 'tr_unique_payment_id';
+        $molliePayment->paidAt = Carbon::now()->toIso8601String();
+        $molliePayment->mandateId = 'mdt_unique_mandate_id';
+        $molliePayment->amount = (object) [
+            'currency' => 'EUR',
+            'value' => '0.05',
+        ];
+        $molliePayment->metadata = json_decode(json_encode([
+            'owner' => [
+                'type' => get_class($this->user),
+                'id' => 1,
+            ],
+            'actions' => [
+                [
+                    'handler' => StartSubscription::class,
+                    'description' => 'Monthly payment',
+                    'subtotal' => [
+                        'value' => '0.00',
+                        'currency' => 'EUR',
+                    ],
+                    'taxPercentage' => 20,
+                    'plan' => 'monthly-10-1',
+                    'name' => 'default',
+                    'quantity' => 1,
+                    'nextPaymentAt' => now()->addDays(12)->toIso8601String(),
+                    'trialUntil' => now()->addDays(5)->toIso8601String(),
+                ],
+                [
+                    'handler' => AddGenericOrderItem::class,
+                    'description' => 'Test mandate payment',
+                    'subtotal' => [
+                        'value' => '0.04',
+                        'currency' => 'EUR',
+                    ],
+                    'taxPercentage' => 20,
+                ],
+            ],
+        ]));
+
+        return $molliePayment;
     }
 
     /**

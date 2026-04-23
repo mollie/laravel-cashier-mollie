@@ -66,6 +66,38 @@ class UpdatePaymentMethodTest extends BaseTestCase
         });
     }
 
+    #[Test]
+    public function doesNotAddBalanceAgainForADuplicateFirstPayment()
+    {
+        $owner = User::factory()->create([
+            'mollie_mandate_id' => 'mdt_unique_mandate_id',
+        ]);
+
+        $newPayment = $this->getNewMandatePaymentStub();
+        Cashier::$paymentModel::createFromMolliePayment($newPayment, $owner);
+
+        Event::fake();
+
+        $firstHandler = new FirstPaymentHandler($newPayment);
+        $firstOrder = $firstHandler->execute();
+
+        $secondHandler = new FirstPaymentHandler($newPayment);
+        $secondOrder = $secondHandler->execute();
+
+        $owner = $owner->fresh();
+
+        $this->assertFalse($firstHandler->wasAlreadyProcessed());
+        $this->assertTrue($secondHandler->wasAlreadyProcessed());
+        $this->assertTrue($firstOrder->is($secondOrder));
+        $this->assertTrue($owner->hasCredit());
+        $this->assertMoneyEURCents(100, $owner->credit('EUR')->money());
+        $this->assertEquals(1, $owner->orderItems()->count());
+        $this->assertEquals(1, $owner->orders()->count());
+        $this->assertEquals($firstOrder->id, Cashier::$paymentModel::first()->order_id);
+
+        Event::assertDispatched(MandateUpdated::class, 1);
+    }
+
     protected function getNewMandatePaymentStub(): Payment
     {
         $newPayment = new Payment(new MollieApiClient());

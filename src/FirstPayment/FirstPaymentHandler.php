@@ -21,6 +21,9 @@ class FirstPaymentHandler
     /** @var \Illuminate\Support\Collection */
     protected $actions;
 
+    /** @var bool */
+    protected $alreadyProcessed = false;
+
     /**
      * FirstPaymentHandler constructor.
      *
@@ -40,7 +43,20 @@ class FirstPaymentHandler
      */
     public function execute()
     {
+        $this->alreadyProcessed = false;
+
         $order = DB::transaction(function () {
+            $localPayment = Cashier::$paymentModel::query()
+                ->where('mollie_payment_id', $this->molliePayment->id)
+                ->lockForUpdate()
+                ->first();
+
+            if ($localPayment?->order) {
+                $this->alreadyProcessed = true;
+
+                return $localPayment->order;
+            }
+
             $this->owner->mollie_mandate_id = $this->molliePayment->mandateId;
             $this->owner->save();
 
@@ -53,7 +69,7 @@ class FirstPaymentHandler
 
             // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
             // In that case we create a record here.
-            $localPayment = Cashier::$paymentModel::findByMolliePaymentOrCreate(
+            $localPayment = $localPayment ?: Cashier::$paymentModel::findByMolliePaymentOrCreate(
                 $this->molliePayment,
                 $this->owner,
                 $this->actions->all()
@@ -68,9 +84,21 @@ class FirstPaymentHandler
             return $order;
         });
 
-        event(new MandateUpdated($this->owner, $this->molliePayment));
+        if (! $this->alreadyProcessed) {
+            event(new MandateUpdated($this->owner, $this->molliePayment));
+        }
 
         return $order;
+    }
+
+    /**
+     * Determine if execute() returned an already processed first payment.
+     *
+     * @return bool
+     */
+    public function wasAlreadyProcessed()
+    {
+        return $this->alreadyProcessed;
     }
 
     /**
