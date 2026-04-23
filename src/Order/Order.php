@@ -78,9 +78,6 @@ class Order extends Model
 
     protected $guarded = [];
 
-    /** @var bool */
-    protected $paymentStatusHandled = false;
-
     /**
      * @return int
      */
@@ -448,9 +445,10 @@ class Order extends Model
      */
     public function handlePaymentFailed(MolliePayment $molliePayment)
     {
-        $this->paymentStatusHandled = false;
         $handled = false;
         $localPayment = DB::transaction(function () use ($molliePayment, &$handled) {
+            // Webhook retries can arrive while callers still hold stale Order instances.
+            // Reload the current row under lock so credit restoration and item hooks run once.
             /** @var static $order */
             $order = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
@@ -468,9 +466,7 @@ class Order extends Model
                 'credit_used' => 0,
             ]);
 
-            // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
-            // In that case we create a record here.
-            $localPayment = Cashier::$paymentModel::findByMolliePaymentOrCreate($molliePayment, $order->owner);
+            $localPayment = Cashier::$paymentModel::findByPaymentIdOrFail($molliePayment->id);
             $localPayment->update([
                 'mollie_payment_status' => PaymentStatus::FAILED,
                 'order_id' => $order->id,
@@ -487,7 +483,6 @@ class Order extends Model
         });
 
         $this->refresh();
-        $this->paymentStatusHandled = $handled;
 
         if ($handled) {
             Event::dispatch(new OrderPaymentFailed($this, $localPayment));
@@ -540,9 +535,10 @@ class Order extends Model
      */
     public function handlePaymentPaid(MolliePayment $molliePayment)
     {
-        $this->paymentStatusHandled = false;
         $handled = false;
         $localPayment = DB::transaction(function () use ($molliePayment, &$handled) {
+            // Paid webhooks have the same stale-instance problem: re-check under lock so the
+            // order transition, local payment update, and item hooks are idempotent.
             /** @var static $order */
             $order = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
@@ -552,9 +548,7 @@ class Order extends Model
 
             $order->update(['mollie_payment_status' => PaymentStatus::PAID]);
 
-            // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
-            // In that case we create a record here.
-            $localPayment = Cashier::$paymentModel::findByMolliePaymentOrCreate($molliePayment, $order->owner);
+            $localPayment = Cashier::$paymentModel::findByPaymentIdOrFail($molliePayment->id);
             $localPayment->update([
                 'mollie_payment_status' => PaymentStatus::PAID,
                 'order_id' => $order->id,
@@ -569,23 +563,12 @@ class Order extends Model
         });
 
         $this->refresh();
-        $this->paymentStatusHandled = $handled;
 
         if ($handled) {
             Event::dispatch(new OrderPaymentPaid($this, $localPayment));
         }
 
         return $this;
-    }
-
-    /**
-     * Determine if the last payment status handler changed this order.
-     *
-     * @return bool
-     */
-    public function wasPaymentStatusHandled()
-    {
-        return $this->paymentStatusHandled;
     }
 
     /**

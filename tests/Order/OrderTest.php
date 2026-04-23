@@ -243,9 +243,6 @@ class OrderTest extends BaseTestCase
         $firstOrderInstance->handlePaymentFailed($molliePayment);
         $secondOrderInstance->handlePaymentFailed($molliePayment);
 
-        $this->assertTrue($firstOrderInstance->wasPaymentStatusHandled());
-        $this->assertFalse($secondOrderInstance->wasPaymentStatusHandled());
-
         $order->refresh();
         $this->assertEquals(PaymentStatus::FAILED, $order->mollie_payment_status);
         $this->assertMoneyEURCents(0, $order->getBalanceBefore());
@@ -285,9 +282,6 @@ class OrderTest extends BaseTestCase
 
         $firstOrderInstance->handlePaymentPaid($molliePayment);
         $secondOrderInstance->handlePaymentPaid($molliePayment);
-
-        $this->assertTrue($firstOrderInstance->wasPaymentStatusHandled());
-        $this->assertFalse($secondOrderInstance->wasPaymentStatusHandled());
 
         $order->refresh();
         $this->assertEquals(PaymentStatus::PAID, $order->mollie_payment_status);

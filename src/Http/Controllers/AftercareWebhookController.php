@@ -49,32 +49,41 @@ class AftercareWebhookController extends BaseWebhookController
             }
 
             $molliePaymentAmountChargedBackTotal = mollie_object_to_money($molliePayment->amountChargedBack);
-            $chargeback = DB::transaction(function () use ($localPayment, $molliePaymentAmountChargedBackTotal) {
+            $updatedLocalPayment = null;
+            $amountChargedBackNow = null;
+
+            DB::transaction(function () use (
+                $localPayment,
+                $molliePaymentAmountChargedBackTotal,
+                &$updatedLocalPayment,
+                &$amountChargedBackNow
+            ) {
+                // A transaction alone does not lock rows that were read earlier. Re-read this
+                // payment with `SELECT ... FOR UPDATE` so concurrent aftercare deliveries cannot
+                // both compute the same old charged-back total and dispatch the event twice.
                 /** @var \Laravel\Cashier\Payment|null $localPayment */
                 $localPayment = Cashier::$paymentModel::whereKey($localPayment->getKey())->lockForUpdate()->first();
 
                 if (! $localPayment) {
-                    return null;
+                    return;
                 }
 
                 $locallyKnownAmountChargedBack = $localPayment->getAmountChargedBack();
 
                 if (! $locallyKnownAmountChargedBack->lessThan($molliePaymentAmountChargedBackTotal)) {
-                    return null;
+                    return;
                 }
 
                 $localPayment->amount_charged_back = (int) $molliePaymentAmountChargedBackTotal->getAmount();
                 $localPayment->save();
 
-                return [
-                    $localPayment,
-                    $molliePaymentAmountChargedBackTotal->subtract($locallyKnownAmountChargedBack),
-                ];
+                $updatedLocalPayment = $localPayment;
+                $amountChargedBackNow = $molliePaymentAmountChargedBackTotal->subtract($locallyKnownAmountChargedBack);
             });
 
-            if ($chargeback) {
+            if ($updatedLocalPayment && $amountChargedBackNow) {
                 Event::dispatch(
-                    new ChargebackReceived($chargeback[0], $chargeback[1])
+                    new ChargebackReceived($updatedLocalPayment, $amountChargedBackNow)
                 );
             }
         }

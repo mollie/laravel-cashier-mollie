@@ -81,6 +81,8 @@ class Refund extends Model
         $handled = false;
 
         DB::transaction(function () use (&$handled) {
+            // Aftercare retries can process the same pending refund twice unless the refund row is
+            // locked and re-checked before creating the compensating order.
             /** @var static $refund */
             $refund = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
@@ -125,6 +127,8 @@ class Refund extends Model
         $handled = false;
 
         DB::transaction(function () use (&$handled) {
+            // Only a pending refund may transition to failed; locking keeps duplicate deliveries
+            // from re-running refund item failure hooks.
             /** @var static $refund */
             $refund = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
