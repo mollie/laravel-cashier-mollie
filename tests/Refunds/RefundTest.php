@@ -57,6 +57,40 @@ class RefundTest extends BaseTestCase
     }
 
     #[Test]
+    public function handlesDuplicateProcessedRefundFromStaleRefundOnce()
+    {
+        Event::fake();
+
+        $this->getCustomerUser();
+        $originalOrderItems = OrderItemFactory::new()->times(2)->create();
+        $originalOrder = Cashier::$orderModel::createProcessedFromItems($originalOrderItems);
+
+        /** @var Refund $refund */
+        $refund = RefundFactory::new()->create([
+            'original_order_id' => $originalOrder->id,
+            'total' => 29524,
+            'currency' => 'EUR',
+        ]);
+
+        $refund->items()->saveMany(
+            RefundItemCollection::makeFromOrderItemCollection($originalOrderItems)
+        );
+
+        $firstRefundInstance = Cashier::$refundModel::find($refund->id);
+        $secondRefundInstance = Cashier::$refundModel::find($refund->id);
+
+        $firstRefundInstance->handleProcessed();
+        $secondRefundInstance->handleProcessed();
+
+        $refund->refresh();
+        $this->assertEquals(MollieRefundStatus::REFUNDED, $refund->mollie_refund_status);
+        $this->assertNotNull($refund->order_id);
+        $this->assertEquals(2, Cashier::$orderModel::count());
+        $this->assertMoneyEURCents(29524, $originalOrder->refresh()->getAmountRefunded());
+        Event::assertDispatchedTimes(RefundProcessed::class, 1);
+    }
+
+    #[Test]
     public function canHandleFailedMollieRefund()
     {
         Event::fake();
@@ -88,5 +122,39 @@ class RefundTest extends BaseTestCase
         Event::assertDispatched(RefundFailed::class, function (RefundFailed $event) use ($refund) {
             return $event->refund->is($refund);
         });
+    }
+
+    #[Test]
+    public function handlesDuplicateFailedRefundFromStaleRefundOnce()
+    {
+        Event::fake();
+
+        $this->getCustomerUser();
+        $originalOrderItems = OrderItemFactory::new()->times(2)->create();
+        $originalOrder = Cashier::$orderModel::createProcessedFromItems($originalOrderItems);
+
+        /** @var Refund $refund */
+        $refund = RefundFactory::new()->create([
+            'original_order_id' => $originalOrder->id,
+            'total' => 29524,
+            'currency' => 'EUR',
+        ]);
+
+        $refund->items()->saveMany(
+            RefundItemCollection::makeFromOrderItemCollection($originalOrderItems)
+        );
+
+        $firstRefundInstance = Cashier::$refundModel::find($refund->id);
+        $secondRefundInstance = Cashier::$refundModel::find($refund->id);
+
+        $firstRefundInstance->handleFailed();
+        $secondRefundInstance->handleFailed();
+
+        $refund->refresh();
+        $this->assertEquals(MollieRefundStatus::FAILED, $refund->mollie_refund_status);
+        $this->assertNull($refund->order_id);
+        $this->assertEquals(1, Cashier::$orderModel::count());
+        $this->assertMoneyEURCents(0, $originalOrder->refresh()->getAmountRefunded());
+        Event::assertDispatchedTimes(RefundFailed::class, 1);
     }
 }

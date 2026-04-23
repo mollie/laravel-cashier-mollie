@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\BalanceTurnedStale;
 use Laravel\Cashier\Events\OrderCreated;
+use Laravel\Cashier\Events\OrderPaymentFailed;
 use Laravel\Cashier\Events\OrderPaymentFailedDueToInvalidMandate;
+use Laravel\Cashier\Events\OrderPaymentPaid;
 use Laravel\Cashier\Events\OrderProcessed;
 use Laravel\Cashier\Exceptions\AmountExceedsMolliePaymentMethodLimit;
 use Laravel\Cashier\Order\Invoice;
@@ -20,6 +22,8 @@ use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
 use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
+use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
 use Money\Currency;
 use Money\Money;
@@ -204,6 +208,85 @@ class OrderTest extends BaseTestCase
         $this->assertSame(0, $order->total_due);
         $this->assertSame(1000, $order->credit_used);
         $this->assertSame(1500, $order->balance_before);
+    }
+
+    #[Test]
+    public function handlesDuplicateFailedPaymentFromStaleOrderOnce()
+    {
+        Event::fake();
+
+        $user = User::factory()->create();
+        $paymentId = 'tr_failed_payment_id';
+        $molliePayment = new MolliePayment(new MollieApiClient);
+        $molliePayment->id = $paymentId;
+        $molliePayment->status = PaymentStatus::OPEN;
+        $molliePayment->amount = (object) [
+            'currency' => 'EUR',
+            'value' => '10.00',
+        ];
+        $molliePayment->mandateId = 'mdt_dummy_mandate_id';
+
+        $order = $user->orders()->save(OrderFactory::new()->make([
+            'mollie_payment_id' => $paymentId,
+            'mollie_payment_status' => PaymentStatus::OPEN,
+            'balance_before' => 500,
+            'credit_used' => 500,
+            'currency' => 'EUR',
+        ]));
+        Cashier::$paymentModel::createFromMolliePayment($molliePayment, $user);
+
+        $firstOrderInstance = Cashier::$orderModel::find($order->id);
+        $secondOrderInstance = Cashier::$orderModel::find($order->id);
+
+        $molliePayment->status = PaymentStatus::FAILED;
+
+        $firstOrderInstance->handlePaymentFailed($molliePayment);
+        $secondOrderInstance->handlePaymentFailed($molliePayment);
+
+        $order->refresh();
+        $this->assertEquals(PaymentStatus::FAILED, $order->mollie_payment_status);
+        $this->assertMoneyEURCents(0, $order->getBalanceBefore());
+        $this->assertMoneyEURCents(0, $order->getCreditUsed());
+        $this->assertMoneyEURCents(500, $user->credit('EUR')->money());
+        $this->assertEquals(PaymentStatus::FAILED, Cashier::$paymentModel::first()->mollie_payment_status);
+        Event::assertDispatchedTimes(OrderPaymentFailed::class, 1);
+    }
+
+    #[Test]
+    public function handlesDuplicatePaidPaymentFromStaleOrderOnce()
+    {
+        Event::fake();
+
+        $user = User::factory()->create();
+        $paymentId = 'tr_paid_payment_id';
+        $molliePayment = new MolliePayment(new MollieApiClient);
+        $molliePayment->id = $paymentId;
+        $molliePayment->status = PaymentStatus::OPEN;
+        $molliePayment->amount = (object) [
+            'currency' => 'EUR',
+            'value' => '10.00',
+        ];
+        $molliePayment->mandateId = 'mdt_dummy_mandate_id';
+
+        $order = $user->orders()->save(OrderFactory::new()->make([
+            'mollie_payment_id' => $paymentId,
+            'mollie_payment_status' => PaymentStatus::OPEN,
+            'currency' => 'EUR',
+        ]));
+        Cashier::$paymentModel::createFromMolliePayment($molliePayment, $user);
+
+        $firstOrderInstance = Cashier::$orderModel::find($order->id);
+        $secondOrderInstance = Cashier::$orderModel::find($order->id);
+
+        $molliePayment->status = PaymentStatus::PAID;
+
+        $firstOrderInstance->handlePaymentPaid($molliePayment);
+        $secondOrderInstance->handlePaymentPaid($molliePayment);
+
+        $order->refresh();
+        $this->assertEquals(PaymentStatus::PAID, $order->mollie_payment_status);
+        $this->assertEquals(PaymentStatus::PAID, Cashier::$paymentModel::first()->mollie_payment_status);
+        Event::assertDispatchedTimes(OrderPaymentPaid::class, 1);
     }
 
     #[Test]
