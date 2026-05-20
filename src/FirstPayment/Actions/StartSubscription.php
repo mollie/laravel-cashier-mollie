@@ -184,6 +184,12 @@ class StartSubscription extends BaseAction implements SubscriptionConfigurator
             $this->builder()->nextPaymentAt($this->plan->interval()->getEndOfNextSubscriptionCycle());
         }
 
+        // The first payment has already been collected by Mollie, so the mandate
+        // is guaranteed to finalize even when it is still pending at this point
+        // (e.g. PayPal or Belfius, where finalization can take up to 72h and
+        // exceeds Mollie's webhook retry window). See issue #289.
+        $this->builder()->acceptPendingMandate();
+
         // Create the subscription, scheduling the next payment
         $subscription = $this->builder()->create();
 

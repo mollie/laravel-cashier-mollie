@@ -66,6 +66,9 @@ class MandatedSubscriptionBuilder implements Contract
     /** @var bool */
     protected $validateCoupon = true;
 
+    /** @var bool */
+    protected $pendingMandateAccepted = false;
+
     /**
      * Create a new subscription builder instance.
      *
@@ -93,7 +96,7 @@ class MandatedSubscriptionBuilder implements Contract
      */
     public function create()
     {
-        $this->owner->guardMollieMandate();
+        $this->owner->guardMollieMandate($this->pendingMandateAccepted);
         $now = now();
 
         return DB::transaction(function () use ($now) {
@@ -239,6 +242,22 @@ class MandatedSubscriptionBuilder implements Contract
     public function skipCouponHandling()
     {
         $this->handleCoupon = false;
+
+        return $this;
+    }
+
+    /**
+     * Treat a pending Mollie mandate as valid when creating the subscription.
+     *
+     * Used by the first-payment flow: Mollie has already collected the payment
+     * and guarantees the mandate will finalize, even when finalization takes
+     * longer than the webhook retry window (PayPal, Belfius). See issue #289.
+     *
+     * @return $this
+     */
+    public function acceptPendingMandate(bool $accept = true)
+    {
+        $this->pendingMandateAccepted = $accept;
 
         return $this;
     }
