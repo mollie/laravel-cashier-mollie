@@ -14,13 +14,13 @@ jobs:
             fail-fast: false
             matrix:
                 php: [ 8.4, 8.3, 8.2 ]
-                laravel: [ 13.*, 12.*, 11.* ]
+                laravel: [ 13.*, 12.* ]
                 exclude:
                     - php: 8.2
                       laravel: 13.*
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
@@ -31,7 +31,12 @@ jobs:
 
             - name: Check dependency resolution
               run: |
-                  composer require illuminate/support:${{ matrix.laravel }} --no-update --no-interaction
+                  case "${{ matrix.laravel }}" in
+                      13.*) testbench="^11.0" ;;
+                      12.*) testbench="^10.0" ;;
+                  esac
+                  composer require "illuminate/support:${{ matrix.laravel }}" --no-update --no-interaction
+                  composer require --dev "orchestra/testbench:${testbench}" --no-update --no-interaction
                   composer update --prefer-stable --prefer-dist --no-interaction --no-progress --dry-run
 
     tests:
@@ -42,7 +47,7 @@ jobs:
             fail-fast: true
             matrix:
                 php: [ 8.4, 8.3, 8.2 ]
-                laravel: [ 13.*, 12.*, 11.* ]
+                laravel: [ 13.*, 12.* ]
                 dependency-version: [ prefer-stable ]
                 exclude:
                     - php: 8.2
@@ -50,7 +55,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
@@ -62,7 +67,12 @@ jobs:
 
             - name: Install dependencies
               run: |
-                  composer require illuminate/support:${{ matrix.laravel }} --no-update --no-interaction
+                  case "${{ matrix.laravel }}" in
+                      13.*) testbench="^11.0" ;;
+                      12.*) testbench="^10.0" ;;
+                  esac
+                  composer require "illuminate/support:${{ matrix.laravel }}" --no-update --no-interaction
+                  composer require --dev "orchestra/testbench:${testbench}" --no-update --no-interaction
                   composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-progress
 
             - name: Execute tests
@@ -73,7 +83,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
