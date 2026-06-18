@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\MandateUpdated;
 use Laravel\Cashier\FirstPayment\Actions\AddBalance;
+use Laravel\Cashier\FirstPayment\Actions\StartSubscription;
 use Laravel\Cashier\FirstPayment\FirstPaymentHandler;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
@@ -83,6 +84,75 @@ class FirstPaymentHandlerTest extends BaseTestCase
 
             return true;
         });
+    }
+
+    #[Test]
+    public function startsSubscriptionWhenMandateIsStillPending()
+    {
+        // End-to-end regression for issue #289: this exercises the path
+        // FirstPaymentWebhookController → FirstPaymentHandler::execute()
+        // → StartSubscription::execute() → MandatedSubscriptionBuilder::create()
+        // with a pending mandate, which is the exact scenario reported for
+        // PayPal and Belfius first payments.
+        Event::fake();
+        $this->withConfiguredPlans();
+        $this->withMockedGetMollieCustomer();
+        $this->withMockedGetMollieMandatePending();
+
+        $molliePayment = $this->getStartSubscriptionPaymentStub();
+
+        $owner = User::factory()->create([
+            'id' => $molliePayment->metadata->owner->id,
+            'mollie_customer_id' => 'cst_unique_customer_id',
+        ]);
+        Cashier::$paymentModel::createFromMolliePayment($molliePayment, $owner);
+
+        $this->assertFalse($owner->subscribed('default'));
+
+        $handler = new FirstPaymentHandler($molliePayment);
+        $order = $handler->execute();
+
+        $owner = $owner->fresh();
+
+        $this->assertTrue($owner->subscribed('default'));
+        $this->assertEquals('mdt_unique_mandate_id', $owner->mollie_mandate_id);
+        $this->assertInstanceOf(Cashier::$orderModel, $order);
+        $this->assertTrue($order->isProcessed());
+
+        Event::assertDispatched(MandateUpdated::class);
+    }
+
+    protected function getStartSubscriptionPaymentStub(): MolliePayment
+    {
+        $payment = new MolliePayment(new MollieApiClient);
+        $payment->sequenceType = 'first';
+        $payment->id = 'tr_unique_start_subscription_payment_id';
+        $payment->customerId = 'cst_unique_customer_id';
+        $payment->mandateId = 'mdt_unique_mandate_id';
+        $payment->amount = (object) ['value' => '10.00', 'currency' => 'EUR'];
+        $payment->status = PaymentStatus::PAID;
+        $payment->metadata = json_decode(json_encode([
+            'owner' => [
+                'type' => User::class,
+                'id' => 1,
+            ],
+            'actions' => [
+                [
+                    'handler' => StartSubscription::class,
+                    'description' => 'Monthly payment',
+                    'subtotal' => [
+                        'currency' => 'EUR',
+                        'value' => '10.00',
+                    ],
+                    'taxPercentage' => 0,
+                    'plan' => 'monthly-10-1',
+                    'name' => 'default',
+                    'quantity' => 1,
+                ],
+            ],
+        ]));
+
+        return $payment;
     }
 
     protected function getMandatePaymentStub(): MolliePayment

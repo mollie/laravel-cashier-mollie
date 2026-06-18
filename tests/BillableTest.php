@@ -72,6 +72,31 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
+    public function validateMollieMandateAcceptsPendingWhenOptedIn()
+    {
+        // Regression test for issue #289: callers in the first-payment flow can
+        // opt in to treating a pending mandate as valid, because Mollie has
+        // already collected the payment and guarantees finalization.
+        $this->withMockedGetMollieCustomer();
+        $this->withMockedGetMollieMandatePending();
+        $user = $this->getMandatedUser(false);
+
+        $this->assertTrue($user->validateMollieMandate(acceptPending: true));
+    }
+
+    #[Test]
+    public function validateMollieMandateStillRejectsPendingByDefault()
+    {
+        $this->expectException(MandateIsNotYetFinalizedException::class);
+
+        $this->withMockedGetMollieCustomer();
+        $this->withMockedGetMollieMandatePending();
+        $user = $this->getMandatedUser(false);
+
+        $user->validateMollieMandate();
+    }
+
+    #[Test]
     public function returnsDefaultSubscriptionBuilderIfOwnerHasValidMandateId()
     {
         $this->withConfiguredPlans();

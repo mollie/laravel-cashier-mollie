@@ -654,6 +654,72 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertEquals(20, $scheduledItem->tax_percentage);
     }
 
+    #[Test]
+    public function startsSubscriptionWhenMandateIsStillPending()
+    {
+        // Regression test for issue #289: PayPal and Belfius mandates can remain
+        // pending for up to 72h after the first payment, which exceeds Mollie's
+        // webhook retry window. The first payment is already collected and the
+        // mandate is guaranteed to finalize, so the subscription must be started.
+        Carbon::setTestNow('2019-01-29');
+
+        $user = $this->getMandatedUser(true);
+        $this->withMockedGetMollieCustomer();
+        $this->withMockedGetMollieMandatePending();
+
+        $this->assertFalse($user->subscribed('default'));
+
+        $action = new StartSubscription(
+            $user,
+            'default',
+            'monthly-10-1'
+        );
+
+        $items = $action->execute();
+        $user = $user->fresh();
+
+        $this->assertTrue($user->subscribed('default'));
+        $this->assertInstanceOf(OrderItemCollection::class, $items);
+        $this->assertCount(1, $items);
+
+        $subscription = $user->subscription('default');
+        $this->assertEquals(2, $subscription->orderItems()->count());
+    }
+
+    #[Test]
+    public function startsSubscriptionWithTrialDaysWhenMandateIsStillPending()
+    {
+        // Regression test for issue #289: covers the trial branch of
+        // MandatedSubscriptionBuilder::create() to ensure the pending-mandate
+        // opt-in also applies when the subscription starts on a trial.
+        $user = $this->getMandatedUser(true, ['tax_percentage' => 20]);
+        $this->withMockedGetMollieCustomer();
+        $this->withMockedGetMollieMandatePending();
+
+        $this->assertFalse($user->subscribed('default'));
+
+        $action = new StartSubscription(
+            $user,
+            'default',
+            'monthly-10-1'
+        );
+
+        $action->trialDays(5);
+
+        $items = $action->execute();
+        $user = $user->fresh();
+
+        $this->assertTrue($user->subscribed('default'));
+        $this->assertTrue($user->onTrial());
+        $this->assertInstanceOf(OrderItemCollection::class, $items);
+        $this->assertCount(1, $items);
+
+        $subscription = $user->subscription('default');
+        $this->assertEquals(2, $subscription->orderItems()->count());
+        $this->assertCarbon(now()->addDays(5), $subscription->cycle_ends_at);
+        $this->assertCarbon(now()->addDays(5), $subscription->trial_ends_at);
+    }
+
     /**
      * Check if the action can be built using the payload, and then can return the same payload.
      *

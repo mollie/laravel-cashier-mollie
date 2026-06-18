@@ -502,11 +502,22 @@ trait Billable
     /**
      * Checks whether the Mollie mandate is still valid. If not, clears it.
      *
+     * When $acceptPending is true, a pending mandate is treated as valid. This is
+     * used by the first-payment flow where Mollie has already collected the
+     * payment and the mandate is guaranteed to finalize (see issue #289). For
+     * recurring/off-session charges the default strict behavior is preserved.
+     *
      * @return bool
+     *
+     * @throws \Laravel\Cashier\Exceptions\MandateIsNotYetFinalizedException
      */
-    public function validateMollieMandate()
+    public function validateMollieMandate(bool $acceptPending = false)
     {
         if ($this->pendingMollieMandate()) {
+            if ($acceptPending) {
+                return true;
+            }
+
             throw new MandateIsNotYetFinalizedException();
         }
 
@@ -523,10 +534,11 @@ trait Billable
      * @return bool
      *
      * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
+     * @throws \Laravel\Cashier\Exceptions\MandateIsNotYetFinalizedException
      */
-    public function guardMollieMandate()
+    public function guardMollieMandate(bool $acceptPending = false)
     {
-        throw_unless($this->validateMollieMandate(), new InvalidMandateException());
+        throw_unless($this->validateMollieMandate($acceptPending), new InvalidMandateException());
 
         return true;
     }
