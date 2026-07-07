@@ -4,7 +4,6 @@ namespace Laravel\Cashier\Console\Commands;
 
 use Illuminate\Console\Command;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Plan\Contracts\PlanRepository;
 use Laravel\Cashier\Plan\Plan;
 use Laravel\Cashier\Subscription;
@@ -32,8 +31,8 @@ class SyncSubscriptionPlans extends Command
      */
     public function handle(PlanRepository $planRepository)
     {
-        $query = OrderItem::query()
-            ->with('orderable')    
+        $query = (Cashier::$orderItemModel)::query()
+            ->with('orderable')
             ->unprocessed()
             ->whereHasMorph('orderable', Cashier::$subscriptionModel);
 
