@@ -108,7 +108,27 @@ class Refund extends Model
                 }
             });
 
-            $refund->originalOrder->increment('amount_refunded', (int) $refundItems->getTotal()->getAmount());
+            // Lock the order too: concurrent refunds on the same order would otherwise both
+            // read the same amount_refunded and restore the same credit twice.
+            /** @var \Laravel\Cashier\Order\Order $originalOrder */
+            $originalOrder = Cashier::$orderModel::whereKey($refund->original_order_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $creditRestoredBefore = $originalOrder->getCreditUsedRestored();
+
+            $originalOrder->increment('amount_refunded', (int) $refundItems->getTotal()->getAmount());
+
+            // Whatever this refund reverses beyond the amount charged through Mollie was paid
+            // from the owner's credit balance, so it goes back there. Deriving it from
+            // amount_refunded means a refund that never gets processed never moves credit.
+            $creditRestored = $originalOrder->refresh()
+                ->getCreditUsedRestored()
+                ->subtract($creditRestoredBefore);
+
+            if ($creditRestored->isPositive()) {
+                $refund->owner->addCredit($creditRestored);
+            }
 
             $handled = true;
         });
