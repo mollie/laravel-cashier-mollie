@@ -15,10 +15,10 @@ class PaymentTest extends BaseTestCase
         $molliePayment = new MolliePayment(new MollieApiClient);
         $molliePayment->id = 'tr_dummy_payment_id';
         $molliePayment->status = 'dummy_status';
-        $molliePayment->amount = (object) [
+        $molliePayment->amount = \Mollie\Api\Http\Data\Money::fromArray([
             'currency' => 'EUR',
             'value' => '12.34',
-        ];
+        ]);
         $molliePayment->amountRefunded = null;
         $molliePayment->amountChargedBack = null;
         $molliePayment->mandateId = 'mdt_dummy_mandate_id';
@@ -42,18 +42,18 @@ class PaymentTest extends BaseTestCase
         $molliePayment = new MolliePayment(new MollieApiClient);
         $molliePayment->id = 'tr_dummy_payment_id';
         $molliePayment->status = 'dummy_status';
-        $molliePayment->amount = (object) [
+        $molliePayment->amount = \Mollie\Api\Http\Data\Money::fromArray([
             'currency' => 'EUR',
             'value' => '12.34',
-        ];
-        $molliePayment->amountRefunded = (object) [
+        ]);
+        $molliePayment->amountRefunded = \Mollie\Api\Http\Data\Money::fromArray([
             'currency' => 'EUR',
             'value' => '3.21',
-        ];
-        $molliePayment->amountChargedBack = (object) [
+        ]);
+        $molliePayment->amountChargedBack = \Mollie\Api\Http\Data\Money::fromArray([
             'currency' => 'EUR',
             'value' => '5.43',
-        ];
+        ]);
         $molliePayment->mandateId = 'mdt_dummy_mandate_id';
         $user = $this->getMandatedUser();
 

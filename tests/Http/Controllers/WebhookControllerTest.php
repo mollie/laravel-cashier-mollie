@@ -98,15 +98,15 @@ class WebhookControllerTest extends BaseTestCase
 
         $payment = new MolliePayment(new MollieApiClient);
         $payment->id = $paymentId;
-        $payment->status = 'open';
-        $payment->amount = (object) [
+        $payment->status = \Mollie\Api\Types\PaymentStatus::Open;
+        $payment->amount = \Mollie\Api\Http\Data\Money::fromArray([
             'currency' => 'EUR',
             'value' => '10.00',
-        ];
+        ]);
         $payment->mandateId = 'mdt_dummy_mandate_id';
 
         Cashier::$paymentModel::createFromMolliePayment($payment, $user);
-        $payment->status = 'failed';
+        $payment->status = \Mollie\Api\Types\PaymentStatus::Failed;
 
         $this->withMockedGetMolliePayment(1, $payment);
 
@@ -166,14 +166,14 @@ class WebhookControllerTest extends BaseTestCase
 
         $payment = new MolliePayment(new MollieApiClient);
         $payment->id = $paymentId;
-        $payment->status = 'open';
-        $payment->amount = (object) [
+        $payment->status = \Mollie\Api\Types\PaymentStatus::Open;
+        $payment->amount = \Mollie\Api\Http\Data\Money::fromArray([
             'currency' => 'EUR',
             'value' => '10.00',
-        ];
+        ]);
         $payment->mandateId = 'mdt_dummy_mandate_id';
         Cashier::$paymentModel::createFromMolliePayment($payment, $user);
-        $payment->status = 'paid';
+        $payment->status = \Mollie\Api\Types\PaymentStatus::Paid;
 
         $this->withMockedGetMolliePayment(1, $payment);
         $this->withMockedUpdateMolliePayment();
@@ -208,7 +208,7 @@ class WebhookControllerTest extends BaseTestCase
 
         $payment = new MolliePayment(new MollieApiClient);
         $payment->id = $paymentId;
-        $payment->status = 'paid';
+        $payment->status = \Mollie\Api\Types\PaymentStatus::Paid;
         $payment->mandateId = 'mdt_dummy_mandate_id';
         $this->withMockedGetMolliePayment(1, $payment);
 

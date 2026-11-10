@@ -273,10 +273,10 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         $molliePayment->id = 'tr_unique_payment_id';
         $molliePayment->paidAt = Carbon::now()->toIso8601String();
         $molliePayment->mandateId = 'mdt_unique_mandate_id';
-        $molliePayment->amount = (object) [
+        $molliePayment->amount = \Mollie\Api\Http\Data\Money::fromArray([
             'currency' => 'EUR',
             'value' => '0.05',
-        ];
+        ]);
         $molliePayment->metadata = json_decode(json_encode([
             'owner' => [
                 'type' => get_class($this->user),

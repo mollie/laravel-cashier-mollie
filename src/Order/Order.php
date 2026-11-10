@@ -396,7 +396,7 @@ class Order extends Model
     public function scopePaid($query)
     {
         return $this
-            ->scopePaymentStatus($query, PaymentStatus::PAID)
+            ->scopePaymentStatus($query, PaymentStatus::Paid->value)
             ->orWhere('total_due', '=', 0);
     }
 
@@ -452,7 +452,7 @@ class Order extends Model
             /** @var static $order */
             $order = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
-            if ($order->mollie_payment_status === PaymentStatus::FAILED) {
+            if ($order->mollie_payment_status === PaymentStatus::Failed->value) {
                 return null;
             }
 
@@ -461,14 +461,14 @@ class Order extends Model
             }
 
             $order->update([
-                'mollie_payment_status' => PaymentStatus::FAILED,
+                'mollie_payment_status' => PaymentStatus::Failed->value,
                 'balance_before' => 0,
                 'credit_used' => 0,
             ]);
 
             $localPayment = Cashier::$paymentModel::findByPaymentIdOrFail($molliePayment->id);
             $localPayment->update([
-                'mollie_payment_status' => PaymentStatus::FAILED,
+                'mollie_payment_status' => PaymentStatus::Failed->value,
                 'order_id' => $order->id,
             ]);
 
@@ -542,15 +542,15 @@ class Order extends Model
             /** @var static $order */
             $order = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
-            if ($order->mollie_payment_status === PaymentStatus::PAID) {
+            if ($order->mollie_payment_status === PaymentStatus::Paid->value) {
                 return null;
             }
 
-            $order->update(['mollie_payment_status' => PaymentStatus::PAID]);
+            $order->update(['mollie_payment_status' => PaymentStatus::Paid->value]);
 
             $localPayment = Cashier::$paymentModel::findByPaymentIdOrFail($molliePayment->id);
             $localPayment->update([
-                'mollie_payment_status' => PaymentStatus::PAID,
+                'mollie_payment_status' => PaymentStatus::Paid->value,
                 'order_id' => $order->id,
             ]);
 

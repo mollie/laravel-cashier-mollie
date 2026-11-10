@@ -79,7 +79,7 @@ class RefundBuilder
     protected static function guardOrderIsPaid(Order $order)
     {
         throw_unless(
-            $order->mollie_payment_status === PaymentStatus::PAID,
+            $order->mollie_payment_status === PaymentStatus::Paid->value,
             new LogicException('Only paid orders can be refunded')
         );
     }
@@ -102,7 +102,7 @@ class RefundBuilder
             'total' => $this->items->getTotal()->getAmount(),
             'currency' => $currency,
             'mollie_refund_id' => $mollieRefund->id,
-            'mollie_refund_status' => $mollieRefund->status,
+            'mollie_refund_status' => mollie_enum_value($mollieRefund->status),
         ]);
 
         $refundRecord->items()->saveMany($this->items);

@@ -31,7 +31,7 @@ class RefundFactory extends Factory
             'owner_type' => User::class,
             'original_order_id' => 1,
             'mollie_refund_id' => 're_dummy_refund_id',
-            'mollie_refund_status' => RefundStatus::PENDING,
+            'mollie_refund_status' => RefundStatus::Pending->value,
         ];
     }
 }
