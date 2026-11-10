@@ -130,4 +130,19 @@ class SubscriptionCancellationTest extends BaseTestCase
         $this->assertFalse($subscription->cancelled());
         $this->assertTrue($subscription->scheduledOrderItem->process_at->isFuture());
     }
+
+    #[Test]
+    public function recovery_preserves_the_next_original_billing_boundary(): void
+    {
+        $this->withTestNow('2026-01-15');
+        $subscription = SubscriptionFactory::new()->create();
+        $item = $subscription->scheduleNewOrderItemAt(now());
+        $item->update(['order_id' => OrderFactory::new()->create()->id]);
+        Subscription::handlePaymentFailed($item);
+        $this->withTestNow('2026-02-12');
+
+        Subscription::handlePaymentPaid($item);
+
+        $this->assertCarbon(now()->setDate(2026, 2, 15), $subscription->fresh()->scheduledOrderItem->process_at);
+    }
 }

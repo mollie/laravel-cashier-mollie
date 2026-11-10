@@ -663,9 +663,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
             if ($subscription->ends_at !== null && $subscription->cancellation_reason !== SubscriptionCancellationReason::REQUESTED) {
                 // A recovered payment settles an existing cycle. Resume billing at the next
                 // future boundary rather than charging that cycle again at the cancellation date.
-                $nextCycle = $subscription->onTrial()
-                    ? $subscription->trial_ends_at
-                    : $subscription->plan()->interval()->getEndOfNextSubscriptionCycle($subscription);
+                $nextCycle = $subscription->nextBillingDateAfterRecovery();
 
                 $scheduledItem = $subscription->scheduledOrderItem
                     ?? $subscription->scheduleNewOrderItemAt($nextCycle);
@@ -678,6 +676,30 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
                 ])->save();
             }
         });
+    }
+
+    protected function nextBillingDateAfterRecovery(): Carbon
+    {
+        if ($this->onTrial()) {
+            return $this->trial_ends_at;
+        }
+
+        // Keep the original cadence. Starting the interval at today's date can skip an
+        // imminent renewal when payment recovers just before the normal billing day.
+        $cursor = clone $this;
+        $cursor->cycle_ends_at = $this->cycle_started_at->copy();
+        $interval = $this->plan()->interval();
+
+        do {
+            $previous = $cursor->cycle_ends_at->copy();
+            $next = $interval->getEndOfNextSubscriptionCycle($cursor);
+            if ($next->lte($previous)) {
+                throw new LogicException('The subscription interval must advance the billing date.');
+            }
+            $cursor->cycle_ends_at = $next;
+        } while (! $next->isFuture());
+
+        return $next;
     }
 
     public static function handlePaymentRefunded(RefundItem $refundItem)
