@@ -27,7 +27,7 @@ if (! function_exists('money')) {
      * Create a Money object from a Mollie Amount array.
      *
      * @param  int|string  $value
-     * @return \Money\Money
+     * @return Money
      */
     function money($value, string $currency)
     {
@@ -39,7 +39,7 @@ if (! function_exists('decimal_to_money')) {
     /**
      * Create a Money object from a decimal string / currency pair.
      *
-     * @return \Money\Money
+     * @return Money
      */
     function decimal_to_money(string $value, string $currency)
     {
@@ -53,7 +53,7 @@ if (! function_exists('mollie_array_to_money')) {
     /**
      * Create a Money object from a Mollie Amount array.
      *
-     * @return \Money\Money
+     * @return Money
      */
     function mollie_array_to_money(array $array)
     {
@@ -65,7 +65,7 @@ if (! function_exists('money_to_mollie_array')) {
     /**
      * Create a Mollie Amount array from a Money object.
      *
-     * @param \Money\Money
+     * @param Money
      * @return array $array
      */
     function money_to_mollie_array(Money $money)
@@ -83,7 +83,7 @@ if (! function_exists('mollie_object_to_money')) {
     /**
      * Create a Money object from a Mollie Amount object.
      *
-     * @return \Money\Money
+     * @return Money
      */
     function mollie_object_to_money(object $object)
     {
@@ -101,5 +101,19 @@ if (! function_exists('money_to_decimal')) {
     function money_to_decimal(Money $money)
     {
         return (new DecimalMoneyFormatter(new ISOCurrencies))->format($money);
+    }
+}
+
+if (! function_exists('mollie_enum_value')) {
+    /**
+     * Unwrap a mollie-api-php v4 enum (for example PaymentStatus::Paid) to its raw string value.
+     * Unknown API values already arrive as plain strings and are returned unchanged.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    function mollie_enum_value($value)
+    {
+        return $value instanceof BackedEnum ? $value->value : $value;
     }
 }

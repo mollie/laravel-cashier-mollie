@@ -80,7 +80,7 @@ class Payment extends Model
 
         return static::make(array_merge([
             'mollie_payment_id' => $payment->id,
-            'mollie_payment_status' => $payment->status,
+            'mollie_payment_status' => mollie_enum_value($payment->status),
             'owner_type' => $owner->getMorphClass(),
             'owner_id' => $owner->getKey(),
             'currency' => $payment->amount->currency,
@@ -129,7 +129,7 @@ class Payment extends Model
 
         $newPayment = static::createFromMolliePayment($molliePayment, $owner, $actions);
 
-        if ($newPayment->mollie_payment_status === PaymentStatus::PAID) {
+        if ($newPayment->mollie_payment_status === PaymentStatus::Paid->value) {
             $molliePayment->webhookUrl = route('webhooks.mollie.aftercare');
 
             /** @var UpdateMolliePayment $updateMolliePayment */

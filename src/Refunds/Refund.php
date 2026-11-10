@@ -58,7 +58,7 @@ class Refund extends Model
      */
     public function scopeWhereUnprocessed(Builder $query)
     {
-        return $query->where('mollie_refund_status', RefundStatus::PENDING);
+        return $query->where('mollie_refund_status', RefundStatus::Pending->value);
     }
 
     public function items(): HasMany
@@ -86,7 +86,7 @@ class Refund extends Model
             /** @var static $refund */
             $refund = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
-            if ($refund->mollie_refund_status !== RefundStatus::PENDING) {
+            if ($refund->mollie_refund_status !== RefundStatus::Pending->value) {
                 return;
             }
 
@@ -95,7 +95,7 @@ class Refund extends Model
             $order = Cashier::$orderModel::createProcessedFromItems($orderItems);
 
             $refund->order_id = $order->id;
-            $refund->mollie_refund_status = RefundStatus::REFUNDED;
+            $refund->mollie_refund_status = RefundStatus::Refunded->value;
 
             $refund->save();
 
@@ -131,12 +131,12 @@ class Refund extends Model
             /** @var static $refund */
             $refund = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
-            if ($refund->mollie_refund_status !== RefundStatus::PENDING) {
+            if ($refund->mollie_refund_status !== RefundStatus::Pending->value) {
                 return;
             }
 
             $refundItems = $refund->items;
-            $refund->mollie_refund_status = RefundStatus::FAILED;
+            $refund->mollie_refund_status = RefundStatus::Failed->value;
 
             $refund->save();
 

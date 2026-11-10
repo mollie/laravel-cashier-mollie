@@ -61,7 +61,7 @@ class MandatedPaymentBuilder
         $overrides = array_merge($this->overrides, $overrides);
 
         return array_filter(array_merge([
-            'sequenceType' => SequenceType::RECURRING,
+            'sequenceType' => SequenceType::Recurring->value,
             'mandateId' => $this->owner->mollieMandateId(),
             'customerId' => $this->owner->mollieCustomerId(),
             'locale' => Cashier::getLocale($this->owner),

@@ -54,7 +54,7 @@ class FirstPaymentBuilderTest extends BaseTestCase
         $customerId = $payload['customerId'];
         unset($payload['customerId']);
         $check_payload = [
-            'sequenceType' => SequenceType::FIRST,
+            'sequenceType' => SequenceType::First->value,
             'description' => 'Test mandate payment',
             'amount' => [
                 'value' => '10.00',

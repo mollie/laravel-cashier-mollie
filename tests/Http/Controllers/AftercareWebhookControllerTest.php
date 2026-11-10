@@ -20,6 +20,7 @@ use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Tests\Fixtures\ChargebackStaleReadPayment;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Mollie\Api\Contracts\Connector;
+use Mollie\Api\Http\Data\Money;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Resources\Refund as MollieRefund;
@@ -46,19 +47,19 @@ class AftercareWebhookControllerTest extends BaseTestCase
         $molliePayment = new MolliePayment(new MollieApiClient);
         $molliePayment->id = 'tr_123xyz';
         $molliePayment->status = 'paid';
-        $molliePayment->amount = (object) [
+        $molliePayment->amount = Money::fromArray([
             'currency' => 'EUR',
             'value' => '20.00',
-        ];
+        ]);
         $molliePayment->amountRefunded = null;
         $molliePayment->amountChargedBack = null;
         $molliePayment->_links = (object) [];
 
         $localPayment = Cashier::$paymentModel::createFromMolliePayment($molliePayment, $this->getUser());
-        $molliePayment->amountChargedBack = (object) [
+        $molliePayment->amountChargedBack = Money::fromArray([
             'value' => '10.00',
             'currency' => 'EUR',
-        ];
+        ]);
         $molliePayment->_links->chargebacks = (object) [
             'href' => 'https://www.mollie.com/dashboard/org_12345678/payments/tr_WDqYK6vllg',
             'type' => 'application/json',
@@ -88,19 +89,19 @@ class AftercareWebhookControllerTest extends BaseTestCase
         $molliePayment = new MolliePayment(new MollieApiClient);
         $molliePayment->id = 'tr_duplicate_chargeback';
         $molliePayment->status = 'paid';
-        $molliePayment->amount = (object) [
+        $molliePayment->amount = Money::fromArray([
             'currency' => 'EUR',
             'value' => '20.00',
-        ];
+        ]);
         $molliePayment->amountRefunded = null;
         $molliePayment->amountChargedBack = null;
         $molliePayment->_links = (object) [];
 
         $localPayment = Cashier::$paymentModel::createFromMolliePayment($molliePayment, $this->getUser());
-        $molliePayment->amountChargedBack = (object) [
+        $molliePayment->amountChargedBack = Money::fromArray([
             'value' => '10.00',
             'currency' => 'EUR',
-        ];
+        ]);
         $molliePayment->_links->chargebacks = (object) [
             'href' => 'https://www.mollie.com/dashboard/org_12345678/payments/tr_WDqYK6vllg',
             'type' => 'application/json',
@@ -150,7 +151,7 @@ class AftercareWebhookControllerTest extends BaseTestCase
             'owner_id' => $user->id,
             'owner_type' => get_class($user),
             'mollie_refund_id' => $mollieRefundId,
-            'mollie_refund_status' => MollieRefundStatus::PENDING,
+            'mollie_refund_status' => MollieRefundStatus::Pending->value,
             'total' => 1000,
             'currency' => 'EUR',
         ]);
@@ -163,7 +164,7 @@ class AftercareWebhookControllerTest extends BaseTestCase
 
         $mollieRefund = new MollieRefund(new MollieApiClient);
         $mollieRefund->id = $mollieRefundId;
-        $mollieRefund->status = MollieRefundStatus::REFUNDED;
+        $mollieRefund->status = MollieRefundStatus::Refunded;
 
         $mollieRefunds = new RefundCollection(
             $this->createStub(Connector::class),
@@ -188,21 +189,21 @@ class AftercareWebhookControllerTest extends BaseTestCase
         };
 
         $molliePayment->id = $molliePaymentId;
-        $molliePayment->status = MolliePaymentStatus::PAID;
-        $molliePayment->amount = (object) [
+        $molliePayment->status = MolliePaymentStatus::Paid;
+        $molliePayment->amount = Money::fromArray([
             'currency' => 'EUR',
             'value' => '10.00',
-        ];
+        ]);
         $molliePayment->amountRefunded = null;
         $molliePayment->amountChargedBack = null;
         $molliePayment->_links = (object) [];
 
         $localPayment = Cashier::$paymentModel::createFromMolliePayment($molliePayment, $user);
 
-        $molliePayment->amountRefunded = (object) [
+        $molliePayment->amountRefunded = Money::fromArray([
             'value' => '10.00',
             'currency' => 'EUR',
-        ];
+        ]);
         $molliePayment->_links->refunds = (object) [
             'href' => 'https://api.mollie.com/v2/payments/tr_WDqYK6vllg/refunds',
             'type' => 'application/hal+json',

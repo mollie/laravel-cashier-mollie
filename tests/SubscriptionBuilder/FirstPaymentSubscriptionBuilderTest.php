@@ -16,6 +16,7 @@ use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder;
 use Laravel\Cashier\SubscriptionBuilder\RedirectToCheckoutResponse;
 use Laravel\Cashier\Tests\BaseTestCase;
+use Mollie\Api\Http\Data\Money;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use PHPUnit\Framework\Attributes\Test;
@@ -273,10 +274,10 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         $molliePayment->id = 'tr_unique_payment_id';
         $molliePayment->paidAt = Carbon::now()->toIso8601String();
         $molliePayment->mandateId = 'mdt_unique_mandate_id';
-        $molliePayment->amount = (object) [
+        $molliePayment->amount = Money::fromArray([
             'currency' => 'EUR',
             'value' => '0.05',
-        ];
+        ]);
         $molliePayment->metadata = json_decode(json_encode([
             'owner' => [
                 'type' => get_class($this->user),

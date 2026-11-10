@@ -36,7 +36,7 @@
     "dompdf/dompdf": "^3.1",
     "illuminate/database": "^12|^13",
     "illuminate/support": "^12|^13",
-    "mollie/laravel-mollie": "^4.0",
+    "mollie/laravel-mollie": "^5.0",
     "moneyphp/money": "^4.6",
     "nesbot/carbon": "^3.8"
   },

@@ -220,16 +220,16 @@ class OrderTest extends BaseTestCase
         $paymentId = 'tr_failed_payment_id';
         $molliePayment = new MolliePayment(new MollieApiClient);
         $molliePayment->id = $paymentId;
-        $molliePayment->status = PaymentStatus::OPEN;
-        $molliePayment->amount = (object) [
+        $molliePayment->status = PaymentStatus::Open;
+        $molliePayment->amount = \Mollie\Api\Http\Data\Money::fromArray([
             'currency' => 'EUR',
             'value' => '10.00',
-        ];
+        ]);
         $molliePayment->mandateId = 'mdt_dummy_mandate_id';
 
         $order = $user->orders()->save(OrderFactory::new()->make([
             'mollie_payment_id' => $paymentId,
-            'mollie_payment_status' => PaymentStatus::OPEN,
+            'mollie_payment_status' => PaymentStatus::Open->value,
             'balance_before' => 500,
             'credit_used' => 500,
             'currency' => 'EUR',
@@ -239,17 +239,17 @@ class OrderTest extends BaseTestCase
         $firstOrderInstance = Cashier::$orderModel::find($order->id);
         $secondOrderInstance = Cashier::$orderModel::find($order->id);
 
-        $molliePayment->status = PaymentStatus::FAILED;
+        $molliePayment->status = PaymentStatus::Failed;
 
         $firstOrderInstance->handlePaymentFailed($molliePayment);
         $secondOrderInstance->handlePaymentFailed($molliePayment);
 
         $order->refresh();
-        $this->assertEquals(PaymentStatus::FAILED, $order->mollie_payment_status);
+        $this->assertEquals(PaymentStatus::Failed->value, $order->mollie_payment_status);
         $this->assertMoneyEURCents(0, $order->getBalanceBefore());
         $this->assertMoneyEURCents(0, $order->getCreditUsed());
         $this->assertMoneyEURCents(500, $user->credit('EUR')->money());
-        $this->assertEquals(PaymentStatus::FAILED, Cashier::$paymentModel::first()->mollie_payment_status);
+        $this->assertEquals(PaymentStatus::Failed->value, Cashier::$paymentModel::first()->mollie_payment_status);
         Event::assertDispatchedTimes(OrderPaymentFailed::class, 1);
     }
 
@@ -262,16 +262,16 @@ class OrderTest extends BaseTestCase
         $paymentId = 'tr_paid_payment_id';
         $molliePayment = new MolliePayment(new MollieApiClient);
         $molliePayment->id = $paymentId;
-        $molliePayment->status = PaymentStatus::OPEN;
-        $molliePayment->amount = (object) [
+        $molliePayment->status = PaymentStatus::Open;
+        $molliePayment->amount = \Mollie\Api\Http\Data\Money::fromArray([
             'currency' => 'EUR',
             'value' => '10.00',
-        ];
+        ]);
         $molliePayment->mandateId = 'mdt_dummy_mandate_id';
 
         $order = $user->orders()->save(OrderFactory::new()->make([
             'mollie_payment_id' => $paymentId,
-            'mollie_payment_status' => PaymentStatus::OPEN,
+            'mollie_payment_status' => PaymentStatus::Open->value,
             'currency' => 'EUR',
         ]));
         Cashier::$paymentModel::createFromMolliePayment($molliePayment, $user);
@@ -279,14 +279,14 @@ class OrderTest extends BaseTestCase
         $firstOrderInstance = Cashier::$orderModel::find($order->id);
         $secondOrderInstance = Cashier::$orderModel::find($order->id);
 
-        $molliePayment->status = PaymentStatus::PAID;
+        $molliePayment->status = PaymentStatus::Paid;
 
         $firstOrderInstance->handlePaymentPaid($molliePayment);
         $secondOrderInstance->handlePaymentPaid($molliePayment);
 
         $order->refresh();
-        $this->assertEquals(PaymentStatus::PAID, $order->mollie_payment_status);
-        $this->assertEquals(PaymentStatus::PAID, Cashier::$paymentModel::first()->mollie_payment_status);
+        $this->assertEquals(PaymentStatus::Paid->value, $order->mollie_payment_status);
+        $this->assertEquals(PaymentStatus::Paid->value, Cashier::$paymentModel::first()->mollie_payment_status);
         Event::assertDispatchedTimes(OrderPaymentPaid::class, 1);
     }
 
@@ -743,7 +743,7 @@ class OrderTest extends BaseTestCase
 
         $order = Cashier::$orderModel::createProcessedFromItems($items, [
             'mollie_payment_id' => 'tr_123456',
-            'mollie_payment_status' => PaymentStatus::PAID,
+            'mollie_payment_status' => PaymentStatus::Paid->value,
         ]);
 
         $this->assertNotNull($order);
@@ -752,7 +752,7 @@ class OrderTest extends BaseTestCase
         $this->assertTrue($order->isProcessed());
 
         $this->assertEquals('tr_123456', $order->mollie_payment_id);
-        $this->assertEquals(PaymentStatus::PAID, $order->mollie_payment_status);
+        $this->assertEquals(PaymentStatus::Paid->value, $order->mollie_payment_status);
 
         $items->each(function ($item) {
             $this->assertTrue($item->isProcessed());

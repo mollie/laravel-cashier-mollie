@@ -101,7 +101,7 @@ class FirstPaymentBuilder
     public function getMolliePayload()
     {
         return array_filter(array_merge([
-            'sequenceType' => SequenceType::FIRST,
+            'sequenceType' => SequenceType::First->value,
             'method' => $this->method,
             'customerId' => $this->owner->asMollieCustomer()->id,
             'locale' => Cashier::getLocale($this->owner),

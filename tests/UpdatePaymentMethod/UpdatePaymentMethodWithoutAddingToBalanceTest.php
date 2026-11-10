@@ -9,6 +9,7 @@ use Laravel\Cashier\FirstPayment\Actions\AddGenericOrderItem;
 use Laravel\Cashier\FirstPayment\FirstPaymentHandler;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
+use Mollie\Api\Http\Data\Money;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment;
 use PHPUnit\Framework\Attributes\Test;
@@ -63,7 +64,7 @@ class UpdatePaymentMethodWithoutAddingToBalanceTest extends BaseTestCase
         $newPayment->id = 'new_tr_unique_mandate_payment_id';
         $newPayment->customerId = 'cst_unique_customer_id';
         $newPayment->mandateId = 'new_mdt_unique_mandate_id';
-        $newPayment->amount = (object) ['value' => '1.00', 'currency' => 'EUR'];
+        $newPayment->amount = Money::fromArray(['value' => '1.00', 'currency' => 'EUR']);
         $newPayment->metadata = json_decode(json_encode([
             'owner' => [
                 'type' => User::class,
