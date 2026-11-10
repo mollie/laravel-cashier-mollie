@@ -2,7 +2,10 @@
 
 namespace Laravel\Cashier\Order;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder;
 use Laravel\Cashier\Cashier;
@@ -12,10 +15,11 @@ use Laravel\Cashier\Refunds\Contracts\IsRefundable;
 use Laravel\Cashier\Refunds\RefundItem;
 use Laravel\Cashier\Traits\FormatsAmount;
 use Laravel\Cashier\Traits\HasOwner;
+use Money\Money;
 
 /**
  * @property InteractsWithOrderItems orderable
- * @property \Carbon\Carbon process_at
+ * @property Carbon process_at
  * @property int quantity
  * @property string currency
  * @property int unit_price
@@ -56,7 +60,7 @@ class OrderItem extends Model implements InvoicableItem
     /**
      * Get the orderable model for this order item.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     * @return MorphTo
      */
     public function orderable()
     {
@@ -66,7 +70,7 @@ class OrderItem extends Model implements InvoicableItem
     /**
      * Return the order for this order item.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function order()
     {
@@ -179,7 +183,7 @@ class OrderItem extends Model implements InvoicableItem
     }
 
     /**
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function toCollection()
     {
@@ -189,7 +193,7 @@ class OrderItem extends Model implements InvoicableItem
     /**
      * Called right before processing the item into an order.
      *
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function preprocess()
     {
@@ -239,7 +243,7 @@ class OrderItem extends Model implements InvoicableItem
     /**
      * Get the unit price before taxes and discounts.
      *
-     * @return \Money\Money
+     * @return Money
      */
     public function getUnitPrice()
     {
@@ -249,7 +253,7 @@ class OrderItem extends Model implements InvoicableItem
     /**
      * Get the order item total after taxes and discounts.
      *
-     * @return \Money\Money
+     * @return Money
      */
     public function getTotal()
     {
@@ -259,7 +263,7 @@ class OrderItem extends Model implements InvoicableItem
     /**
      * Get the order item total before taxes and discounts.
      *
-     * @return \Money\Money
+     * @return Money
      */
     public function getSubtotal()
     {
@@ -281,7 +285,7 @@ class OrderItem extends Model implements InvoicableItem
     /**
      * The discount as a money value.
      *
-     * @return \Money\Money
+     * @return Money
      */
     public function getDiscount()
     {
@@ -291,7 +295,7 @@ class OrderItem extends Model implements InvoicableItem
     /**
      * The order item tax as a money value.
      *
-     * @return \Money\Money
+     * @return Money
      */
     public function getTax()
     {

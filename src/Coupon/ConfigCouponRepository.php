@@ -49,7 +49,7 @@ class ConfigCouponRepository implements CouponRepository
     }
 
     /**
-     * @return \Laravel\Cashier\Coupon\Coupon
+     * @return Coupon
      */
     protected function buildCoupon(string $name)
     {

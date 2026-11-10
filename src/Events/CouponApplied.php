@@ -11,12 +11,12 @@ class CouponApplied
     use SerializesModels;
 
     /**
-     * @var \Laravel\Cashier\Coupon\RedeemedCoupon
+     * @var RedeemedCoupon
      */
     public $redeemedCoupon;
 
     /**
-     * @var \Laravel\Cashier\Coupon\AppliedCoupon
+     * @var AppliedCoupon
      */
     public $appliedCoupon;
 

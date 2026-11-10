@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Charge\Contracts\ChargeBuilder as Contract;
+use Laravel\Cashier\Exceptions\InvalidMandateException;
 use Laravel\Cashier\Order\Order;
 
 class MandatedChargeBuilder implements Contract
@@ -64,7 +65,7 @@ class MandatedChargeBuilder implements Contract
     }
 
     /**
-     * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
+     * @throws InvalidMandateException
      */
     public function create(): ?Order
     {

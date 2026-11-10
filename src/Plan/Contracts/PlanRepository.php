@@ -7,12 +7,12 @@ namespace Laravel\Cashier\Plan\Contracts;
 interface PlanRepository
 {
     /**
-     * @return null|\Laravel\Cashier\Plan\Contracts\Plan
+     * @return null|Plan
      */
     public static function find(string $name);
 
     /**
-     * @return \Laravel\Cashier\Plan\Contracts\Plan
+     * @return Plan
      */
     public static function findOrFail(string $name);
 }

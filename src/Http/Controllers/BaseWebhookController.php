@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Http\Controllers;
 
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Resources\Payment;
 
 abstract class BaseWebhookController
 {
@@ -18,9 +19,9 @@ abstract class BaseWebhookController
      * Fetch a payment from Mollie using its ID.
      * Returns null if the payment cannot be retrieved.
      *
-     * @return \Mollie\Api\Resources\Payment|null
+     * @return Payment|null
      *
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws ApiException
      */
     public function getMolliePaymentById(string $id, array $parameters = [])
     {

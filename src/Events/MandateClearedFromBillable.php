@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Events;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 
 class MandateClearedFromBillable
@@ -9,7 +10,7 @@ class MandateClearedFromBillable
     use SerializesModels;
 
     /**
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var Model
      */
     public $owner;
 

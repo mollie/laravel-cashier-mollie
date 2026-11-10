@@ -2,12 +2,15 @@
 
 namespace Laravel\Cashier\Traits;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+
 trait HasOwner
 {
     /**
      * Retrieve the model's owner.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     * @return MorphTo
      */
     public function owner()
     {
@@ -17,9 +20,9 @@ trait HasOwner
     /**
      * Scope a query to only records for a specific owner.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  Builder  $query
      * @param  mixed  $owner
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return Builder
      */
     public function scopeWhereOwner($query, $owner)
     {

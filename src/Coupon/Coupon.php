@@ -5,6 +5,7 @@ namespace Laravel\Cashier\Coupon;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\Contracts\AcceptsCoupons;
 use Laravel\Cashier\Coupon\Contracts\CouponHandler;
+use Laravel\Cashier\Exceptions\CouponException;
 use Laravel\Cashier\Order\OrderItemCollection;
 
 class Coupon
@@ -12,7 +13,7 @@ class Coupon
     /** @var string */
     protected $name;
 
-    /** @var \Laravel\Cashier\Coupon\Contracts\CouponHandler */
+    /** @var CouponHandler */
     protected $handler;
 
     /** @var array */
@@ -41,7 +42,7 @@ class Coupon
     }
 
     /**
-     * @return \Laravel\Cashier\Coupon\Contracts\CouponHandler
+     * @return CouponHandler
      */
     public function handler()
     {
@@ -67,7 +68,7 @@ class Coupon
     }
 
     /**
-     * @return \Laravel\Cashier\Coupon\Coupon
+     * @return Coupon
      *
      * @throws \LogicException|\Throwable
      */
@@ -81,7 +82,7 @@ class Coupon
     }
 
     /**
-     * @return \Laravel\Cashier\Coupon\RedeemedCoupon
+     * @return RedeemedCoupon
      */
     public function redeemFor(AcceptsCoupons $model)
     {
@@ -92,7 +93,7 @@ class Coupon
      * Check if the coupon can be applied to the model
      *
      *
-     * @throws \Throwable|\Laravel\Cashier\Exceptions\CouponException
+     * @throws \Throwable|CouponException
      */
     public function validateFor(AcceptsCoupons $model)
     {

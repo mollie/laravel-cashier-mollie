@@ -8,7 +8,7 @@ use Laravel\Cashier\Subscription;
 class BaseIntervalGenerator
 {
     /**
-     * @return \Carbon\Carbon
+     * @return Carbon
      */
     protected function startOfTheSubscription(?Subscription $subscription = null)
     {

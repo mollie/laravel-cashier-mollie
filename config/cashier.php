@@ -1,5 +1,7 @@
 <?php
 
+use Laravel\Cashier\Order\OrderNumberGenerator;
+
 return [
 
     /**
@@ -32,7 +34,7 @@ return [
         /**
          * The model used for Order Numbers. You can extend and override it here to implement your own logic.
          */
-        'model' => \Laravel\Cashier\Order\OrderNumberGenerator::class,
+        'model' => OrderNumberGenerator::class,
 
         /**
          * The offset used by the Order Number Generator.

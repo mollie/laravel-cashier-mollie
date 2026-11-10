@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Tests;
 
 use Carbon\Carbon;
+use Illuminate\Foundation\Application;
 use Laravel\Cashier\CashierServiceProvider;
 use Laravel\Cashier\Coupon\CouponOrderItemPreprocessor;
 use Laravel\Cashier\Plan\AdvancedIntervalGenerator;
@@ -37,7 +38,7 @@ abstract class BaseTestCase extends TestCase
     }
 
     /**
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  Application  $app
      * @return array
      */
     protected function getPackageProviders($app)

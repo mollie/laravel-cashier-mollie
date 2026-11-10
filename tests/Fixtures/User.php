@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Tests\Fixtures;
 
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Billable;
@@ -49,7 +50,7 @@ class User extends Model implements ProvidesInvoiceInformation
     /**
      * Create a new factory instance for the model.
      *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory<static>
+     * @return Factory<static>
      */
     protected static function newFactory()
     {

@@ -30,7 +30,7 @@ class ActionCollection extends Collection
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function total()
     {
@@ -62,7 +62,7 @@ class ActionCollection extends Collection
     {
         $payload = [];
         foreach ($this->items as $item) {
-            /** @var \Laravel\Cashier\FirstPayment\Actions\BaseAction $item */
+            /** @var BaseAction $item */
             $itemPayload = $item->getPayload();
 
             if (! empty($itemPayload)) {
@@ -74,13 +74,13 @@ class ActionCollection extends Collection
     }
 
     /**
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function processedOrderItems()
     {
         $orderItems = new OrderItemCollection;
 
-        /** @var \Laravel\Cashier\FirstPayment\Actions\BaseAction $action */
+        /** @var BaseAction $action */
         foreach ($this->items as $action) {
             $orderItems = $orderItems->concat($action->makeProcessedOrderItems());
         }

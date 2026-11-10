@@ -14,7 +14,7 @@ class ConfigPlanRepository implements PlanRepository
     /**
      * Get a plan by its name.
      *
-     * @return null|\Laravel\Cashier\Plan\Contracts\Plan
+     * @return null|Contracts\Plan
      */
     public static function find(string $name)
     {
@@ -30,7 +30,7 @@ class ConfigPlanRepository implements PlanRepository
     /**
      * Get a plan by its name or throw an exception.
      *
-     * @return \Laravel\Cashier\Plan\Contracts\Plan
+     * @return Contracts\Plan
      *
      * @throws PlanNotFoundException
      */
@@ -44,7 +44,7 @@ class ConfigPlanRepository implements PlanRepository
     }
 
     /**
-     * @return \Laravel\Cashier\Plan\PlanCollection
+     * @return PlanCollection
      */
     protected static function all()
     {
@@ -59,7 +59,7 @@ class ConfigPlanRepository implements PlanRepository
     }
 
     /**
-     * @return \Laravel\Cashier\Plan\Plan
+     * @return Plan
      */
     public static function populatePlan(string $name, array $planConfig, array $planDefaults = [])
     {

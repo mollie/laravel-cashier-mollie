@@ -10,7 +10,7 @@ class FirstPaymentFailed
     use SerializesModels;
 
     /**
-     * @var \Mollie\Api\Resources\Payment
+     * @var Payment
      */
     public $payment;
 

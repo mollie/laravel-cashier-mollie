@@ -62,21 +62,21 @@ class Invoice
     /**
      * The customer starting balance.
      *
-     * @var \Money\Money
+     * @var Money
      */
     protected $startingBalance;
 
     /**
      * The amount of customer's starting balance applied to the total.
      *
-     * @var \Money\Money
+     * @var Money
      */
     protected $usedBalance;
 
     /**
      * The amount of customer balance left when this invoice is incurred.
      *
-     * @var \Money\Money
+     * @var Money
      */
     protected $completedBalance;
 
@@ -125,7 +125,7 @@ class Invoice
     }
 
     /**
-     * @return \Carbon\Carbon
+     * @return Carbon
      */
     public function date()
     {
@@ -172,7 +172,7 @@ class Invoice
     /**
      * Returns a collection of invoice items
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function items()
     {
@@ -202,7 +202,7 @@ class Invoice
     /**
      * The raw sum of all items' subtotals
      *
-     * @return \Money\Money
+     * @return Money
      */
     public function rawSubtotal()
     {
@@ -228,7 +228,7 @@ class Invoice
     /**
      * The raw sum of all items' totals.
      *
-     * @return \Money\Money
+     * @return Money
      */
     public function rawTotal()
     {
@@ -254,7 +254,7 @@ class Invoice
     /**
      * The raw sum of all items' totals minus the balance used.
      *
-     * @return \Money\Money
+     * @return Money
      */
     public function rawTotalDue()
     {
@@ -264,7 +264,7 @@ class Invoice
     /**
      * Get the tax totals summed up per tax percentage.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function taxDetails()
     {
@@ -298,7 +298,7 @@ class Invoice
      * If you provide separator, an imploded string is returned.
      *
      * @param  null  $separator
-     * @return \Illuminate\Support\Collection|string
+     * @return Collection|string
      */
     public function receiverAddress($separator = null)
     {
@@ -330,7 +330,7 @@ class Invoice
     /**
      * The raw starting balance.
      *
-     * @return \Money\Money|null
+     * @return Money|null
      */
     public function rawStartingBalance()
     {
@@ -360,7 +360,7 @@ class Invoice
     /**
      * The raw used balance.
      *
-     * @return \Money\Money|null
+     * @return Money|null
      */
     public function rawUsedBalance()
     {
@@ -390,7 +390,7 @@ class Invoice
     /**
      * The formatted balance after processing this invoice.
      *
-     * @return \Money\Money|null
+     * @return Money|null
      */
     public function rawCompletedBalance()
     {
@@ -413,7 +413,7 @@ class Invoice
      * If you provide separator, an imploded string is returned.
      *
      * @param  null  $separator
-     * @return \Illuminate\Support\Collection|string
+     * @return Collection|string
      */
     public function extraInformation($separator = null)
     {
@@ -466,7 +466,7 @@ class Invoice
      * Create an invoice download response.
      *
      * @param  null|array  $data
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function download(array $data = [], string $view = self::DEFAULT_VIEW, ?Options $options = null)
     {
@@ -495,7 +495,7 @@ class Invoice
      * Helper method. By default a collection of lines (strings) is returned.
      * If a separator is provided an imploded string is returned.
      *
-     * @return \Illuminate\Support\Collection|string
+     * @return Collection|string
      */
     private function optionallyImplode(Collection $collection, $separator)
     {

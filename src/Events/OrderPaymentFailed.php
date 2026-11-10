@@ -3,6 +3,8 @@
 namespace Laravel\Cashier\Events;
 
 use Illuminate\Queue\SerializesModels;
+use Laravel\Cashier\Order\Order;
+use Laravel\Cashier\Payment;
 
 class OrderPaymentFailed
 {
@@ -11,14 +13,14 @@ class OrderPaymentFailed
     /**
      * The failed order.
      *
-     * @var \Laravel\Cashier\Order\Order
+     * @var Order
      */
     public $order;
 
     /**
      * The paid payment.
      *
-     * @var \Laravel\Cashier\Payment
+     * @var Payment
      */
     public $payment;
 
