@@ -26,4 +26,3 @@ jobs:
 
             - name: Run Pint
               run: pint --test
-
