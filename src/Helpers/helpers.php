@@ -110,3 +110,17 @@ if (!function_exists('money_to_decimal')) {
         return (new DecimalMoneyFormatter(new ISOCurrencies()))->format($money);
     }
 }
+
+if (!function_exists('mollie_enum_value')) {
+    /**
+     * Unwrap a mollie-api-php v4 enum (for example PaymentStatus::Paid) to its raw string value.
+     * Unknown API values already arrive as plain strings and are returned unchanged.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    function mollie_enum_value($value)
+    {
+        return $value instanceof \BackedEnum ? $value->value : $value;
+    }
+}

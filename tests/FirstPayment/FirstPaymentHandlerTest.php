@@ -129,8 +129,8 @@ class FirstPaymentHandlerTest extends BaseTestCase
         $payment->id = 'tr_unique_start_subscription_payment_id';
         $payment->customerId = 'cst_unique_customer_id';
         $payment->mandateId = 'mdt_unique_mandate_id';
-        $payment->amount = (object) ['value' => '10.00', 'currency' => 'EUR'];
-        $payment->status = PaymentStatus::PAID;
+        $payment->amount = \Mollie\Api\Http\Data\Money::fromArray(['value' => '10.00', 'currency' => 'EUR']);
+        $payment->status = PaymentStatus::Paid;
         $payment->metadata = json_decode(json_encode([
             'owner' => [
                 'type' => User::class,
@@ -162,8 +162,8 @@ class FirstPaymentHandlerTest extends BaseTestCase
         $payment->id = 'tr_unique_mandate_payment_id';
         $payment->customerId = 'cst_unique_customer_id';
         $payment->mandateId = 'mdt_unique_mandate_id';
-        $payment->amount = (object) ['value' => '10.00', 'currency' => 'EUR'];
-        $payment->status = PaymentStatus::PAID;
+        $payment->amount = \Mollie\Api\Http\Data\Money::fromArray(['value' => '10.00', 'currency' => 'EUR']);
+        $payment->status = PaymentStatus::Paid;
         $payment->metadata = json_decode(json_encode([
             'owner' => [
                 'type' => User::class,

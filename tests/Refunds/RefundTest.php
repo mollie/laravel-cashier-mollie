@@ -37,12 +37,12 @@ class RefundTest extends BaseTestCase
         $refund->items()->saveMany(
             RefundItemCollection::makeFromOrderItemCollection($originalOrderItems)
         );
-        $this->assertEquals(MollieRefundStatus::PENDING, $refund->mollie_refund_status);
+        $this->assertEquals(MollieRefundStatus::Pending->value, $refund->mollie_refund_status);
 
         $refund = $refund->handleProcessed();
 
         $this->assertNotNull($refund->order_id);
-        $this->assertEquals(MollieRefundStatus::REFUNDED, $refund->mollie_refund_status);
+        $this->assertEquals(MollieRefundStatus::Refunded->value, $refund->mollie_refund_status);
         $this->assertMoneyEURCents(29524, $originalOrder->refresh()->getAmountRefunded());
 
         $order = $refund->order;
@@ -83,7 +83,7 @@ class RefundTest extends BaseTestCase
         $secondRefundInstance->handleProcessed();
 
         $refund->refresh();
-        $this->assertEquals(MollieRefundStatus::REFUNDED, $refund->mollie_refund_status);
+        $this->assertEquals(MollieRefundStatus::Refunded->value, $refund->mollie_refund_status);
         $this->assertNotNull($refund->order_id);
         $this->assertEquals(2, Cashier::$orderModel::count());
         $this->assertMoneyEURCents(29524, $originalOrder->refresh()->getAmountRefunded());
@@ -109,12 +109,12 @@ class RefundTest extends BaseTestCase
         $refund->items()->saveMany(
             RefundItemCollection::makeFromOrderItemCollection($originalOrderItems)
         );
-        $this->assertEquals(MollieRefundStatus::PENDING, $refund->mollie_refund_status);
+        $this->assertEquals(MollieRefundStatus::Pending->value, $refund->mollie_refund_status);
 
         $refund = $refund->handleFailed();
 
         $this->assertNull($refund->order_id);
-        $this->assertEquals(MollieRefundStatus::FAILED, $refund->mollie_refund_status);
+        $this->assertEquals(MollieRefundStatus::Failed->value, $refund->mollie_refund_status);
         $this->assertMoneyEURCents(0, $originalOrder->refresh()->getAmountRefunded());
 
         $this->assertNull($refund->order);
@@ -151,7 +151,7 @@ class RefundTest extends BaseTestCase
         $secondRefundInstance->handleFailed();
 
         $refund->refresh();
-        $this->assertEquals(MollieRefundStatus::FAILED, $refund->mollie_refund_status);
+        $this->assertEquals(MollieRefundStatus::Failed->value, $refund->mollie_refund_status);
         $this->assertNull($refund->order_id);
         $this->assertEquals(1, Cashier::$orderModel::count());
         $this->assertMoneyEURCents(0, $originalOrder->refresh()->getAmountRefunded());

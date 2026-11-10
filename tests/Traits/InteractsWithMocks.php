@@ -230,10 +230,10 @@ trait InteractsWithMocks
         $this->mock(CreateMolliePayment::class, function ($mock) use ($times, $amount, $paymentId) {
             $payment = new Payment(resolve(MollieApiClient::class));
             $payment->id = $paymentId;
-            $payment->amount = (object) [
+            $payment->amount = \Mollie\Api\Http\Data\Money::fromArray([
                 'currency' => 'EUR',
                 'value' => $amount,
-            ];
+            ]);
             $payment->_links = json_decode(json_encode([
                 'checkout' => [
                     'href' => 'https://foo-redirect-bar.com',
@@ -257,10 +257,10 @@ trait InteractsWithMocks
         $this->mock(UpdateMolliePayment::class, function ($mock) use ($times, $amount, $paymentId, $redirectUrl) {
             $payment = new Payment(resolve(MollieApiClient::class));
             $payment->id = $paymentId;
-            $payment->amount = (object) [
+            $payment->amount = \Mollie\Api\Http\Data\Money::fromArray([
                 'currency' => 'EUR',
                 'value' => $amount,
-            ];
+            ]);
             $payment->redirectUrl = $redirectUrl;
             $payment->mandateId = 'mdt_dummy_mandate_id';
 

@@ -105,7 +105,7 @@ class UpdatePaymentMethodTest extends BaseTestCase
         $newPayment->id = 'new_tr_unique_mandate_payment_id';
         $newPayment->customerId = 'cst_unique_customer_id';
         $newPayment->mandateId = 'new_mdt_unique_mandate_id';
-        $newPayment->amount = (object) ['value' => '1.00', 'currency' => 'EUR'];
+        $newPayment->amount = \Mollie\Api\Http\Data\Money::fromArray(['value' => '1.00', 'currency' => 'EUR']);
         $newPayment->metadata = json_decode(json_encode([
             'owner' => [
                 'type' => User::class,

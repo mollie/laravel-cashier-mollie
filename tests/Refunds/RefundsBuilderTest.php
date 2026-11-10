@@ -27,7 +27,7 @@ class RefundsBuilderTest extends BaseTestCase
         $this->mock(CreateMollieRefund::class, function (CreateMollieRefund $mock) {
             $mollieRefund = new MollieRefund(new MollieApiClient);
             $mollieRefund->id = 're_dummy_refund_id';
-            $mollieRefund->status = MollieRefundStatus::PENDING;
+            $mollieRefund->status = MollieRefundStatus::Pending;
             $mock->shouldReceive('execute')->with('tr_dummy_payment_id', [
                 'amount' => [
                     'value' => '22.00',
@@ -61,7 +61,7 @@ class RefundsBuilderTest extends BaseTestCase
 
         $this->assertInstanceOf(Cashier::$refundModel, $refund);
         $this->assertEquals('re_dummy_refund_id', $refund->mollie_refund_id);
-        $this->assertEquals(MollieRefundStatus::PENDING, $refund->mollie_refund_status);
+        $this->assertEquals(MollieRefundStatus::Pending->value, $refund->mollie_refund_status);
         $this->assertNull($refund->order_id);
 
         $refundItems = $refund->items;

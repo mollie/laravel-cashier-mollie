@@ -64,7 +64,7 @@ class FirstPaymentHandler
 
             $order = Cashier::$orderModel::createProcessedFromItems($orderItems, [
                 'mollie_payment_id' => $this->molliePayment->id,
-                'mollie_payment_status' => $this->molliePayment->status,
+                'mollie_payment_status' => mollie_enum_value($this->molliePayment->status),
             ]);
 
             // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
@@ -77,7 +77,7 @@ class FirstPaymentHandler
 
             $localPayment->update([
                 'order_id' => $order->id,
-                'mollie_payment_status' => $this->molliePayment->status,
+                'mollie_payment_status' => mollie_enum_value($this->molliePayment->status),
                 'mollie_mandate_id' => $this->molliePayment->mandateId,
             ]);
 
