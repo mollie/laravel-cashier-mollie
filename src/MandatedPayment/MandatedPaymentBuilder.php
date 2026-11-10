@@ -5,13 +5,14 @@ namespace Laravel\Cashier\MandatedPayment;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
+use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\SequenceType;
 use Money\Money;
 
 class MandatedPaymentBuilder
 {
     /**
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var Model
      */
     protected $owner;
 
@@ -21,7 +22,7 @@ class MandatedPaymentBuilder
     protected $description;
 
     /**
-     * @var \Money\Money
+     * @var Money
      */
     protected $amount;
 
@@ -60,7 +61,7 @@ class MandatedPaymentBuilder
         $overrides = array_merge($this->overrides, $overrides);
 
         return array_filter(array_merge([
-            'sequenceType' => SequenceType::SEQUENCETYPE_RECURRING,
+            'sequenceType' => SequenceType::RECURRING,
             'mandateId' => $this->owner->mollieMandateId(),
             'customerId' => $this->owner->mollieCustomerId(),
             'locale' => Cashier::getLocale($this->owner),
@@ -71,7 +72,7 @@ class MandatedPaymentBuilder
     }
 
     /**
-     * @return \Mollie\Api\Resources\Payment
+     * @return Payment
      */
     public function create(array $overrides = [])
     {

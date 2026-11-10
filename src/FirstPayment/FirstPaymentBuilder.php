@@ -9,6 +9,7 @@ use Laravel\Cashier\FirstPayment\Actions\ActionCollection;
 use Laravel\Cashier\FirstPayment\Traits\PaymentMethodString;
 use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
+use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\SequenceType;
 
 class FirstPaymentBuilder
@@ -18,7 +19,7 @@ class FirstPaymentBuilder
     /**
      * The billable model.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var Model
      */
     protected $owner;
 
@@ -61,7 +62,7 @@ class FirstPaymentBuilder
     protected $webhookUrl;
 
     /**
-     * @var \Mollie\Api\Resources\Payment|null
+     * @var Payment|null
      */
     protected $molliePayment;
 
@@ -100,7 +101,7 @@ class FirstPaymentBuilder
     public function getMolliePayload()
     {
         return array_filter(array_merge([
-            'sequenceType' => SequenceType::SEQUENCETYPE_FIRST,
+            'sequenceType' => SequenceType::FIRST,
             'method' => $this->method,
             'customerId' => $this->owner->asMollieCustomer()->id,
             'locale' => Cashier::getLocale($this->owner),
@@ -118,7 +119,7 @@ class FirstPaymentBuilder
     }
 
     /**
-     * @return \Mollie\Api\Resources\Payment
+     * @return Payment
      */
     public function create()
     {
@@ -202,7 +203,7 @@ class FirstPaymentBuilder
     }
 
     /**
-     * @return \Mollie\Api\Resources\Payment|null
+     * @return Payment|null
      */
     public function getMolliePayment()
     {

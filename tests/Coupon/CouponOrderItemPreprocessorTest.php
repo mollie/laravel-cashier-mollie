@@ -4,16 +4,18 @@ namespace Laravel\Cashier\Tests\Coupon;
 
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
+use Laravel\Cashier\Coupon\Coupon;
 use Laravel\Cashier\Coupon\CouponOrderItemPreprocessor;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
+use PHPUnit\Framework\Attributes\Test;
 
 class CouponOrderItemPreprocessorTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function applies_coupon()
     {
         $this->withMockedCouponRepository();
@@ -23,7 +25,7 @@ class CouponOrderItemPreprocessorTest extends BaseTestCase
         $item = OrderItemFactory::new()->make();
         $subscription->orderItems()->save($item);
 
-        /** @var \Laravel\Cashier\Coupon\Coupon $coupon */
+        /** @var Coupon $coupon */
         $coupon = app()->make(CouponRepository::class)->findOrFail('test-coupon');
         $redeemedCoupon = $coupon->redeemFor($subscription);
         $preprocessor = new CouponOrderItemPreprocessor;
@@ -38,7 +40,7 @@ class CouponOrderItemPreprocessorTest extends BaseTestCase
         $this->assertEquals(0, $redeemedCoupon->refresh()->times_left);
     }
 
-    /** @test */
+    #[Test]
     public function passes_through_when_no_redeemed_coupon()
     {
         $preprocessor = new CouponOrderItemPreprocessor;

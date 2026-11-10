@@ -11,10 +11,11 @@ use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment;
+use PHPUnit\Framework\Attributes\Test;
 
 class UpdatePaymentMethodWithoutAddingToBalanceTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function can_update_payment_method_without_adding_to_balance()
     {
         $owner = User::factory()->create([

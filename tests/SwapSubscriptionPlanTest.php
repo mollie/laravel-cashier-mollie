@@ -10,6 +10,7 @@ use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
+use PHPUnit\Framework\Attributes\Test;
 
 class SwapSubscriptionPlanTest extends BaseTestCase
 {
@@ -23,7 +24,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
         Event::fake();
     }
 
-    /** @test */
+    #[Test]
     public function can_swap_to_another_plan()
     {
         $now = now();
@@ -110,9 +111,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
         $this->assertFalse($scheduled_order_item->isProcessed());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function can_swap_to_another_plan_with_immediately_applied_coupon()
     {
         $now = now();
@@ -194,7 +193,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function swapping_a_cancelled_subscription_resumes_it()
     {
         $subscription = $this->getUser()->subscriptions()->save(
@@ -212,7 +211,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
         $this->assertFalse($subscription->cancelled());
     }
 
-    /** @test */
+    #[Test]
     public function swapping_a_cancelled_subscription_at_next_cycle_resumes_it()
     {
         $subscription = $this->getUser()->subscriptions()->save(
@@ -230,7 +229,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
         $this->assertFalse($subscription->cancelled());
     }
 
-    /** @test */
+    #[Test]
     public function swapping_on_trial_does_not_create_an_order_even_when_invoice_now_is_true()
     {
         $subscription = $this->getUser()->subscriptions()->save(
@@ -248,7 +247,7 @@ class SwapSubscriptionPlanTest extends BaseTestCase
         $this->assertEquals(0, Order::count());
     }
 
-    /** @test */
+    #[Test]
     public function can_swap_next_cycle()
     {
         $user = $this->getUserWithZeroBalance();

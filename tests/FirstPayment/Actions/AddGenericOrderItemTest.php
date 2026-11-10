@@ -9,10 +9,11 @@ use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Money\Currency;
 use Money\Money;
+use PHPUnit\Framework\Attributes\Test;
 
 class AddGenericOrderItemTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function can_get_payload()
     {
         $action = new AddGenericOrderItem(
@@ -36,7 +37,7 @@ class AddGenericOrderItemTest extends BaseTestCase
         ], $payload);
     }
 
-    /** @test */
+    #[Test]
     public function can_create_from_payload()
     {
         $action = AddGenericOrderItem::createFromPayload([
@@ -55,7 +56,7 @@ class AddGenericOrderItemTest extends BaseTestCase
         $this->assertEquals(20, $action->getTaxPercentage());
     }
 
-    /** @test */
+    #[Test]
     public function can_create_from_payload_without_tax_percentage()
     {
         $action = AddGenericOrderItem::createFromPayload([
@@ -73,7 +74,7 @@ class AddGenericOrderItemTest extends BaseTestCase
         $this->assertEquals(0, $action->getTaxPercentage());
     }
 
-    /** @test */
+    #[Test]
     public function can_execute()
     {
         $user = User::factory()->create(['tax_percentage' => 20]);

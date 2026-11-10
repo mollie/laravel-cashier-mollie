@@ -6,10 +6,11 @@ use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Money\Money;
+use PHPUnit\Framework\Attributes\Test;
 
 class CreditTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function test_add_amount_for_owner()
     {
         $user = User::factory()->create();
@@ -29,7 +30,7 @@ class CreditTest extends BaseTestCase
         $this->assertTrue(Money::USD(12348)->equals($creditUSD->money()));
     }
 
-    /** @test */
+    #[Test]
     public function test_max_out_for_owner()
     {
         $user = User::factory()->create();

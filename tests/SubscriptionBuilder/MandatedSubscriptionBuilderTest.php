@@ -7,6 +7,7 @@ use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Exceptions\CouponException;
 use Laravel\Cashier\SubscriptionBuilder\MandatedSubscriptionBuilder;
 use Laravel\Cashier\Tests\BaseTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class MandatedSubscriptionBuilderTest extends BaseTestCase
 {
@@ -23,7 +24,7 @@ class MandatedSubscriptionBuilderTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function test_with_coupon_no_trial()
     {
         $this->withMockedCouponRepository();
@@ -81,7 +82,7 @@ class MandatedSubscriptionBuilderTest extends BaseTestCase
         $this->assertEquals(1, $orderItem->quantity);
     }
 
-    /** @test */
+    #[Test]
     public function test_with_coupon_validates_coupon()
     {
         $this->expectException(CouponException::class);
@@ -91,7 +92,7 @@ class MandatedSubscriptionBuilderTest extends BaseTestCase
         $this->getBuilder()->withCoupon('test-coupon')->create();
     }
 
-    /** @test */
+    #[Test]
     public function test_skip_trial_works()
     {
         $builder = $this->getBuilder()->trialDays(5);
@@ -102,7 +103,7 @@ class MandatedSubscriptionBuilderTest extends BaseTestCase
     }
 
     /**
-     * @return \Laravel\Cashier\SubscriptionBuilder\MandatedSubscriptionBuilder
+     * @return MandatedSubscriptionBuilder
      */
     protected function getBuilder()
     {

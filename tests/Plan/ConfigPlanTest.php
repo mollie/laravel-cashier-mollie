@@ -6,6 +6,7 @@ use Laravel\Cashier\Plan\ConfigPlanRepository;
 use Laravel\Cashier\Plan\Plan;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Order\FakeOrderItemPreprocessor;
+use PHPUnit\Framework\Attributes\Test;
 
 class ConfigPlanTest extends BaseTestCase
 {
@@ -44,7 +45,7 @@ class ConfigPlanTest extends BaseTestCase
         $this->plan = ConfigPlanRepository::populatePlan('Test', $this->configArray);
     }
 
-    /** @test */
+    #[Test]
     public function create_from_config_arrays()
     {
         $this->assertMoneyEURCents(1000, $this->plan->amount());
@@ -56,20 +57,20 @@ class ConfigPlanTest extends BaseTestCase
         $this->assertCount(1, $this->plan->orderItemPreprocessors());
     }
 
-    /** @test */
+    #[Test]
     public function get_first_payment_amount()
     {
         $amount = $this->plan->firstPaymentAmount();
         $this->assertMoneyEURCents(5, $amount);
     }
 
-    /** @test */
+    #[Test]
     public function get_first_payment_description()
     {
         $this->assertEquals('Test mandate payment', $this->plan->firstPaymentDescription());
     }
 
-    /** @test */
+    #[Test]
     public function get_preprocessors()
     {
         $this->assertNotEmpty($this->plan->orderItemPreprocessors());

@@ -2,24 +2,31 @@
 
 namespace Laravel\Cashier\FirstPayment;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\MandateUpdated;
 use Laravel\Cashier\FirstPayment\Actions\BaseAction;
+use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Order\OrderItemCollection;
+use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Payment as MolliePayment;
 
 class FirstPaymentHandler
 {
-    /** @var \Illuminate\Database\Eloquent\Model */
+    /** @var Model */
     protected $owner;
 
-    /** @var \Mollie\Api\Resources\Payment */
+    /** @var Payment */
     protected $molliePayment;
 
-    /** @var \Illuminate\Support\Collection */
+    /** @var Collection */
     protected $actions;
+
+    /** @var bool */
+    protected $alreadyProcessed = false;
 
     /**
      * FirstPaymentHandler constructor.
@@ -34,11 +41,24 @@ class FirstPaymentHandler
     /**
      * Execute all actions for the mandate payment and return the created Order.
      *
-     * @return \Laravel\Cashier\Order\Order
+     * @return Order
      */
     public function execute()
     {
+        $this->alreadyProcessed = false;
+
         $order = DB::transaction(function () {
+            $localPayment = Cashier::$paymentModel::query()
+                ->where('mollie_payment_id', $this->molliePayment->id)
+                ->lockForUpdate()
+                ->first();
+
+            if ($localPayment?->order) {
+                $this->alreadyProcessed = true;
+
+                return $localPayment->order;
+            }
+
             $this->owner->mollie_mandate_id = $this->molliePayment->mandateId;
             $this->owner->save();
 
@@ -51,7 +71,7 @@ class FirstPaymentHandler
 
             // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
             // In that case we create a record here.
-            $localPayment = Cashier::$paymentModel::findByMolliePaymentOrCreate(
+            $localPayment = $localPayment ?: Cashier::$paymentModel::findByMolliePaymentOrCreate(
                 $this->molliePayment,
                 $this->owner,
                 $this->actions->all()
@@ -66,15 +86,27 @@ class FirstPaymentHandler
             return $order;
         });
 
-        event(new MandateUpdated($this->owner, $this->molliePayment));
+        if (! $this->alreadyProcessed) {
+            event(new MandateUpdated($this->owner, $this->molliePayment));
+        }
 
         return $order;
     }
 
     /**
+     * Determine if execute() returned an already processed first payment.
+     *
+     * @return bool
+     */
+    public function wasAlreadyProcessed()
+    {
+        return $this->alreadyProcessed;
+    }
+
+    /**
      * Fetch the owner model using the mandate payment metadata.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return Model
      */
     protected function extractOwner()
     {
@@ -89,7 +121,7 @@ class FirstPaymentHandler
     /**
      * Build the action objects from the payment metadata.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     protected function extractActions()
     {
@@ -113,7 +145,7 @@ class FirstPaymentHandler
      * Execute the Actions and return a collection of the resulting OrderItems.
      * These OrderItems are already paid for using the mandate payment.
      *
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     protected function executeActions()
     {
@@ -129,7 +161,7 @@ class FirstPaymentHandler
     /**
      * Retrieve the owner object.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return Model
      */
     public function getOwner()
     {
@@ -139,7 +171,7 @@ class FirstPaymentHandler
     /**
      * Retrieve all Action objects.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function getActions()
     {

@@ -10,20 +10,35 @@ use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\ChargebackReceived;
 use Laravel\Cashier\Events\RefundProcessed;
 use Laravel\Cashier\Http\Controllers\AftercareWebhookController;
+use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Order\OrderItemCollection;
+use Laravel\Cashier\Payment;
+use Laravel\Cashier\Refunds\Refund;
 use Laravel\Cashier\Refunds\RefundItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
+use Laravel\Cashier\Tests\Fixtures\ChargebackStaleReadPayment;
 use Laravel\Cashier\Tests\Fixtures\User;
+use Mollie\Api\Contracts\Connector;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Resources\Refund as MollieRefund;
+use Mollie\Api\Resources\RefundCollection;
 use Mollie\Api\Types\PaymentStatus as MolliePaymentStatus;
 use Mollie\Api\Types\RefundStatus as MollieRefundStatus;
+use PHPUnit\Framework\Attributes\Test;
 
 class AftercareWebhookControllerTest extends BaseTestCase
 {
-    /** @test */
+    protected function tearDown(): void
+    {
+        ChargebackStaleReadPayment::resetStaleChargebackReads();
+        Cashier::usePaymentModel(Payment::class);
+
+        parent::tearDown();
+    }
+
+    #[Test]
     public function it_detects_new_chargebacks()
     {
         Event::fake();
@@ -64,7 +79,48 @@ class AftercareWebhookControllerTest extends BaseTestCase
         Event::assertDispatched(ChargebackReceived::class);
     }
 
-    /** @test */
+    #[Test]
+    public function it_handles_duplicate_chargeback_deliveries_when_the_outer_payment_read_is_stale()
+    {
+        Event::fake();
+        Cashier::usePaymentModel(ChargebackStaleReadPayment::class);
+
+        $molliePayment = new MolliePayment(new MollieApiClient);
+        $molliePayment->id = 'tr_duplicate_chargeback';
+        $molliePayment->status = 'paid';
+        $molliePayment->amount = (object) [
+            'currency' => 'EUR',
+            'value' => '20.00',
+        ];
+        $molliePayment->amountRefunded = null;
+        $molliePayment->amountChargedBack = null;
+        $molliePayment->_links = (object) [];
+
+        $localPayment = Cashier::$paymentModel::createFromMolliePayment($molliePayment, $this->getUser());
+        $molliePayment->amountChargedBack = (object) [
+            'value' => '10.00',
+            'currency' => 'EUR',
+        ];
+        $molliePayment->_links->chargebacks = (object) [
+            'href' => 'https://www.mollie.com/dashboard/org_12345678/payments/tr_WDqYK6vllg',
+            'type' => 'application/json',
+        ];
+
+        $this->withMockedGetMolliePayment(2, $molliePayment);
+        ChargebackStaleReadPayment::returnStaleChargebackAmountOnNextReads(2);
+
+        /** @var AftercareWebhookController $controller */
+        $controller = $this->app->make(AftercareWebhookController::class);
+
+        $controller->handleWebhook($this->getWebhookRequest($molliePayment->id));
+        $controller->handleWebhook($this->getWebhookRequest($molliePayment->id));
+
+        $localPayment->refresh();
+        $this->assertMoney(1000, 'EUR', $localPayment->getAmountChargedBack());
+        Event::assertDispatchedTimes(ChargebackReceived::class, 1);
+    }
+
+    #[Test]
     public function it_detects_new_refunds()
     {
         Event::fake();
@@ -83,18 +139,18 @@ class AftercareWebhookControllerTest extends BaseTestCase
             $subscription->scheduleNewOrderItemAt(now()),
         ]);
 
-        /** @var \Laravel\Cashier\Order\Order */
+        /** @var Order */
         $originalOrder = Cashier::$orderModel::createFromItems($orderItems, [
             'mollie_payment_id' => $molliePaymentId,
             'mollie_payment_status' => 'paid',
         ]);
 
-        /** @var \Laravel\Cashier\Refunds\Refund */
+        /** @var Refund */
         $localRefund = $originalOrder->refunds()->create([
             'owner_id' => $user->id,
             'owner_type' => get_class($user),
             'mollie_refund_id' => $mollieRefundId,
-            'mollie_refund_status' => MollieRefundStatus::STATUS_PENDING,
+            'mollie_refund_status' => MollieRefundStatus::PENDING,
             'total' => 1000,
             'currency' => 'EUR',
         ]);
@@ -107,19 +163,32 @@ class AftercareWebhookControllerTest extends BaseTestCase
 
         $mollieRefund = new MollieRefund(new MollieApiClient);
         $mollieRefund->id = $mollieRefundId;
-        $mollieRefund->status = MollieRefundStatus::STATUS_REFUNDED;
+        $mollieRefund->status = MollieRefundStatus::REFUNDED;
 
-        $molliePayment = $this->getMockBuilder(MolliePayment::class)
-            ->setConstructorArgs([new MollieApiClient])
-            ->onlyMethods(['refunds'])
-            ->getMock();
+        $mollieRefunds = new RefundCollection(
+            $this->createStub(Connector::class),
+            [$mollieRefund],
+        );
 
-        $molliePayment
-            ->method('refunds')
-            ->willReturn([$mollieRefund]);
+        $molliePayment = new class(new MollieApiClient, $mollieRefunds) extends MolliePayment
+        {
+            private RefundCollection $refunds;
+
+            public function __construct(MollieApiClient $client, RefundCollection $refunds)
+            {
+                parent::__construct($client);
+
+                $this->refunds = $refunds;
+            }
+
+            public function refunds(): RefundCollection
+            {
+                return $this->refunds;
+            }
+        };
 
         $molliePayment->id = $molliePaymentId;
-        $molliePayment->status = MolliePaymentStatus::STATUS_PAID;
+        $molliePayment->status = MolliePaymentStatus::PAID;
         $molliePayment->amount = (object) [
             'currency' => 'EUR',
             'value' => '10.00',

@@ -5,6 +5,8 @@ namespace Laravel\Cashier;
 use Carbon\Carbon;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Coupon\AppliedCoupon;
@@ -22,6 +24,7 @@ use Laravel\Cashier\Plan\Contracts\Plan;
 use Laravel\Cashier\Plan\Contracts\PlanRepository;
 use Laravel\Cashier\Refunds\Contracts\IsRefundable;
 use Laravel\Cashier\Refunds\RefundItem;
+use Laravel\Cashier\Refunds\RefundItemCollection;
 use Laravel\Cashier\Traits\HasOwner;
 use Laravel\Cashier\Types\SubscriptionCancellationReason;
 use LogicException;
@@ -30,9 +33,9 @@ use Money\Money;
 
 /**
  * @property int id
- * @property \Carbon\Carbon cycle_ends_at
- * @property \Carbon\Carbon cycle_started_at
- * @property \Carbon\Carbon ends_at
+ * @property Carbon cycle_ends_at
+ * @property Carbon cycle_started_at
+ * @property Carbon ends_at
  * @property mixed owner_id
  * @property string owner_type
  * @property string next_plan
@@ -41,7 +44,7 @@ use Money\Money;
  * @property mixed scheduled_order_item_id
  * @property OrderItem scheduledOrderItem
  * @property float tax_percentage
- * @property \Carbon\Carbon trial_ends_at
+ * @property Carbon trial_ends_at
  * @property float cycle_progress
  * @property float cycle_left
  * @property string currency
@@ -401,7 +404,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
      *
      * @return $this
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function resume()
     {
@@ -431,7 +434,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
     /**
      * Get the order items for this subscription.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function orderItems()
     {
@@ -441,7 +444,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
     /**
      * Relation to the scheduled order item, if defined.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function scheduledOrderItem()
     {
@@ -451,7 +454,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
     /**
      * Relation to the scheduled order item, if defined.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function scheduled_order_item()
     {
@@ -464,7 +467,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
      * @param  Carbon|null  $process_at
      * @param  array  $item_overrides
      * @param  bool  $fill_link  Indicates whether scheduled_order_item_id field should be filled to point to the newly scheduled order item
-     * @return \Illuminate\Database\Eloquent\Model|\Laravel\Cashier\Order\OrderItem
+     * @return Model|OrderItem
      */
     public function scheduleNewOrderItemAt(Carbon $process_at, $item_overrides = [], $fill_link = true, ?Plan $plan = null)
     {
@@ -502,7 +505,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
     /**
      * Called right before processing the order item into an order.
      *
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public static function preprocessOrderItem(OrderItem $item)
     {
@@ -678,7 +681,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
      * Increment the quantity of the subscription.
      *
      * @param  bool  $invoiceNow
-     * @return \Laravel\Cashier\Subscription
+     * @return Subscription
      *
      * @throws \Throwable
      */
@@ -691,7 +694,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
      * Increment the quantity of the subscription, and invoice immediately.
      *
      * @param  int  $count
-     * @return \Laravel\Cashier\Subscription
+     * @return Subscription
      *
      * @throws \Throwable
      */
@@ -704,7 +707,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
      * Decrement the quantity of the subscription.
      *
      * @param  bool  $invoiceNow
-     * @return \Laravel\Cashier\Subscription
+     * @return Subscription
      *
      * @throws \Throwable
      */
@@ -773,7 +776,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
     /**
      * The maximum amount that can be reimbursed, ranging from zero to a positive Money amount.
      *
-     * @return \Money\Money
+     * @return Money
      */
     protected function reimbursableAmount()
     {
@@ -787,7 +790,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
             ->subtract($latestProcessedOrderItem->getTax()); // tax calculated elsewhere
 
         // Subtract any refunds
-        /** @var \Laravel\Cashier\Refunds\RefundItemCollection $refundItems */
+        /** @var RefundItemCollection $refundItems */
         $refundItems = Cashier::$refundItemModel::where('original_order_item_id', $latestProcessedOrderItem->id)->get();
 
         if ($refundItems->isNotEmpty()) {
@@ -821,7 +824,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
     }
 
     /**
-     * @return null|\Laravel\Cashier\Order\OrderItem
+     * @return null|OrderItem
      */
     protected function reimburseUnusedTime(?Carbon $now = null)
     {
@@ -849,7 +852,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
      * Wrap up the current billing cycle, apply modifications to this subscription and start a new cycle.
      *
      * @param  bool  $invoiceNow
-     * @return \Laravel\Cashier\Subscription
+     * @return Subscription
      */
     public function restartCycleWithModifications(\Closure $applyNewSettings, ?Carbon $now = null, $invoiceNow = true)
     {
@@ -897,7 +900,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
      * Wrap up the current billing cycle and start a new cycle.
      *
      * @param  bool  $invoiceNow
-     * @return \Laravel\Cashier\Subscription
+     * @return Subscription
      */
     public function restartCycle(?Carbon $now = null, $invoiceNow = true)
     {
@@ -907,7 +910,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
     /**
      * Any coupons redeemed for this subscription
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function redeemedCoupons()
     {
@@ -917,7 +920,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
     /**
      * Any coupons applied to this subscription
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function appliedCoupons()
     {

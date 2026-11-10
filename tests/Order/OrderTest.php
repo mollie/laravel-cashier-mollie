@@ -3,11 +3,14 @@
 namespace Laravel\Cashier\Tests\Order;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\BalanceTurnedStale;
 use Laravel\Cashier\Events\OrderCreated;
+use Laravel\Cashier\Events\OrderPaymentFailed;
 use Laravel\Cashier\Events\OrderPaymentFailedDueToInvalidMandate;
+use Laravel\Cashier\Events\OrderPaymentPaid;
 use Laravel\Cashier\Events\OrderProcessed;
 use Laravel\Cashier\Exceptions\AmountExceedsMolliePaymentMethodLimit;
 use Laravel\Cashier\Order\Invoice;
@@ -20,9 +23,13 @@ use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
 use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
+use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
 use Money\Currency;
 use Money\Money;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 
 class OrderTest extends BaseTestCase
 {
@@ -33,7 +40,7 @@ class OrderTest extends BaseTestCase
         $this->withConfiguredPlans();
     }
 
-    /** @test */
+    #[Test]
     public function can_create_from_order_items_and_process()
     {
         Carbon::setTestNow(Carbon::parse('2018-01-01'));
@@ -92,7 +99,7 @@ class OrderTest extends BaseTestCase
         $this->assertEquals('open', $order->mollie_payment_status);
     }
 
-    /** @test */
+    #[Test]
     public function creating_a_new_order_schedules_next_order_items()
     {
         $user = User::factory()->create(['id' => 2]);
@@ -129,7 +136,7 @@ class OrderTest extends BaseTestCase
         $this->assertSame(0.0, $scheduled_item->tax_percentage);
     }
 
-    /** @test */
+    #[Test]
     public function yields_order_collection()
     {
         $collection = OrderFactory::new()->times(2)->make();
@@ -137,7 +144,7 @@ class OrderTest extends BaseTestCase
         $this->assertInstanceOf(OrderCollection::class, $collection);
     }
 
-    /** @test */
+    #[Test]
     public function handles_owner_balance()
     {
         // Owner with 15 euro balance
@@ -204,7 +211,86 @@ class OrderTest extends BaseTestCase
         $this->assertSame(1500, $order->balance_before);
     }
 
-    /** @test */
+    #[Test]
+    public function handles_duplicate_failed_payment_from_stale_order_once()
+    {
+        Event::fake();
+
+        $user = User::factory()->create();
+        $paymentId = 'tr_failed_payment_id';
+        $molliePayment = new MolliePayment(new MollieApiClient);
+        $molliePayment->id = $paymentId;
+        $molliePayment->status = PaymentStatus::OPEN;
+        $molliePayment->amount = (object) [
+            'currency' => 'EUR',
+            'value' => '10.00',
+        ];
+        $molliePayment->mandateId = 'mdt_dummy_mandate_id';
+
+        $order = $user->orders()->save(OrderFactory::new()->make([
+            'mollie_payment_id' => $paymentId,
+            'mollie_payment_status' => PaymentStatus::OPEN,
+            'balance_before' => 500,
+            'credit_used' => 500,
+            'currency' => 'EUR',
+        ]));
+        Cashier::$paymentModel::createFromMolliePayment($molliePayment, $user);
+
+        $firstOrderInstance = Cashier::$orderModel::find($order->id);
+        $secondOrderInstance = Cashier::$orderModel::find($order->id);
+
+        $molliePayment->status = PaymentStatus::FAILED;
+
+        $firstOrderInstance->handlePaymentFailed($molliePayment);
+        $secondOrderInstance->handlePaymentFailed($molliePayment);
+
+        $order->refresh();
+        $this->assertEquals(PaymentStatus::FAILED, $order->mollie_payment_status);
+        $this->assertMoneyEURCents(0, $order->getBalanceBefore());
+        $this->assertMoneyEURCents(0, $order->getCreditUsed());
+        $this->assertMoneyEURCents(500, $user->credit('EUR')->money());
+        $this->assertEquals(PaymentStatus::FAILED, Cashier::$paymentModel::first()->mollie_payment_status);
+        Event::assertDispatchedTimes(OrderPaymentFailed::class, 1);
+    }
+
+    #[Test]
+    public function handles_duplicate_paid_payment_from_stale_order_once()
+    {
+        Event::fake();
+
+        $user = User::factory()->create();
+        $paymentId = 'tr_paid_payment_id';
+        $molliePayment = new MolliePayment(new MollieApiClient);
+        $molliePayment->id = $paymentId;
+        $molliePayment->status = PaymentStatus::OPEN;
+        $molliePayment->amount = (object) [
+            'currency' => 'EUR',
+            'value' => '10.00',
+        ];
+        $molliePayment->mandateId = 'mdt_dummy_mandate_id';
+
+        $order = $user->orders()->save(OrderFactory::new()->make([
+            'mollie_payment_id' => $paymentId,
+            'mollie_payment_status' => PaymentStatus::OPEN,
+            'currency' => 'EUR',
+        ]));
+        Cashier::$paymentModel::createFromMolliePayment($molliePayment, $user);
+
+        $firstOrderInstance = Cashier::$orderModel::find($order->id);
+        $secondOrderInstance = Cashier::$orderModel::find($order->id);
+
+        $molliePayment->status = PaymentStatus::PAID;
+
+        $firstOrderInstance->handlePaymentPaid($molliePayment);
+        $secondOrderInstance->handlePaymentPaid($molliePayment);
+
+        $order->refresh();
+        $this->assertEquals(PaymentStatus::PAID, $order->mollie_payment_status);
+        $this->assertEquals(PaymentStatus::PAID, Cashier::$paymentModel::first()->mollie_payment_status);
+        Event::assertDispatchedTimes(OrderPaymentPaid::class, 1);
+    }
+
+    #[Test]
     public function can_get_invoice()
     {
         $user = User::factory()->create(['extra_billing_information' => "Some dummy\nextra billing information"]);
@@ -236,7 +322,7 @@ class OrderTest extends BaseTestCase
         $this->assertMoneyEURCents(29024, $invoice->rawTotalDue());
     }
 
-    /** @test */
+    #[Test]
     public function does_not_process_payment_if_total_due_is_zero()
     {
         Event::fake();
@@ -259,7 +345,7 @@ class OrderTest extends BaseTestCase
         $this->assertDispatchedOrderProcessed($order);
     }
 
-    /** @test */
+    #[Test]
     public function creates_a_mollie_payment_if_total_due_is_larger_than_mollies_minimum()
     {
         Event::fake();
@@ -293,7 +379,7 @@ class OrderTest extends BaseTestCase
         $this->assertDispatchedOrderProcessed($order);
     }
 
-    /** @test */
+    #[Test]
     public function creates_a_mollie_payment_if_mollies_maximum_is_null()
     {
         Event::fake();
@@ -327,7 +413,7 @@ class OrderTest extends BaseTestCase
         $this->assertDispatchedOrderProcessed($order);
     }
 
-    /** @test */
+    #[Test]
     public function not_creates_a_mollie_payment_if_total_due_is_greathen_than_mollies_maximum()
     {
         Event::fake();
@@ -355,7 +441,7 @@ class OrderTest extends BaseTestCase
         $order->processPayment();
     }
 
-    /** @test */
+    #[Test]
     public function handles_an_invalid_mandate_when_processing_the_payment()
     {
         Event::fake();
@@ -388,7 +474,7 @@ class OrderTest extends BaseTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function can_retry_a_failed_order_now()
     {
         $this->withMockedGetMollieMandateAccepted(3);
@@ -430,7 +516,7 @@ class OrderTest extends BaseTestCase
         $this->assertDatabaseHas('payments', ['mollie_payment_id' => 'tr_new_payment_id']);
     }
 
-    /** @test */
+    #[Test]
     public function stores_owner_credit_if_total_is_positive_and_smaller_than_mollies_minimum()
     {
         Event::fake();
@@ -470,7 +556,7 @@ class OrderTest extends BaseTestCase
         $this->assertDispatchedOrderProcessed($order);
     }
 
-    /** @test */
+    #[Test]
     public function stores_owner_credit_if_total_due_is_negative_and_owner_has_active_subscription()
     {
         Event::fake();
@@ -504,7 +590,7 @@ class OrderTest extends BaseTestCase
         $this->assertDispatchedOrderProcessed($order);
     }
 
-    /** @test */
+    #[Test]
     public function handles_negative_total_due_and_owner_has_no_active_subscription()
     {
         Event::fake();
@@ -536,9 +622,7 @@ class OrderTest extends BaseTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function can_create_order_from_order_items_when_total_value_is_negative_and_owner_has_no_mandate()
     {
         Carbon::setTestNow(Carbon::parse('2018-01-01'));
@@ -587,9 +671,7 @@ class OrderTest extends BaseTestCase
         $this->assertMoneyEURCents(29998, $user->credit('EUR')->money());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function can_create_order_from_order_items_when_total_is_paid_by_credit_and_owner_has_no_mandate()
     {
         Carbon::setTestNow(Carbon::parse('2018-01-01'));
@@ -641,7 +723,7 @@ class OrderTest extends BaseTestCase
         $this->assertMoneyEURCents(0, $user->credit('EUR')->money());
     }
 
-    /** @test */
+    #[Test]
     public function can_create_processed_order_from_items()
     {
         Event::fake();
@@ -661,7 +743,7 @@ class OrderTest extends BaseTestCase
 
         $order = Cashier::$orderModel::createProcessedFromItems($items, [
             'mollie_payment_id' => 'tr_123456',
-            'mollie_payment_status' => PaymentStatus::STATUS_PAID,
+            'mollie_payment_status' => PaymentStatus::PAID,
         ]);
 
         $this->assertNotNull($order);
@@ -670,7 +752,7 @@ class OrderTest extends BaseTestCase
         $this->assertTrue($order->isProcessed());
 
         $this->assertEquals('tr_123456', $order->mollie_payment_id);
-        $this->assertEquals(PaymentStatus::STATUS_PAID, $order->mollie_payment_status);
+        $this->assertEquals(PaymentStatus::PAID, $order->mollie_payment_status);
 
         $items->each(function ($item) {
             $this->assertTrue($item->isProcessed());
@@ -679,7 +761,7 @@ class OrderTest extends BaseTestCase
         $this->assertDispatchedOrderProcessed($order);
     }
 
-    /** @test */
+    #[Test]
     public function find_by_mollie_payment_id_works()
     {
         $this->assertNull(Cashier::$orderModel::findByMolliePaymentId('tr_xxxxx1234dummy'));
@@ -693,14 +775,14 @@ class OrderTest extends BaseTestCase
         $this->assertTrue($found->isNot($otherOrder));
     }
 
-    /** @test */
+    #[Test]
     public function find_by_mollie_payment_id_or_fail_throws_an_exception_if_not_found()
     {
-        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        $this->expectException(ModelNotFoundException::class);
         Cashier::$orderModel::findByMolliePaymentIdOrFail('tr_xxxxx1234dummy');
     }
 
-    /** @test */
+    #[Test]
     public function find_by_mollie_payment_id_or_fail_works()
     {
         $order = OrderFactory::new()->create(['mollie_payment_id' => 'tr_xxxxx1234dummy']);
@@ -712,11 +794,8 @@ class OrderTest extends BaseTestCase
         $this->assertTrue($found->isNot($otherOrder));
     }
 
-    /**
-     * @test
-     *
-     * @group generate_new_invoice_template
-     */
+    #[Test]
+    #[Group('generate_new_invoice_template')]
     public function generate_new_example_invoice()
     {
         $user = User::factory()->create(['extra_billing_information' => 'Some dummy extra billing information']);
@@ -752,8 +831,6 @@ class OrderTest extends BaseTestCase
         } else {
             $this->fail('Cannot write example invoice to '.$filename);
         }
-
-        $this->assertTrue(true, 'Unable to generate dummy invoice.');
     }
 
     /**

@@ -8,6 +8,7 @@ use Laravel\Cashier\Events\FirstPaymentFailed;
 use Laravel\Cashier\Events\FirstPaymentPaid;
 use Laravel\Cashier\FirstPayment\FirstPaymentHandler;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
+use Mollie\Api\Exceptions\ApiException;
 use Symfony\Component\HttpFoundation\Response;
 
 class FirstPaymentWebhookController extends BaseWebhookController
@@ -15,7 +16,7 @@ class FirstPaymentWebhookController extends BaseWebhookController
     /**
      * @return Response
      *
-     * @throws \Mollie\Api\Exceptions\ApiException Only in debug mode
+     * @throws ApiException Only in debug mode
      */
     public function handleWebhook(Request $request)
     {
@@ -23,7 +24,13 @@ class FirstPaymentWebhookController extends BaseWebhookController
 
         if ($payment) {
             if ($payment->isPaid()) {
-                $order = (new FirstPaymentHandler($payment))->execute();
+                $handler = new FirstPaymentHandler($payment);
+                $order = $handler->execute();
+
+                if ($handler->wasAlreadyProcessed()) {
+                    return new Response(null, 200);
+                }
+
                 $payment->webhookUrl = route('webhooks.mollie.aftercare');
 
                 /** @var UpdateMolliePayment $updateMolliePayment */

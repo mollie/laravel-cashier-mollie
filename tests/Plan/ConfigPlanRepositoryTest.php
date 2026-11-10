@@ -11,6 +11,7 @@ use Laravel\Cashier\Plan\ConfigPlanRepository;
 use Laravel\Cashier\Plan\Contracts\IntervalGeneratorContract;
 use Laravel\Cashier\Plan\Contracts\Plan;
 use Laravel\Cashier\Tests\BaseTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ConfigPlanRepositoryTest extends BaseTestCase
 {
@@ -42,41 +43,42 @@ class ConfigPlanRepositoryTest extends BaseTestCase
         Config::set('cashier_plans.plans.Test', $this->testPlanArray);
     }
 
-    /** @test */
+    #[Test]
     public function find_returns_null_when_not_found()
     {
         $this->assertNull(ConfigPlanRepository::find('some_wrong_name'));
     }
 
-    /** @test */
+    #[Test]
     public function find_returns_plan_when_found()
     {
         $this->assertInstanceOf(Plan::class, ConfigPlanRepository::find('Test'));
     }
 
-    /** @test
-     * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
+    /**
+     * @throws PlanNotFoundException
      */
+    #[Test]
     public function find_or_fail_correct()
     {
         $this->assertInstanceOf(Plan::class, ConfigPlanRepository::findOrFail('Test'));
     }
 
-    /** @test */
+    #[Test]
     public function find_or_fail_wrong()
     {
         $this->expectException(PlanNotFoundException::class);
         ConfigPlanRepository::findOrFail('some_wrong_name');
     }
 
-    /** @test */
+    #[Test]
     public function find_is_case_sensitive()
     {
         $this->assertNull(ConfigPlanRepository::find('test'));
         $this->assertInstanceOf(Plan::class, ConfigPlanRepository::find('Test'));
     }
 
-    /** @test */
+    #[Test]
     public function populates_plan_properly_without_defaults_set()
     {
         Config::set('cashier_plans.defaults', []); // clear Plan defaults
@@ -97,7 +99,7 @@ class ConfigPlanRepositoryTest extends BaseTestCase
         $this->assertCount(0, $plan->orderItemPreprocessors());
     }
 
-    /** @test */
+    #[Test]
     public function populates_plan_properly_with_defaults_set()
     {
         Config::set('cashier_plans.defaults.first_payment', $this->firstPaymentDefaultsArray);

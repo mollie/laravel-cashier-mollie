@@ -3,9 +3,12 @@
 namespace Laravel\Cashier;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Order\ConvertsToMoney;
+use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Traits\HasOwner;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
@@ -26,7 +29,7 @@ use Money\Money;
  * @property int amount_charged_back
  * @property object first_payment_actions // An object for legacy reasons
  * @property string mollie_mandate_id
- * @property \Laravel\Cashier\Order\Order order
+ * @property Order order
  * @property array|null metadata
  *
  * @method static create(array $data)
@@ -104,7 +107,7 @@ class Payment extends Model
      *
      * @return static
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
     public static function findByPaymentIdOrFail($id): self
     {
@@ -126,7 +129,7 @@ class Payment extends Model
 
         $newPayment = static::createFromMolliePayment($molliePayment, $owner, $actions);
 
-        if ($newPayment->mollie_payment_status === PaymentStatus::STATUS_PAID) {
+        if ($newPayment->mollie_payment_status === PaymentStatus::PAID) {
             $molliePayment->webhookUrl = route('webhooks.mollie.aftercare');
 
             /** @var UpdateMolliePayment $updateMolliePayment */
@@ -138,7 +141,7 @@ class Payment extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function order()
     {

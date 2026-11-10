@@ -6,14 +6,13 @@ namespace Laravel\Cashier\Tests\Mollie;
 
 use Laravel\Cashier\Mollie\Contracts\GetMollieRefund;
 use Mollie\Api\Resources\Refund;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 
 class GetMollieRefundTest extends BaseMollieInteraction
 {
-    /**
-     * @test
-     *
-     * @group mollie_integration
-     */
+    #[Test]
+    #[Group('mollie_integration')]
     public function test_execute()
     {
         /** @var GetMollieRefund $action */

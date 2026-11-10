@@ -10,7 +10,7 @@ use Money\Money;
 class PercentageDiscountHandler extends BaseCouponHandler
 {
     /**
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function getDiscountOrderItems(OrderItemCollection $items)
     {
@@ -21,7 +21,8 @@ class PercentageDiscountHandler extends BaseCouponHandler
         /** @var OrderItem $firstItem */
         $firstItem = $items->first();
 
-        $unitPrice = $this->unitPrice($firstItem->getTotal());
+        // Calculate discount from subtotal (excluding tax)
+        $unitPrice = $this->unitPrice($firstItem->getSubtotal());
 
         return $this->makeOrderItem([
             'process_at' => now(),
@@ -36,8 +37,8 @@ class PercentageDiscountHandler extends BaseCouponHandler
     }
 
     /**
-     * @param  \Money\Money  $base  The amount the discount is applied to.
-     * @return \Money\Money
+     * @param  Money  $base  The amount the discount is applied to.
+     * @return Money
      */
     protected function unitPrice(Money $base)
     {

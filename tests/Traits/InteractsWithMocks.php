@@ -14,16 +14,20 @@ use Laravel\Cashier\Mollie\Contracts\GetMollieMethodMinimumAmount;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Mollie\GetMollieMethodMaximumAmount;
+use Laravel\Cashier\Tests\BaseTestCase;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Http\Response;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Mandate;
 use Mollie\Api\Resources\Payment;
 use Money\Currency;
 use Money\Money;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\StreamInterface;
 
 /**
- * @mixin \Laravel\Cashier\Tests\BaseTestCase
+ * @mixin BaseTestCase
  */
 trait InteractsWithMocks
 {
@@ -289,7 +293,18 @@ trait InteractsWithMocks
             return $mock->shouldReceive('execute')
                 ->with($wrongId, [])
                 ->times($times)
-                ->andThrow(new ApiException);
+                ->andThrow(new ApiException(
+                    \Mockery::mock(Response::class, [
+                        'json' => (object) ['status' => 404, 'title' => 'Not Found', '_links' => (object) []],
+                        'getPsrRequest' => \Mockery::mock(RequestInterface::class, [
+                            'getBody' => \Mockery::mock(StreamInterface::class, [
+                                '__toString' => '',
+                            ]),
+                        ]),
+                    ]),
+                    'Test exception',
+                    404,
+                ));
         });
     }
 

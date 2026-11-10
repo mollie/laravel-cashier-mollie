@@ -2,7 +2,10 @@
 
 namespace Laravel\Cashier\Order;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +24,9 @@ use Laravel\Cashier\Exceptions\OrderRetryRequiresStatusFailedException;
 use Laravel\Cashier\MandatedPayment\MandatedPaymentBuilder;
 use Laravel\Cashier\Order\Contracts\MaximumPayment;
 use Laravel\Cashier\Order\Contracts\MinimumPayment;
+use Laravel\Cashier\Refunds\Refund;
 use Laravel\Cashier\Refunds\RefundBuilder;
+use Laravel\Cashier\Refunds\RefundCollection;
 use Laravel\Cashier\Traits\HasOwner;
 use LogicException;
 use Mollie\Api\Resources\Mandate;
@@ -44,12 +49,12 @@ use Money\Money;
  * @property int total_due
  * @property string mollie_payment_id
  * @property string mollie_payment_status
- * @property \Carbon\Carbon|null processed_at
+ * @property Carbon|null processed_at
  * @property int amount_refunded
  * @property int amount_charged_back
  * @property array|null metadata
- * @property \Laravel\Cashier\Order\OrderItemCollection items
- * @property \Laravel\Cashier\Refunds\RefundCollection refunds
+ * @property OrderItemCollection items
+ * @property RefundCollection refunds
  *
  * @method static create(array $data)
  */
@@ -165,7 +170,7 @@ class Order extends Model
 
     /**
      * @param  array  $overrides
-     * @return \Laravel\Cashier\Order\Order
+     * @return Order
      */
     public static function createProcessedFromItem($item, $overrides = [])
     {
@@ -177,7 +182,7 @@ class Order extends Model
      *
      * @return $this
      *
-     * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
+     * @throws InvalidMandateException
      */
     public function processPayment()
     {
@@ -290,7 +295,7 @@ class Order extends Model
     /**
      * Create a new Eloquent Collection instance.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public function newCollection(array $models = [])
     {
@@ -302,7 +307,7 @@ class Order extends Model
      *
      * @param  null  $id
      * @param  null  $date
-     * @return \Laravel\Cashier\Order\Invoice
+     * @return Invoice
      */
     public function invoice($id = null, $date = null)
     {
@@ -390,7 +395,7 @@ class Order extends Model
     public function scopePaid($query)
     {
         return $this
-            ->scopePaymentStatus($query, PaymentStatus::STATUS_PAID)
+            ->scopePaymentStatus($query, PaymentStatus::PAID)
             ->orWhere('total_due', '=', 0);
     }
 
@@ -409,7 +414,7 @@ class Order extends Model
      *
      * @return static
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
     public static function findByMolliePaymentIdOrFail($id)
     {
@@ -436,35 +441,49 @@ class Order extends Model
      */
     public function handlePaymentFailed(MolliePayment $molliePayment)
     {
-        $localPayment = DB::transaction(function () use ($molliePayment) {
-            if ($this->creditApplied()) {
-                $this->owner->addCredit($this->getCreditUsed());
+        $handled = false;
+        $localPayment = DB::transaction(function () use ($molliePayment, &$handled) {
+            // Webhook retries can arrive while callers still hold stale Order instances.
+            // Reload the current row under lock so credit restoration and item hooks run once.
+            /** @var static $order */
+            $order = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
+
+            if ($order->mollie_payment_status === PaymentStatus::FAILED) {
+                return null;
             }
 
-            $this->update([
-                'mollie_payment_status' => 'failed',
+            if ($order->creditApplied()) {
+                $order->owner->addCredit($order->getCreditUsed());
+            }
+
+            $order->update([
+                'mollie_payment_status' => PaymentStatus::FAILED,
                 'balance_before' => 0,
                 'credit_used' => 0,
             ]);
 
-            // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
-            // In that case we create a record here.
-            $localPayment = Cashier::$paymentModel::findByMolliePaymentOrCreate($molliePayment, $this->owner);
+            $localPayment = Cashier::$paymentModel::findByPaymentIdOrFail($molliePayment->id);
             $localPayment->update([
-                'mollie_payment_status' => 'failed',
-                'order_id' => $this->id,
+                'mollie_payment_status' => PaymentStatus::FAILED,
+                'order_id' => $order->id,
             ]);
 
-            $this->items->each(function (OrderItem $item) {
+            $order->items->each(function (OrderItem $item) {
                 $item->handlePaymentFailed();
             });
 
-            $this->owner->validateMollieMandate();
+            $order->owner->validateMollieMandate();
+
+            $handled = true;
 
             return $localPayment;
         });
 
-        Event::dispatch(new OrderPaymentFailed($this, $localPayment));
+        $this->refresh();
+
+        if ($handled) {
+            Event::dispatch(new OrderPaymentFailed($this, $localPayment));
+        }
 
         return $this;
     }
@@ -511,31 +530,45 @@ class Order extends Model
      */
     public function handlePaymentPaid(MolliePayment $molliePayment)
     {
-        $localPayment = DB::transaction(function () use ($molliePayment) {
-            $this->update(['mollie_payment_status' => 'paid']);
+        $handled = false;
+        $localPayment = DB::transaction(function () use ($molliePayment, &$handled) {
+            // Paid webhooks have the same stale-instance problem: re-check under lock so the
+            // order transition, local payment update, and item hooks are idempotent.
+            /** @var static $order */
+            $order = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
-            // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
-            // In that case we create a record here.
-            $localPayment = Cashier::$paymentModel::findByMolliePaymentOrCreate($molliePayment, $this->owner);
+            if ($order->mollie_payment_status === PaymentStatus::PAID) {
+                return null;
+            }
+
+            $order->update(['mollie_payment_status' => PaymentStatus::PAID]);
+
+            $localPayment = Cashier::$paymentModel::findByPaymentIdOrFail($molliePayment->id);
             $localPayment->update([
-                'mollie_payment_status' => 'paid',
-                'order_id' => $this->id,
+                'mollie_payment_status' => PaymentStatus::PAID,
+                'order_id' => $order->id,
             ]);
 
-            $this->items->each(function (OrderItem $item) {
+            $order->items->each(function (OrderItem $item) {
                 $item->handlePaymentPaid();
             });
+
+            $handled = true;
 
             return $localPayment;
         });
 
-        Event::dispatch(new OrderPaymentPaid($this, $localPayment));
+        $this->refresh();
+
+        if ($handled) {
+            Event::dispatch(new OrderPaymentPaid($this, $localPayment));
+        }
 
         return $this;
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getSubtotal()
     {
@@ -543,7 +576,7 @@ class Order extends Model
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getTax()
     {
@@ -551,7 +584,7 @@ class Order extends Model
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getTotal()
     {
@@ -559,7 +592,7 @@ class Order extends Model
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getTotalDue()
     {
@@ -567,7 +600,7 @@ class Order extends Model
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getBalanceBefore()
     {
@@ -575,7 +608,7 @@ class Order extends Model
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getBalanceAfter()
     {
@@ -583,7 +616,7 @@ class Order extends Model
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getCreditUsed()
     {
@@ -591,7 +624,7 @@ class Order extends Model
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getAmountRefunded()
     {
@@ -599,7 +632,7 @@ class Order extends Model
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getAmountChargedBack()
     {
@@ -627,7 +660,7 @@ class Order extends Model
     /**
      * Get an empty refund builder for this order.
      *
-     * @return \Laravel\Cashier\Refunds\RefundBuilder
+     * @return RefundBuilder
      */
     public function refundBuilder()
     {
@@ -637,7 +670,7 @@ class Order extends Model
     /**
      * Initiate a new refund for this order.
      *
-     * @return \Laravel\Cashier\Refunds\RefundBuilder
+     * @return RefundBuilder
      */
     public function newRefund()
     {
@@ -647,7 +680,7 @@ class Order extends Model
     /**
      * Get a refund builder prepared to completely refund this order.
      *
-     * @return \Laravel\Cashier\Refunds\RefundBuilder
+     * @return RefundBuilder
      */
     public function completeRefundBuilder()
     {
@@ -657,7 +690,7 @@ class Order extends Model
     /**
      * Initiate a complete refund for this order.
      *
-     * @return \Laravel\Cashier\Refunds\Refund
+     * @return Refund
      */
     public function refundCompletely()
     {
@@ -665,7 +698,7 @@ class Order extends Model
     }
 
     /**
-     * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
+     * @throws InvalidMandateException
      */
     protected function guardMandate(?Mandate $mandate)
     {
@@ -675,7 +708,7 @@ class Order extends Model
     }
 
     /**
-     * @return \Laravel\Cashier\Order\OrderNumberGenerator
+     * @return OrderNumberGenerator
      */
     protected static function numberGenerator()
     {
@@ -685,7 +718,7 @@ class Order extends Model
     /**
      * @throws InvalidMandateException
      */
-    private function ensureValidMandateAndMinimumPaymentAmountWhenTotalDuePositive(): \Money\Money
+    private function ensureValidMandateAndMinimumPaymentAmountWhenTotalDuePositive(): Money
     {
         // If the total due amount is below 0 checking for a mandate doesn't make sense.
         if ((int) $this->getTotalDue()->getAmount() > 0) {
@@ -702,7 +735,7 @@ class Order extends Model
     /**
      * @throws InvalidMandateException
      */
-    private function ensureValidMandateAndMaximumPaymentAmountWhenTotalDuePositive(): ?\Money\Money
+    private function ensureValidMandateAndMaximumPaymentAmountWhenTotalDuePositive(): ?Money
     {
         if ((int) $this->getTotalDue()->getAmount() > 0) {
             $mandate = $this->owner->mollieMandate();
@@ -725,8 +758,8 @@ class Order extends Model
     }
 
     /**
-     * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
-     * @throws \Laravel\Cashier\Exceptions\OrderRetryRequiresStatusFailedException
+     * @throws InvalidMandateException
+     * @throws OrderRetryRequiresStatusFailedException
      */
     public function retryNow()
     {

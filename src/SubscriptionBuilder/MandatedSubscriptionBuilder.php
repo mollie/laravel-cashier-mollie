@@ -6,8 +6,14 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
+use Laravel\Cashier\Coupon\Coupon;
+use Laravel\Cashier\Exceptions\CouponNotFoundException;
+use Laravel\Cashier\Exceptions\InvalidMandateException;
+use Laravel\Cashier\Exceptions\PlanNotFoundException;
 use Laravel\Cashier\Plan\Contracts\PlanRepository;
+use Laravel\Cashier\Plan\Plan;
 use Laravel\Cashier\Subscription;
+use Laravel\Cashier\SubscriptionBuilder\Contracts\SubscriptionBuilder;
 use Laravel\Cashier\SubscriptionBuilder\Contracts\SubscriptionBuilder as Contract;
 
 /**
@@ -18,7 +24,7 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * The model that is subscribing.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var Model
      */
     protected $owner;
 
@@ -53,11 +59,11 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * The Plan being subscribed to.
      *
-     * @var \Laravel\Cashier\Plan\Plan
+     * @var Plan
      */
     protected $plan;
 
-    /** @var \Laravel\Cashier\Coupon\Coupon */
+    /** @var Coupon */
     protected $coupon;
 
     /** @var bool */
@@ -66,12 +72,15 @@ class MandatedSubscriptionBuilder implements Contract
     /** @var bool */
     protected $validateCoupon = true;
 
+    /** @var bool */
+    protected $pendingMandateAccepted = false;
+
     /**
      * Create a new subscription builder instance.
      *
      * @param  mixed  $owner
      *
-     * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
+     * @throws PlanNotFoundException
      */
     public function __construct(Model $owner, string $name, string $plan)
     {
@@ -87,11 +96,11 @@ class MandatedSubscriptionBuilder implements Contract
      * @return Subscription
      *                      \Laravel\Cashier\Exceptions\CouponException
      *
-     * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
+     * @throws InvalidMandateException
      */
     public function create()
     {
-        $this->owner->guardMollieMandate();
+        $this->owner->guardMollieMandate($this->pendingMandateAccepted);
         $now = now();
 
         return DB::transaction(function () use ($now) {
@@ -162,7 +171,7 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Force the trial to end immediately.
      *
-     * @return \Laravel\Cashier\SubscriptionBuilder\Contracts\SubscriptionBuilder|void
+     * @return SubscriptionBuilder|void
      */
     public function skipTrial()
     {
@@ -187,9 +196,9 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Specify a coupon.
      *
-     * @return $this|\Laravel\Cashier\SubscriptionBuilder\Contracts\SubscriptionBuilder
+     * @return $this|SubscriptionBuilder
      *
-     * @throws \Laravel\Cashier\Exceptions\CouponNotFoundException
+     * @throws CouponNotFoundException
      */
     public function withCoupon(string $coupon)
     {
@@ -232,6 +241,22 @@ class MandatedSubscriptionBuilder implements Contract
     public function skipCouponHandling()
     {
         $this->handleCoupon = false;
+
+        return $this;
+    }
+
+    /**
+     * Treat a pending Mollie mandate as valid when creating the subscription.
+     *
+     * Used by the first-payment flow: Mollie has already collected the payment
+     * and guarantees the mandate will finalize, even when finalization takes
+     * longer than the webhook retry window (PayPal, Belfius). See issue #289.
+     *
+     * @return $this
+     */
+    public function acceptPendingMandate(bool $accept = true)
+    {
+        $this->pendingMandateAccepted = $accept;
 
         return $this;
     }

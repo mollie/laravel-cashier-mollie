@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Tests\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Testing\TestResponse;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\OrderPaymentFailed;
 use Laravel\Cashier\Events\OrderPaymentPaid;
@@ -18,10 +19,11 @@ use Laravel\Cashier\Types\SubscriptionCancellationReason;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
+use PHPUnit\Framework\Attributes\Test;
 
 class WebhookControllerTest extends BaseTestCase
 {
-    /** @test */
+    #[Test]
     public function retrieves_payment_resource()
     {
         $payment = new MolliePayment(resolve(MollieApiClient::class));
@@ -32,7 +34,7 @@ class WebhookControllerTest extends BaseTestCase
         $this->assertInstanceOf(MolliePayment::class, $this->getController()->getMolliePaymentById($payment->id));
     }
 
-    /** @test **/
+    #[Test]
     public function mollie_api_exception_is_catched_when_debug_disabled()
     {
         $wrongId = 'sub_xxxxxxxxxxx';
@@ -42,7 +44,7 @@ class WebhookControllerTest extends BaseTestCase
         $this->assertNull($this->getController()->getMolliePaymentById($wrongId));
     }
 
-    /** @test **/
+    #[Test]
     public function mollie_api_exception_is_thrown_when_debug_enabled()
     {
         $wrongId = 'sub_xxxxxxxxxxx';
@@ -54,7 +56,7 @@ class WebhookControllerTest extends BaseTestCase
         $this->assertNull($this->getController()->getMolliePaymentById($wrongId));
     }
 
-    /** @test **/
+    #[Test]
     public function handles_unexisting_id_gracefully()
     {
         $wrongId = 'sub_xxxxxxxxxxx';
@@ -66,7 +68,7 @@ class WebhookControllerTest extends BaseTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    /** @test **/
+    #[Test]
     public function handles_payment_failed()
     {
         $this->withConfiguredPlans();
@@ -138,7 +140,7 @@ class WebhookControllerTest extends BaseTestCase
         });
     }
 
-    /** @test **/
+    #[Test]
     public function handles_payment_paid()
     {
         $this->withConfiguredPlans();
@@ -189,7 +191,7 @@ class WebhookControllerTest extends BaseTestCase
         });
     }
 
-    /** @test **/
+    #[Test]
     public function skips_if_payment_status_unchanged()
     {
         Event::fake();
@@ -239,6 +241,6 @@ class WebhookControllerTest extends BaseTestCase
         }
 
         // Laravel v7
-        return new \Illuminate\Testing\TestResponse($response);
+        return new TestResponse($response);
     }
 }

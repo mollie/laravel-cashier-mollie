@@ -7,6 +7,7 @@ use Laravel\Cashier\Cashier;
 use Laravel\Cashier\FirstPayment\Actions\StartSubscription;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class StartSubscriptionTest extends BaseTestCase
 {
@@ -18,8 +19,7 @@ class StartSubscriptionTest extends BaseTestCase
             ->withTestNow('2019-01-01');
     }
 
-    /** @test
-     */
+    #[Test]
     public function can_get_basic_payload()
     {
         $action = new StartSubscription(
@@ -44,7 +44,7 @@ class StartSubscriptionTest extends BaseTestCase
         ], $payload);
     }
 
-    /** @test */
+    #[Test]
     public function can_get_payload_with_trial_days()
     {
         $action = new StartSubscription(
@@ -72,7 +72,7 @@ class StartSubscriptionTest extends BaseTestCase
         ], $payload);
     }
 
-    /** @test */
+    #[Test]
     public function can_get_payload_with_trial_until()
     {
         $action = new StartSubscription(
@@ -100,7 +100,7 @@ class StartSubscriptionTest extends BaseTestCase
         ], $payload);
     }
 
-    /** @test */
+    #[Test]
     public function can_get_payload_with_skip_trial()
     {
         $action = new StartSubscription(
@@ -128,7 +128,7 @@ class StartSubscriptionTest extends BaseTestCase
         ], $payload);
     }
 
-    /** @test */
+    #[Test]
     public function can_get_payload_with_coupon()
     {
         $this->withMockedCouponRepository();
@@ -158,13 +158,13 @@ class StartSubscriptionTest extends BaseTestCase
         ], $payload);
     }
 
-    /** @test */
+    #[Test]
     public function can_create_from_basic_payload()
     {
         $this->assertFromPayloadToPayload();
     }
 
-    /** @test */
+    #[Test]
     public function can_create_from_payload_with_trial_until()
     {
         $this->assertFromPayloadToPayload([
@@ -176,7 +176,7 @@ class StartSubscriptionTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function can_create_from_payload_with_trial_days()
     {
         $this->assertFromPayloadToPayload([
@@ -188,7 +188,7 @@ class StartSubscriptionTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function can_create_from_payload_with_skip_trial()
     {
         $this->assertFromPayloadToPayload([
@@ -200,7 +200,7 @@ class StartSubscriptionTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function can_create_from_payload_with_quantity()
     {
         $this->assertFromPayloadToPayload([
@@ -212,7 +212,7 @@ class StartSubscriptionTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function can_create_from_payload_with_trial_and_quantity()
     {
         $this->assertFromPayloadToPayload([
@@ -225,7 +225,7 @@ class StartSubscriptionTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function can_create_from_payload_with_coupon_no_trial()
     {
         $this->withMockedCouponRepository();
@@ -238,7 +238,7 @@ class StartSubscriptionTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function can_create_from_payload_with_coupon_and_trial()
     {
         $this->withMockedCouponRepository();
@@ -252,7 +252,7 @@ class StartSubscriptionTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function can_create_from_payload_without_tax_percentage()
     {
         $this->withMockedCouponRepository();
@@ -267,7 +267,7 @@ class StartSubscriptionTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function can_start_default_subscription()
     {
         Carbon::setTestNow('2019-01-29');
@@ -311,7 +311,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertEquals(1000, $scheduledItem->total);
     }
 
-    /** @test */
+    #[Test]
     public function can_start_subscription_with_trial_days()
     {
         $user = $this->getMandatedUser(true, ['tax_percentage' => 20]);
@@ -361,7 +361,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertEquals(20, $scheduledItem->tax_percentage);
     }
 
-    /** @test */
+    #[Test]
     public function can_start_subscription_with_trial_until()
     {
         $this->withMockedGetMollieCustomer(2);
@@ -408,7 +408,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertEquals(1000, $scheduledItem->total);
     }
 
-    /** @test */
+    #[Test]
     public function can_start_subscription_with_quantity_no_trial()
     {
         $this->withMockedGetMollieCustomer(2);
@@ -456,7 +456,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertEquals(5 * 1000, $scheduledItem->total);
     }
 
-    /** @test */
+    #[Test]
     public function can_start_subscription_with_quantity_and_trial_until()
     {
         $this->withMockedGetMollieCustomer(2);
@@ -506,7 +506,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertEquals(5 * 1000, $scheduledItem->total);
     }
 
-    /** @test */
+    #[Test]
     public function can_start_subscription_using_next_payment_at()
     {
         $this->withMockedGetMollieCustomer(2);
@@ -545,7 +545,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertCarbon(now()->addWeeks(2), $scheduledItem->process_at);
     }
 
-    /** @test */
+    #[Test]
     public function can_start_subscription_with_coupon_no_trial()
     {
         $this->withMockedCouponRepository();
@@ -598,7 +598,7 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertEquals(-500, $couponItem->total);
     }
 
-    /** @test */
+    #[Test]
     public function can_start_subscription_with_coupon_and_trial()
     {
         $this->withMockedCouponRepository();
@@ -652,6 +652,72 @@ class StartSubscriptionTest extends BaseTestCase
         $this->assertEquals(1000, $scheduledItem->subtotal);
         $this->assertEquals(1200, $scheduledItem->total);
         $this->assertEquals(20, $scheduledItem->tax_percentage);
+    }
+
+    #[Test]
+    public function starts_subscription_when_mandate_is_still_pending()
+    {
+        // Regression test for issue #289: PayPal and Belfius mandates can remain
+        // pending for up to 72h after the first payment, which exceeds Mollie's
+        // webhook retry window. The first payment is already collected and the
+        // mandate is guaranteed to finalize, so the subscription must be started.
+        Carbon::setTestNow('2019-01-29');
+
+        $user = $this->getMandatedUser(true);
+        $this->withMockedGetMollieCustomer();
+        $this->withMockedGetMollieMandatePending();
+
+        $this->assertFalse($user->subscribed('default'));
+
+        $action = new StartSubscription(
+            $user,
+            'default',
+            'monthly-10-1'
+        );
+
+        $items = $action->execute();
+        $user = $user->fresh();
+
+        $this->assertTrue($user->subscribed('default'));
+        $this->assertInstanceOf(OrderItemCollection::class, $items);
+        $this->assertCount(1, $items);
+
+        $subscription = $user->subscription('default');
+        $this->assertEquals(2, $subscription->orderItems()->count());
+    }
+
+    #[Test]
+    public function starts_subscription_with_trial_days_when_mandate_is_still_pending()
+    {
+        // Regression test for issue #289: covers the trial branch of
+        // MandatedSubscriptionBuilder::create() to ensure the pending-mandate
+        // opt-in also applies when the subscription starts on a trial.
+        $user = $this->getMandatedUser(true, ['tax_percentage' => 20]);
+        $this->withMockedGetMollieCustomer();
+        $this->withMockedGetMollieMandatePending();
+
+        $this->assertFalse($user->subscribed('default'));
+
+        $action = new StartSubscription(
+            $user,
+            'default',
+            'monthly-10-1'
+        );
+
+        $action->trialDays(5);
+
+        $items = $action->execute();
+        $user = $user->fresh();
+
+        $this->assertTrue($user->subscribed('default'));
+        $this->assertTrue($user->onTrial());
+        $this->assertInstanceOf(OrderItemCollection::class, $items);
+        $this->assertCount(1, $items);
+
+        $subscription = $user->subscription('default');
+        $this->assertEquals(2, $subscription->orderItems()->count());
+        $this->assertCarbon(now()->addDays(5), $subscription->cycle_ends_at);
+        $this->assertCarbon(now()->addDays(5), $subscription->trial_ends_at);
     }
 
     /**

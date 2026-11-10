@@ -18,6 +18,7 @@ use Laravel\Cashier\SubscriptionBuilder\RedirectToCheckoutResponse;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
+use PHPUnit\Framework\Attributes\Test;
 
 class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
 {
@@ -35,7 +36,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function creates_a_first_payment_for_subscription()
     {
         $firstPayment = config('cashier_plans.defaults.first_payment');
@@ -97,7 +98,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         $this->assertEquals(20, $localPayment->first_payment_actions[1]->taxPercentage);
     }
 
-    /** @test */
+    #[Test]
     public function handles_quantity()
     {
         config(['cashier.locale' => 'nl_NL']);
@@ -124,13 +125,150 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         ], $payload['amount']);
     }
 
-    /** @test */
+    #[Test]
     public function handles_a_paid_first_payment()
     {
         $this->withoutExceptionHandling();
 
         Event::fake();
 
+        $molliePayment = $this->getPaidFirstPayment();
+
+        Cashier::$paymentModel::createFromMolliePayment($molliePayment, $this->user);
+
+        $this->withMockedGetMolliePayment(1, $molliePayment);
+        $this->withMockedGetMollieMandateAccepted(2);
+
+        $this->withMockedGetMollieCustomer(2);
+
+        $this->assertFalse($this->user->subscribed());
+        $this->assertNull($this->user->mollie_mandate_id);
+
+        $this->withMockedUpdateMolliePayment();
+
+        $response = $this->post(route('webhooks.mollie.first_payment', [
+            'id' => 'tr_unique_payment_id',
+        ]));
+
+        $response->assertStatus(200);
+
+        $this->user = $this->user->fresh();
+        $this->assertTrue($this->user->subscribed());
+        $this->assertTrue($this->user->onTrial());
+        $this->assertNotNull($this->user->mollie_mandate_id);
+
+        Event::assertDispatched(OrderProcessed::class);
+        Event::assertDispatched(FirstPaymentPaid::class);
+
+        $subscription = $this->user->subscription('default')->fresh();
+
+        Event::assertDispatched(SubscriptionStarted::class, function (SubscriptionStarted $e) use ($subscription) {
+            $this->assertTrue($e->subscription->is($subscription));
+
+            return true;
+        });
+        $this->assertSame(Order::first()->items->first()->description_extra_lines[0], 'From 2019-01-01 to 2019-02-01');
+    }
+
+    #[Test]
+    public function ignores_a_duplicate_paid_first_payment_webhook()
+    {
+        Event::fake();
+
+        $molliePayment = $this->getPaidFirstPayment();
+
+        Cashier::$paymentModel::createFromMolliePayment($molliePayment, $this->user);
+
+        $this->withMockedGetMolliePayment(2, $molliePayment);
+        $this->withMockedGetMollieMandateAccepted(2);
+        $this->withMockedGetMollieCustomer(2);
+        $this->withMockedUpdateMolliePayment();
+
+        $firstResponse = $this->post(route('webhooks.mollie.first_payment', [
+            'id' => 'tr_unique_payment_id',
+        ]));
+
+        $secondResponse = $this->post(route('webhooks.mollie.first_payment', [
+            'id' => 'tr_unique_payment_id',
+        ]));
+
+        $firstResponse->assertStatus(200);
+        $secondResponse->assertStatus(200);
+
+        $this->assertSame(1, Order::count());
+        $this->assertSame(1, Order::query()->where('mollie_payment_id', 'tr_unique_payment_id')->count());
+        $this->assertSame(1, Cashier::$paymentModel::count());
+        $this->assertNotNull(Cashier::$paymentModel::first()->order_id);
+
+        Event::assertDispatched(OrderProcessed::class, 1);
+        Event::assertDispatched(FirstPaymentPaid::class, 1);
+        Event::assertDispatched(SubscriptionStarted::class, 1);
+    }
+
+    #[Test]
+    public function test_with_coupon_no_trial_validates_coupon()
+    {
+        $this->expectException(CouponException::class);
+        $this->withMockedCouponRepository(null, new InvalidatingCouponHandler);
+        $this->getBuilder()->withCoupon('test-coupon')->create();
+    }
+
+    #[Test]
+    public function test_with_coupon_with_trial_validates_coupon()
+    {
+        $this->expectException(CouponException::class);
+        $this->withMockedCouponRepository(null, new InvalidatingCouponHandler);
+        $this->getBuilder()->trialDays(5)->withCoupon('test-coupon')->create();
+    }
+
+    #[Test]
+    public function test_with_coupon_no_trial_modifies_the_payment_amount()
+    {
+        $this->withMockedCouponRepository();
+        $this->withMockedCreateMolliePayment();
+        $this->withMockedGetMollieCustomer(2);
+
+        $builder = $this->getBuilder()->withCoupon('test-coupon');
+        $builder->create();
+
+        $amount = $builder->getMandatePaymentBuilder()->getMolliePayload()['amount'];
+
+        $this->assertEquals('7.00', $amount['value']);
+        $this->assertEquals('EUR', $amount['currency']);
+    }
+
+    #[Test]
+    public function test_handles_trial_days()
+    {
+        $this->withMockedCreateMolliePayment();
+        $this->withMockedGetMollieCustomer(2);
+        $trialBuilder = $this->getBuilder();
+
+        $trialBuilder->trialDays(5)->create();
+
+        $this->assertEquals(
+            '0.05',
+            $trialBuilder->getMandatePaymentBuilder()->getMolliePayload()['amount']['value']
+        );
+    }
+
+    #[Test]
+    public function test_handles_no_trial_mode()
+    {
+        $this->withMockedCreateMolliePayment();
+        $this->withMockedGetMollieCustomer(2);
+        $skipTrialBuilder = $this->getBuilder()->trialDays(5)->skipTrial();
+
+        $skipTrialBuilder->create();
+
+        $this->assertEquals(
+            '12.00',
+            $skipTrialBuilder->getMandatePaymentBuilder()->getMolliePayload()['amount']['value']
+        );
+    }
+
+    protected function getPaidFirstPayment(): MolliePayment
+    {
         $molliePayment = new MolliePayment(new MollieApiClient);
         $molliePayment->id = 'tr_unique_payment_id';
         $molliePayment->paidAt = Carbon::now()->toIso8601String();
@@ -171,106 +309,11 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
             ],
         ]));
 
-        Cashier::$paymentModel::createFromMolliePayment($molliePayment, $this->user);
-
-        $this->withMockedGetMolliePayment(1, $molliePayment);
-        $this->withMockedGetMollieMandateAccepted(2);
-
-        $this->withMockedGetMollieCustomer(2);
-
-        $this->assertFalse($this->user->subscribed());
-        $this->assertNull($this->user->mollie_mandate_id);
-
-        $this->withMockedUpdateMolliePayment();
-
-        $response = $this->post(route('webhooks.mollie.first_payment', [
-            'id' => 'tr_unique_payment_id',
-        ]));
-
-        $response->assertStatus(200);
-
-        $this->user = $this->user->fresh();
-        $this->assertTrue($this->user->subscribed());
-        $this->assertTrue($this->user->onTrial());
-        $this->assertNotNull($this->user->mollie_mandate_id);
-
-        Event::assertDispatched(OrderProcessed::class);
-        Event::assertDispatched(FirstPaymentPaid::class);
-
-        $subscription = $this->user->subscription('default')->fresh();
-
-        Event::assertDispatched(SubscriptionStarted::class, function (SubscriptionStarted $e) use ($subscription) {
-            $this->assertTrue($e->subscription->is($subscription));
-
-            return true;
-        });
-        $this->assertSame(Order::first()->items->first()->description_extra_lines[0], 'From 2019-01-01 to 2019-02-01');
-    }
-
-    /** @test */
-    public function test_with_coupon_no_trial_validates_coupon()
-    {
-        $this->expectException(CouponException::class);
-        $this->withMockedCouponRepository(null, new InvalidatingCouponHandler);
-        $this->getBuilder()->withCoupon('test-coupon')->create();
-    }
-
-    /** @test */
-    public function test_with_coupon_with_trial_validates_coupon()
-    {
-        $this->expectException(CouponException::class);
-        $this->withMockedCouponRepository(null, new InvalidatingCouponHandler);
-        $this->getBuilder()->trialDays(5)->withCoupon('test-coupon')->create();
-    }
-
-    /** @test */
-    public function test_with_coupon_no_trial_modifies_the_payment_amount()
-    {
-        $this->withMockedCouponRepository();
-        $this->withMockedCreateMolliePayment();
-        $this->withMockedGetMollieCustomer(2);
-
-        $builder = $this->getBuilder()->withCoupon('test-coupon');
-        $builder->create();
-
-        $amount = $builder->getMandatePaymentBuilder()->getMolliePayload()['amount'];
-
-        $this->assertEquals('7.00', $amount['value']);
-        $this->assertEquals('EUR', $amount['currency']);
-    }
-
-    /** @test */
-    public function test_handles_trial_days()
-    {
-        $this->withMockedCreateMolliePayment();
-        $this->withMockedGetMollieCustomer(2);
-        $trialBuilder = $this->getBuilder();
-
-        $trialBuilder->trialDays(5)->create();
-
-        $this->assertEquals(
-            '0.05',
-            $trialBuilder->getMandatePaymentBuilder()->getMolliePayload()['amount']['value']
-        );
-    }
-
-    /** @test */
-    public function test_handles_no_trial_mode()
-    {
-        $this->withMockedCreateMolliePayment();
-        $this->withMockedGetMollieCustomer(2);
-        $skipTrialBuilder = $this->getBuilder()->trialDays(5)->skipTrial();
-
-        $skipTrialBuilder->create();
-
-        $this->assertEquals(
-            '12.00',
-            $skipTrialBuilder->getMandatePaymentBuilder()->getMolliePayload()['amount']['value']
-        );
+        return $molliePayment;
     }
 
     /**
-     * @return \Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder
+     * @return FirstPaymentSubscriptionBuilder
      */
     protected function getBuilder()
     {

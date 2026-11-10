@@ -12,6 +12,7 @@ use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
 use LogicException;
+use PHPUnit\Framework\Attributes\Test;
 
 class SubscriptionTest extends BaseTestCase
 {
@@ -20,7 +21,7 @@ class SubscriptionTest extends BaseTestCase
         parent::setUp();
     }
 
-    /** @test */
+    #[Test]
     public function can_access_owner()
     {
         $user = User::factory()->create();
@@ -32,7 +33,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertTrue($user->is($subscription->owner));
     }
 
-    /** @test */
+    #[Test]
     public function can_access_order_items()
     {
         $subscription = SubscriptionFactory::new()->create();
@@ -44,7 +45,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertNotNull($items);
     }
 
-    /** @test */
+    #[Test]
     public function cannot_schedule_new_order_item_if_id_is_set()
     {
         $this->expectException(LogicException::class);
@@ -68,7 +69,7 @@ class SubscriptionTest extends BaseTestCase
         $subscription->scheduleNewOrderItemAt(now());
     }
 
-    /** @test */
+    #[Test]
     public function cannot_resume_if_not_cancelled()
     {
         $this->expectException(LogicException::class);
@@ -84,7 +85,7 @@ class SubscriptionTest extends BaseTestCase
         Event::assertNotDispatched(SubscriptionResumed::class);
     }
 
-    /** @test */
+    #[Test]
     public function cannot_resume_if_not_on_grace_period()
     {
         $this->expectException(LogicException::class);
@@ -103,7 +104,7 @@ class SubscriptionTest extends BaseTestCase
         Event::assertNotDispatched(SubscriptionResumed::class);
     }
 
-    /** @test */
+    #[Test]
     public function get_cycle_progress_test()
     {
         $now = now();
@@ -127,7 +128,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertEquals(0.5, $progressing_subscription->cycle_progress);
     }
 
-    /** @test */
+    #[Test]
     public function test_sync_tax_percentage()
     {
         $user = User::factory()->create();
@@ -142,7 +143,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertEquals(0, $subscription->tax_percentage);
     }
 
-    /** @test */
+    #[Test]
     public function yields_order_items_at_set_intervals()
     {
         Carbon::setTestNow(Carbon::parse('2018-01-01'));
@@ -225,7 +226,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertSame(null, $item_3->order_id);
     }
 
-    /** @test */
+    #[Test]
     public function yields_order_items_at_set_intervals_with_interval_generator()
     {
         Carbon::setTestNow(Carbon::parse('2019-01-29'));
@@ -308,7 +309,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertSame(null, $item_3->order_id);
     }
 
-    /** @test */
+    #[Test]
     public function yields_order_items_at_set_intervals_with_interval_generator_last_day_of_the_month()
     {
         Carbon::setTestNow(Carbon::parse('2019-01-31'));
@@ -416,7 +417,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertSame(null, $item_4->order_id);
     }
 
-    /** @test */
+    #[Test]
     public function cancel_works()
     {
         $cycle_ends_at = now()->addWeek();
@@ -440,7 +441,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertTrue($subscription->onGracePeriod());
     }
 
-    /** @test */
+    #[Test]
     public function cancel_at_works()
     {
         $user = User::factory()->create();
@@ -465,7 +466,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertTrue($subscription->onGracePeriod());
     }
 
-    /** @test */
+    #[Test]
     public function cancel_now_works()
     {
         $user = User::factory()->create();
@@ -490,7 +491,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertFalse($subscription->onGracePeriod());
     }
 
-    /** @test */
+    #[Test]
     public function resuming_a_cancelled_subscription_resets_cycle_ends_at()
     {
         $this->withConfiguredPlans();
@@ -509,7 +510,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertCarbon(now()->addWeek(), $subscription->cycle_ends_at);
     }
 
-    /** @test */
+    #[Test]
     public function can_query_active_subscriptions()
     {
         SubscriptionFactory::new()
@@ -526,7 +527,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertEquals(1, Subscription::whereNotActive()->count());
     }
 
-    /** @test */
+    #[Test]
     public function can_query_on_trial_subscriptions()
     {
         SubscriptionFactory::new()
@@ -542,7 +543,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertEquals(2, Subscription::whereNotOnTrial()->count());
     }
 
-    /** @test */
+    #[Test]
     public function can_query_on_grace_period_subscriptions()
     {
         SubscriptionFactory::new()
@@ -558,7 +559,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertEquals(2, Subscription::whereNotOnGracePeriod()->count());
     }
 
-    /** @test */
+    #[Test]
     public function can_query_cancelled_subscriptions()
     {
         SubscriptionFactory::new()
@@ -574,7 +575,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertEquals(2, Subscription::whereNotCancelled()->count());
     }
 
-    /** @test */
+    #[Test]
     public function can_query_recurring_subscriptions()
     {
         SubscriptionFactory::new()
@@ -590,7 +591,7 @@ class SubscriptionTest extends BaseTestCase
         $this->assertEquals(2, Subscription::whereNotRecurring()->count());
     }
 
-    /** @test */
+    #[Test]
     public function halfway_through_subscription_returns_positive_reimbursement_amount()
     {
         $this->withConfiguredPlans();
@@ -614,7 +615,7 @@ class SubscriptionTest extends BaseTestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function non_reimbursable_subscription_returns_no_reimbursement_amount()
     {
         $this->withConfiguredPlans();

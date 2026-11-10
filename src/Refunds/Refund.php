@@ -25,7 +25,7 @@ use Mollie\Api\Types\RefundStatus;
  * @property int|null original_order_item_id
  * @property int|null original_order_id
  * @property int|null order_id
- * @property \Laravel\Cashier\Refunds\RefundItemCollection items
+ * @property RefundItemCollection items
  * @property Order order
  * @property Order originalOrder
  * @property array|null metadata
@@ -44,7 +44,7 @@ class Refund extends Model
     /**
      * Create a new Refund Collection instance.
      *
-     * @return \Laravel\Cashier\Refunds\RefundCollection
+     * @return RefundCollection
      */
     public function newCollection(array $models = [])
     {
@@ -58,7 +58,7 @@ class Refund extends Model
      */
     public function scopeWhereUnprocessed(Builder $query)
     {
-        return $query->where('mollie_refund_status', RefundStatus::STATUS_PENDING);
+        return $query->where('mollie_refund_status', RefundStatus::PENDING);
     }
 
     public function items(): HasMany
@@ -78,16 +78,26 @@ class Refund extends Model
 
     public function handleProcessed(): self
     {
-        $refundItems = $this->items;
+        $handled = false;
 
-        DB::transaction(function () use ($refundItems) {
+        DB::transaction(function () use (&$handled) {
+            // Aftercare retries can process the same pending refund twice unless the refund row is
+            // locked and re-checked before creating the compensating order.
+            /** @var static $refund */
+            $refund = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
+
+            if ($refund->mollie_refund_status !== RefundStatus::PENDING) {
+                return;
+            }
+
+            $refundItems = $refund->items;
             $orderItems = $refundItems->toNewOrderItemCollection()->save();
             $order = Cashier::$orderModel::createProcessedFromItems($orderItems);
 
-            $this->order_id = $order->id;
-            $this->mollie_refund_status = RefundStatus::STATUS_REFUNDED;
+            $refund->order_id = $order->id;
+            $refund->mollie_refund_status = RefundStatus::REFUNDED;
 
-            $this->save();
+            $refund->save();
 
             $refundItems->each(function (RefundItem $refundItem) {
                 $originalOrderItem = $refundItem->originalOrderItem;
@@ -97,29 +107,51 @@ class Refund extends Model
                 }
             });
 
-            $this->originalOrder->increment('amount_refunded', (int) $refundItems->getTotal()->getAmount());
+            $refund->originalOrder->increment('amount_refunded', (int) $refundItems->getTotal()->getAmount());
+
+            $handled = true;
         });
 
-        event(new RefundProcessed($this));
+        $this->refresh();
+
+        if ($handled) {
+            event(new RefundProcessed($this));
+        }
 
         return $this;
     }
 
     public function handleFailed(): self
     {
-        $refundItems = $this->items;
+        $handled = false;
 
-        DB::transaction(function () use ($refundItems) {
-            $this->mollie_refund_status = RefundStatus::STATUS_FAILED;
+        DB::transaction(function () use (&$handled) {
+            // Only a pending refund may transition to failed; locking keeps duplicate deliveries
+            // from re-running refund item failure hooks.
+            /** @var static $refund */
+            $refund = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
-            $this->save();
+            if ($refund->mollie_refund_status !== RefundStatus::PENDING) {
+                return;
+            }
+
+            $refundItems = $refund->items;
+            $refund->mollie_refund_status = RefundStatus::FAILED;
+
+            $refund->save();
 
             $refundItems->each(function (RefundItem $refundItem) {
                 $refundItem->originalOrderItem->handlePaymentRefundFailed($refundItem);
             });
+
+            $handled = true;
         });
 
-        event(new RefundFailed($this));
+        $this->refresh();
+
+        if ($handled) {
+            event(new RefundFailed($this));
+        }
 
         return $this;
     }
