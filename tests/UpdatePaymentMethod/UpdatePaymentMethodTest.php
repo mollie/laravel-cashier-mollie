@@ -9,6 +9,7 @@ use Laravel\Cashier\FirstPayment\Actions\AddBalance;
 use Laravel\Cashier\FirstPayment\FirstPaymentHandler;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
+use Mollie\Api\Http\Data\Money;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment;
 use PHPUnit\Framework\Attributes\Test;
@@ -16,7 +17,7 @@ use PHPUnit\Framework\Attributes\Test;
 class UpdatePaymentMethodTest extends BaseTestCase
 {
     #[Test]
-    public function canUpdatePaymentMethod()
+    public function can_update_payment_method()
     {
         $owner = User::factory()->create([
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
@@ -67,7 +68,7 @@ class UpdatePaymentMethodTest extends BaseTestCase
     }
 
     #[Test]
-    public function doesNotAddBalanceAgainForADuplicateFirstPayment()
+    public function does_not_add_balance_again_for_a_duplicate_first_payment()
     {
         $owner = User::factory()->create([
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
@@ -100,12 +101,12 @@ class UpdatePaymentMethodTest extends BaseTestCase
 
     protected function getNewMandatePaymentStub(): Payment
     {
-        $newPayment = new Payment(new MollieApiClient());
+        $newPayment = new Payment(new MollieApiClient);
         $newPayment->sequenceType = 'first';
         $newPayment->id = 'new_tr_unique_mandate_payment_id';
         $newPayment->customerId = 'cst_unique_customer_id';
         $newPayment->mandateId = 'new_mdt_unique_mandate_id';
-        $newPayment->amount = (object) ['value' => '1.00', 'currency' => 'EUR'];
+        $newPayment->amount = Money::fromArray(['value' => '1.00', 'currency' => 'EUR']);
         $newPayment->metadata = json_decode(json_encode([
             'owner' => [
                 'type' => User::class,

@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Tests\Coupon;
 
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
+use Laravel\Cashier\Coupon\Coupon;
 use Laravel\Cashier\Coupon\CouponOrderItemPreprocessor;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Subscription;
@@ -15,7 +16,7 @@ use PHPUnit\Framework\Attributes\Test;
 class CouponOrderItemPreprocessorTest extends BaseTestCase
 {
     #[Test]
-    public function appliesCoupon()
+    public function applies_coupon()
     {
         $this->withMockedCouponRepository();
 
@@ -24,10 +25,10 @@ class CouponOrderItemPreprocessorTest extends BaseTestCase
         $item = OrderItemFactory::new()->make();
         $subscription->orderItems()->save($item);
 
-        /** @var \Laravel\Cashier\Coupon\Coupon $coupon */
+        /** @var Coupon $coupon */
         $coupon = app()->make(CouponRepository::class)->findOrFail('test-coupon');
         $redeemedCoupon = $coupon->redeemFor($subscription);
-        $preprocessor = new CouponOrderItemPreprocessor();
+        $preprocessor = new CouponOrderItemPreprocessor;
         $this->assertEquals(0, Cashier::$appliedCouponModel::count());
         $this->assertEquals(1, $redeemedCoupon->times_left);
 
@@ -40,9 +41,9 @@ class CouponOrderItemPreprocessorTest extends BaseTestCase
     }
 
     #[Test]
-    public function passesThroughWhenNoRedeemedCoupon()
+    public function passes_through_when_no_redeemed_coupon()
     {
-        $preprocessor = new CouponOrderItemPreprocessor();
+        $preprocessor = new CouponOrderItemPreprocessor;
         $items = OrderItemFactory::new()->times(1)->make();
         $this->assertInstanceOf(OrderItemCollection::class, $items);
         $this->assertEquals(0, Cashier::$redeemedCouponModel::count());

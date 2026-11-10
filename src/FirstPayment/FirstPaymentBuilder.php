@@ -9,6 +9,7 @@ use Laravel\Cashier\FirstPayment\Actions\ActionCollection;
 use Laravel\Cashier\FirstPayment\Traits\PaymentMethodString;
 use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
+use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\SequenceType;
 
 class FirstPaymentBuilder
@@ -18,7 +19,7 @@ class FirstPaymentBuilder
     /**
      * The billable model.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var Model
      */
     protected $owner;
 
@@ -61,15 +62,14 @@ class FirstPaymentBuilder
     protected $webhookUrl;
 
     /**
-     * @var \Mollie\Api\Resources\Payment|null
+     * @var Payment|null
      */
     protected $molliePayment;
 
     /**
      * FirstPaymentBuilder constructor.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
-     * @param  array  $options Overrides the Mollie Payment payload
+     * @param  array  $options  Overrides the Mollie Payment payload
      */
     public function __construct(Model $owner, array $options = [])
     {
@@ -84,7 +84,6 @@ class FirstPaymentBuilder
     /**
      * Define actions to be executed once the payment has been paid.
      *
-     * @param  array  $actions
      * @return $this
      */
     public function inOrderTo(array $actions = [])
@@ -102,7 +101,7 @@ class FirstPaymentBuilder
     public function getMolliePayload()
     {
         return array_filter(array_merge([
-            'sequenceType' => SequenceType::FIRST,
+            'sequenceType' => SequenceType::First->value,
             'method' => $this->method,
             'customerId' => $this->owner->asMollieCustomer()->id,
             'locale' => Cashier::getLocale($this->owner),
@@ -120,7 +119,7 @@ class FirstPaymentBuilder
     }
 
     /**
-     * @return \Mollie\Api\Resources\Payment
+     * @return Payment
      */
     public function create()
     {
@@ -170,7 +169,6 @@ class FirstPaymentBuilder
     }
 
     /**
-     * @param  string  $description
      * @return FirstPaymentBuilder
      */
     public function setDescription(string $description)
@@ -183,7 +181,6 @@ class FirstPaymentBuilder
     /**
      * Override the default Mollie redirectUrl. Takes an absolute or relative url.
      *
-     * @param  string  $redirectUrl
      * @return $this
      */
     public function setRedirectUrl(string $redirectUrl)
@@ -196,7 +193,6 @@ class FirstPaymentBuilder
     /**
      * Override the default Mollie webhookUrl. Takes an absolute or relative url.
      *
-     * @param  string  $webhookUrl
      * @return $this
      */
     public function setWebhookUrl(string $webhookUrl)
@@ -207,7 +203,7 @@ class FirstPaymentBuilder
     }
 
     /**
-     * @return \Mollie\Api\Resources\Payment|null
+     * @return Payment|null
      */
     public function getMolliePayment()
     {

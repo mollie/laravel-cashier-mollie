@@ -18,7 +18,7 @@ class StartSubscriptionWithPlanIntervalArrayTest extends BaseTestCase
     }
 
     #[Test]
-    public function canStartSubscriptionWithFixedIntervalTest()
+    public function can_start_subscription_with_fixed_interval_test()
     {
         $this->withMockedGetMollieCustomer(2);
         $this->withMockedGetMollieMandate(2);
@@ -45,7 +45,7 @@ class StartSubscriptionWithPlanIntervalArrayTest extends BaseTestCase
     }
 
     #[Test]
-    public function canStartSubscriptionWithoutFixedInterval()
+    public function can_start_subscription_without_fixed_interval()
     {
         $this->withMockedGetMollieCustomer(2);
         $this->withMockedGetMollieMandate(2);

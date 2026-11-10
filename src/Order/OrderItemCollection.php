@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Order;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
 use Laravel\Cashier\Cashier;
 use LogicException;
@@ -14,7 +15,7 @@ class OrderItemCollection extends Collection
     /**
      * Get a collection of distinct currencies in this collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return BaseCollection
      */
     public function currencies()
     {
@@ -24,7 +25,7 @@ class OrderItemCollection extends Collection
     /**
      * Get the distinct owners for this collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return BaseCollection
      */
     public function owners()
     {
@@ -38,8 +39,8 @@ class OrderItemCollection extends Collection
     /**
      * Filter this collection by owner.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @param  Model  $owner
+     * @return OrderItemCollection
      */
     public function whereOwner($owner)
     {
@@ -52,7 +53,7 @@ class OrderItemCollection extends Collection
     /**
      * Returns a collection of OrderItemCollections, grouped by owner.
      *
-     * @return \Illuminate\Support\Collection
+     * @return BaseCollection
      */
     public function chunkByOwner()
     {
@@ -68,8 +69,7 @@ class OrderItemCollection extends Collection
     /**
      * Filter this collection by currency symbol.
      *
-     * @param $currency
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function whereCurrency($currency)
     {
@@ -79,7 +79,7 @@ class OrderItemCollection extends Collection
     /**
      * Returns a collection of OrderItemCollections, grouped by currency symbol.
      *
-     * @return \Illuminate\Support\Collection
+     * @return BaseCollection
      */
     public function chunkByCurrency()
     {
@@ -93,7 +93,7 @@ class OrderItemCollection extends Collection
     /**
      * Returns a collection of OrderItemCollections, grouped by currency symbol AND owner.
      *
-     * @return \Illuminate\Support\Collection
+     * @return BaseCollection
      */
     public function chunkByOwnerAndCurrency()
     {
@@ -112,7 +112,7 @@ class OrderItemCollection extends Collection
     /**
      * Preprocesses the OrderItems.
      *
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function preprocess()
     {
@@ -127,8 +127,7 @@ class OrderItemCollection extends Collection
     /**
      * Create an OrderItemCollection from a basic Collection.
      *
-     * @param  \Illuminate\Support\Collection  $collection
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public static function fromBaseCollection(BaseCollection $collection)
     {
@@ -138,7 +137,7 @@ class OrderItemCollection extends Collection
     /**
      * Persist all items in the collection.
      *
-     * @return \Illuminate\Support\Collection|\Laravel\Cashier\Order\OrderItemCollection
+     * @return BaseCollection|OrderItemCollection
      */
     public function save()
     {
@@ -152,7 +151,7 @@ class OrderItemCollection extends Collection
     /**
      * Get a collection of distinct tax percentages in this collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return BaseCollection
      */
     public function taxPercentages()
     {
@@ -160,9 +159,7 @@ class OrderItemCollection extends Collection
     }
 
     /**
-     * @return \Money\Money
-     *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function getTotal(): Money
     {

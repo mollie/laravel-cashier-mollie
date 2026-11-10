@@ -46,7 +46,7 @@ class ConfigPlanTest extends BaseTestCase
     }
 
     #[Test]
-    public function createFromConfigArrays()
+    public function create_from_config_arrays()
     {
         $this->assertMoneyEURCents(1000, $this->plan->amount());
         $this->assertCarbon(now()->addMonth(), $this->plan->interval()->getEndOfNextSubscriptionCycle());
@@ -58,20 +58,20 @@ class ConfigPlanTest extends BaseTestCase
     }
 
     #[Test]
-    public function getFirstPaymentAmount()
+    public function get_first_payment_amount()
     {
         $amount = $this->plan->firstPaymentAmount();
         $this->assertMoneyEURCents(5, $amount);
     }
 
     #[Test]
-    public function getFirstPaymentDescription()
+    public function get_first_payment_description()
     {
         $this->assertEquals('Test mandate payment', $this->plan->firstPaymentDescription());
     }
 
     #[Test]
-    public function getPreprocessors()
+    public function get_preprocessors()
     {
         $this->assertNotEmpty($this->plan->orderItemPreprocessors());
         $this->assertInstanceOf(

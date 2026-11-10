@@ -25,7 +25,7 @@ class OrderInvoiceSubscriberTest extends BaseTestCase
     }
 
     #[Test]
-    public function itHandlesTheFirstPaymentPaidEvent()
+    public function it_handles_the_first_payment_paid_event()
     {
         $this->assertItHandlesEvent(
             new FirstPaymentPaid($this->mock(Payment::class), $this->order()),
@@ -34,7 +34,7 @@ class OrderInvoiceSubscriberTest extends BaseTestCase
     }
 
     #[Test]
-    public function itHandlesTheOrderPaymentPaidEvent()
+    public function it_handles_the_order_payment_paid_event()
     {
         $this->assertItHandlesEvent(
             new OrderPaymentPaid($this->order(), $this->mock(Cashier::$paymentModel)),

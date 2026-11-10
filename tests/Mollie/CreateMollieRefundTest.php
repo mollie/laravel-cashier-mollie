@@ -14,7 +14,7 @@ class CreateMollieRefundTest extends BaseMollieInteraction
     #[Test]
     #[Group('mollie_integration')]
     #[Group('requires_manual_intervention')]
-    public function testExecute()
+    public function test_execute()
     {
         // Manually create a new refundable payment first before running this.
 

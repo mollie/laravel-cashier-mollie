@@ -5,6 +5,8 @@ namespace Laravel\Cashier\Http\Controllers;
 use Illuminate\Http\Request;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
+use Laravel\Cashier\Order\Order;
+use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentStatus;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,10 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
 class WebhookController extends BaseWebhookController
 {
     /**
-     * @param  Request  $request
      * @return Response
      *
-     * @throws \Mollie\Api\Exceptions\ApiException Only in debug mode
+     * @throws ApiException Only in debug mode
      */
     public function handleWebhook(Request $request)
     {
@@ -24,9 +25,9 @@ class WebhookController extends BaseWebhookController
         if ($payment) {
             $order = $this->getOrder($payment);
 
-            if ($order && $order->mollie_payment_status !== $payment->status) {
-                switch ($payment->status) {
-                    case PaymentStatus::PAID:
+            if ($order && $order->mollie_payment_status !== mollie_enum_value($payment->status)) {
+                switch (mollie_enum_value($payment->status)) {
+                    case PaymentStatus::Paid->value:
                         $order->handlePaymentPaid($payment);
                         $payment->webhookUrl = route('webhooks.mollie.aftercare');
 
@@ -35,7 +36,7 @@ class WebhookController extends BaseWebhookController
                         $updateMolliePayment->execute($payment);
 
                         break;
-                    case PaymentStatus::FAILED:
+                    case PaymentStatus::Failed->value:
                         $order->handlePaymentFailed($payment);
 
                         break;
@@ -49,8 +50,7 @@ class WebhookController extends BaseWebhookController
     }
 
     /**
-     * @param  \Mollie\Api\Resources\Payment  $payment
-     * @return \Laravel\Cashier\Order\Order|null
+     * @return Order|null
      */
     protected function getOrder(Payment $payment)
     {

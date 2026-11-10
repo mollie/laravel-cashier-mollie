@@ -4,7 +4,6 @@ namespace Laravel\Cashier\Tests\Order;
 
 use Carbon\Carbon;
 use Illuminate\Support\Str;
-use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\OrderNumberGenerator;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
@@ -21,13 +20,13 @@ class OrderNumberGeneratorTest extends BaseTestCase
     }
 
     #[Test]
-    public function canGenerateANumber()
+    public function can_generate_a_number()
     {
         $this->assertNotNull($this->generator->generate());
     }
 
     #[Test]
-    public function numberStartsWithCurrentYear()
+    public function number_starts_with_current_year()
     {
         Carbon::setTestNow(Carbon::parse('1 jul 2018'));
 
@@ -35,7 +34,7 @@ class OrderNumberGeneratorTest extends BaseTestCase
     }
 
     #[Test]
-    public function usesConfiguredOffsetAndModelCount()
+    public function uses_configured_offset_and_model_count()
     {
         config(['cashier.order_number_generator.offset' => 15]);
         $this->generator = new OrderNumberGenerator;
@@ -47,7 +46,7 @@ class OrderNumberGeneratorTest extends BaseTestCase
     }
 
     #[Test]
-    public function hasAReadableFormat()
+    public function has_a_readable_format()
     {
         Carbon::setTestNow(Carbon::parse(('1 jul 2018')));
         config(['cashier.order_number_generator.offset' => 123455]);

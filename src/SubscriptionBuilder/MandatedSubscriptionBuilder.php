@@ -6,8 +6,14 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
+use Laravel\Cashier\Coupon\Coupon;
+use Laravel\Cashier\Exceptions\CouponNotFoundException;
+use Laravel\Cashier\Exceptions\InvalidMandateException;
+use Laravel\Cashier\Exceptions\PlanNotFoundException;
 use Laravel\Cashier\Plan\Contracts\PlanRepository;
+use Laravel\Cashier\Plan\Plan;
 use Laravel\Cashier\Subscription;
+use Laravel\Cashier\SubscriptionBuilder\Contracts\SubscriptionBuilder;
 use Laravel\Cashier\SubscriptionBuilder\Contracts\SubscriptionBuilder as Contract;
 
 /**
@@ -18,7 +24,7 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * The model that is subscribing.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var Model
      */
     protected $owner;
 
@@ -53,11 +59,11 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * The Plan being subscribed to.
      *
-     * @var \Laravel\Cashier\Plan\Plan
+     * @var Plan
      */
     protected $plan;
 
-    /** @var \Laravel\Cashier\Coupon\Coupon */
+    /** @var Coupon */
     protected $coupon;
 
     /** @var bool */
@@ -73,10 +79,8 @@ class MandatedSubscriptionBuilder implements Contract
      * Create a new subscription builder instance.
      *
      * @param  mixed  $owner
-     * @param  string  $name
-     * @param  string  $plan
      *
-     * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
+     * @throws PlanNotFoundException
      */
     public function __construct(Model $owner, string $name, string $plan)
     {
@@ -90,9 +94,9 @@ class MandatedSubscriptionBuilder implements Contract
      * Create a new Cashier subscription.
      *
      * @return Subscription
-     * \Laravel\Cashier\Exceptions\CouponException
+     *                      \Laravel\Cashier\Exceptions\CouponException
      *
-     * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
+     * @throws InvalidMandateException
      */
     public function create()
     {
@@ -144,7 +148,6 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Specify the number of days of the trial.
      *
-     * @param  int  $trialDays
      * @return $this
      */
     public function trialDays(int $trialDays)
@@ -155,7 +158,6 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Specify the ending date of the trial.
      *
-     * @param  Carbon  $trialUntil
      * @return $this
      */
     public function trialUntil(Carbon $trialUntil)
@@ -169,7 +171,7 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Force the trial to end immediately.
      *
-     * @return \Laravel\Cashier\SubscriptionBuilder\Contracts\SubscriptionBuilder|void
+     * @return SubscriptionBuilder|void
      */
     public function skipTrial()
     {
@@ -182,7 +184,6 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Specify the quantity of the subscription.
      *
-     * @param  int  $quantity
      * @return $this
      */
     public function quantity(int $quantity)
@@ -195,10 +196,9 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Specify a coupon.
      *
-     * @param  string  $coupon
-     * @return $this|\Laravel\Cashier\SubscriptionBuilder\Contracts\SubscriptionBuilder
+     * @return $this|SubscriptionBuilder
      *
-     * @throws \Laravel\Cashier\Exceptions\CouponNotFoundException
+     * @throws CouponNotFoundException
      */
     public function withCoupon(string $coupon)
     {
@@ -212,7 +212,6 @@ class MandatedSubscriptionBuilder implements Contract
     /**
      * Override the default next payment date. This is superseded by the trial end date.
      *
-     * @param  \Carbon\Carbon  $nextPaymentAt
      * @return MandatedSubscriptionBuilder
      */
     public function nextPaymentAt(Carbon $nextPaymentAt)

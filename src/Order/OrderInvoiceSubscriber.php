@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Order;
 
+use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Events\FirstPaymentPaid;
 use Laravel\Cashier\Events\OrderInvoiceAvailable;
@@ -28,7 +29,7 @@ class OrderInvoiceSubscriber
     /**
      * Register the listeners for the subscriber.
      *
-     * @param  \Illuminate\Events\Dispatcher  $events
+     * @param  Dispatcher  $events
      */
     public function subscribe($events)
     {

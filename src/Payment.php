@@ -3,9 +3,12 @@
 namespace Laravel\Cashier;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Order\ConvertsToMoney;
+use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Traits\HasOwner;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
@@ -26,7 +29,8 @@ use Money\Money;
  * @property int amount_charged_back
  * @property object first_payment_actions // An object for legacy reasons
  * @property string mollie_mandate_id
- * @property \Laravel\Cashier\Order\Order order
+ * @property Order order
+ * @property array|null metadata
  *
  * @method static create(array $data)
  * @method static make(array $data)
@@ -48,13 +52,10 @@ class Payment extends Model
      */
     protected $casts = [
         'first_payment_actions' => 'object',
+        'metadata' => 'array',
     ];
 
     /**
-     * @param  MolliePayment  $payment
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
-     * @param  array  $actions
-     * @param  array  $overrides
      * @return static
      */
     public static function createFromMolliePayment(MolliePayment $payment, Model $owner, array $actions = [], array $overrides = []): self
@@ -63,10 +64,6 @@ class Payment extends Model
     }
 
     /**
-     * @param  MolliePayment  $payment
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
-     * @param  array  $actions
-     * @param  array  $overrides
      * @return static
      */
     public static function makeFromMolliePayment(MolliePayment $payment, Model $owner, array $actions = [], array $overrides = []): self
@@ -83,7 +80,7 @@ class Payment extends Model
 
         return static::make(array_merge([
             'mollie_payment_id' => $payment->id,
-            'mollie_payment_status' => $payment->status,
+            'mollie_payment_status' => mollie_enum_value($payment->status),
             'owner_type' => $owner->getMorphClass(),
             'owner_id' => $owner->getKey(),
             'currency' => $payment->amount->currency,
@@ -98,7 +95,6 @@ class Payment extends Model
     /**
      * Retrieve an Order by the Mollie Payment id.
      *
-     * @param $id
      * @return static
      */
     public static function findByPaymentId($id): ?self
@@ -109,10 +105,9 @@ class Payment extends Model
     /**
      * Retrieve a Payment by the Mollie Payment id or throw an Exception if not found.
      *
-     * @param $id
      * @return static
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
     public static function findByPaymentIdOrFail($id): self
     {
@@ -122,9 +117,6 @@ class Payment extends Model
     /**
      * Find a Payment by the Mollie payment id, or create a new Payment record from a Mollie payment if not found.
      *
-     * @param  \Mollie\Api\Resources\Payment  $molliePayment
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
-     * @param  array  $actions
      * @return static
      */
     public static function findByMolliePaymentOrCreate(MolliePayment $molliePayment, Model $owner, array $actions = []): self
@@ -137,7 +129,7 @@ class Payment extends Model
 
         $newPayment = static::createFromMolliePayment($molliePayment, $owner, $actions);
 
-        if ($newPayment->mollie_payment_status === PaymentStatus::PAID) {
+        if ($newPayment->mollie_payment_status === PaymentStatus::Paid->value) {
             $molliePayment->webhookUrl = route('webhooks.mollie.aftercare');
 
             /** @var UpdateMolliePayment $updateMolliePayment */
@@ -149,40 +141,28 @@ class Payment extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function order()
     {
         return $this->belongsTo(Cashier::$orderModel);
     }
 
-    /**
-     * @return string
-     */
     public function getCurrency(): string
     {
         return $this->currency;
     }
 
-    /**
-     * @return \Money\Money
-     */
     public function getAmount(): Money
     {
         return $this->toMoney($this->amount);
     }
 
-    /**
-     * @return \Money\Money
-     */
     public function getAmountRefunded(): Money
     {
         return $this->toMoney($this->amount_refunded);
     }
 
-    /**
-     * @return \Money\Money
-     */
     public function getAmountChargedBack(): Money
     {
         return $this->toMoney($this->amount_charged_back);
@@ -190,8 +170,6 @@ class Payment extends Model
 
     /**
      * Fetch the Mollie payment resource for this local payment instance.
-     *
-     * @return MolliePayment
      */
     public function asMolliePayment(): MolliePayment
     {

@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 class CashierServiceProviderTest extends BaseTestCase
 {
     #[Test]
-    public function canOptionallySetCurrencyInConfig()
+    public function can_optionally_set_currency_in_config()
     {
         $this->assertEquals('INEXISTENT', config('cashier.currency', 'INEXISTENT'));
 
@@ -24,7 +24,7 @@ class CashierServiceProviderTest extends BaseTestCase
     }
 
     #[Test]
-    public function canOptionallySetCurrencyLocaleInConfig()
+    public function can_optionally_set_currency_locale_in_config()
     {
         $this->assertEquals('INEXISTENT', config('cashier.currency_locale', 'INEXISTENT'));
         $this->assertEquals('de_DE', Cashier::usesCurrencyLocale());

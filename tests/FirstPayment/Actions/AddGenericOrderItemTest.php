@@ -14,7 +14,7 @@ use PHPUnit\Framework\Attributes\Test;
 class AddGenericOrderItemTest extends BaseTestCase
 {
     #[Test]
-    public function canGetPayload()
+    public function can_get_payload()
     {
         $action = new AddGenericOrderItem(
             $this->getMandatedUser(true, ['tax_percentage' => 20]),
@@ -38,7 +38,7 @@ class AddGenericOrderItemTest extends BaseTestCase
     }
 
     #[Test]
-    public function canCreateFromPayload()
+    public function can_create_from_payload()
     {
         $action = AddGenericOrderItem::createFromPayload([
             'subtotal' => [
@@ -57,7 +57,7 @@ class AddGenericOrderItemTest extends BaseTestCase
     }
 
     #[Test]
-    public function canCreateFromPayloadWithoutTaxPercentage()
+    public function can_create_from_payload_without_tax_percentage()
     {
         $action = AddGenericOrderItem::createFromPayload([
             'subtotal' => [
@@ -75,7 +75,7 @@ class AddGenericOrderItemTest extends BaseTestCase
     }
 
     #[Test]
-    public function canExecute()
+    public function can_execute()
     {
         $user = User::factory()->create(['tax_percentage' => 20]);
         $this->assertFalse($user->hasCredit());

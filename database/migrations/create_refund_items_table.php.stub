@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRefundItemsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -25,6 +25,7 @@ class CreateRefundItemsTable extends Migration
             $table->unsignedInteger('quantity');
             $table->integer('unit_price');
             $table->decimal('tax_percentage', 6, 4);
+            $table->text('metadata')->nullable();
             $table->timestamps();
         });
     }
@@ -38,4 +39,4 @@ class CreateRefundItemsTable extends Migration
     {
         Schema::dropIfExists('refund_items');
     }
-}
+};

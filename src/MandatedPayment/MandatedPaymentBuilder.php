@@ -5,13 +5,14 @@ namespace Laravel\Cashier\MandatedPayment;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Mollie\Contracts\CreateMolliePayment;
+use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\SequenceType;
 use Money\Money;
 
 class MandatedPaymentBuilder
 {
     /**
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var Model
      */
     protected $owner;
 
@@ -21,7 +22,7 @@ class MandatedPaymentBuilder
     protected $description;
 
     /**
-     * @var \Money\Money
+     * @var Money
      */
     protected $amount;
 
@@ -37,12 +38,6 @@ class MandatedPaymentBuilder
 
     /**
      * MandatedPaymentBuilder constructor.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
-     * @param  string  $description
-     * @param  \Money\Money  $amount
-     * @param  string  $webhookUrl
-     * @param  array  $overrides
      */
     public function __construct(
         Model $owner,
@@ -59,7 +54,6 @@ class MandatedPaymentBuilder
     }
 
     /**
-     * @param  array  $overrides
      * @return array
      */
     public function getPayload(array $overrides = [])
@@ -67,7 +61,7 @@ class MandatedPaymentBuilder
         $overrides = array_merge($this->overrides, $overrides);
 
         return array_filter(array_merge([
-            'sequenceType' => SequenceType::RECURRING,
+            'sequenceType' => SequenceType::Recurring->value,
             'mandateId' => $this->owner->mollieMandateId(),
             'customerId' => $this->owner->mollieCustomerId(),
             'locale' => Cashier::getLocale($this->owner),
@@ -78,8 +72,7 @@ class MandatedPaymentBuilder
     }
 
     /**
-     * @param  array  $overrides
-     * @return \Mollie\Api\Resources\Payment
+     * @return Payment
      */
     public function create(array $overrides = [])
     {

@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier\Tests\UpdatePaymentMethod;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\MandateUpdated;
@@ -10,6 +9,7 @@ use Laravel\Cashier\FirstPayment\Actions\AddGenericOrderItem;
 use Laravel\Cashier\FirstPayment\FirstPaymentHandler;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
+use Mollie\Api\Http\Data\Money;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment;
 use PHPUnit\Framework\Attributes\Test;
@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\Test;
 class UpdatePaymentMethodWithoutAddingToBalanceTest extends BaseTestCase
 {
     #[Test]
-    public function canUpdatePaymentMethodWithoutAddingToBalance()
+    public function can_update_payment_method_without_adding_to_balance()
     {
         $owner = User::factory()->create([
             'mollie_mandate_id' => 'mdt_unique_mandate_id',
@@ -59,12 +59,12 @@ class UpdatePaymentMethodWithoutAddingToBalanceTest extends BaseTestCase
 
     protected function getNewMandatePaymentStub(): Payment
     {
-        $newPayment = new Payment(new MollieApiClient());
+        $newPayment = new Payment(new MollieApiClient);
         $newPayment->sequenceType = 'first';
         $newPayment->id = 'new_tr_unique_mandate_payment_id';
         $newPayment->customerId = 'cst_unique_customer_id';
         $newPayment->mandateId = 'new_mdt_unique_mandate_id';
-        $newPayment->amount = (object) ['value' => '1.00', 'currency' => 'EUR'];
+        $newPayment->amount = Money::fromArray(['value' => '1.00', 'currency' => 'EUR']);
         $newPayment->metadata = json_decode(json_encode([
             'owner' => [
                 'type' => User::class,

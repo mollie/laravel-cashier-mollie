@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Tests\Charge;
 
+use Laravel\Cashier\Charge\ChargeItemBuilder;
 use Laravel\Cashier\Http\RedirectToCheckoutResponse;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
@@ -19,19 +20,19 @@ class FirstPaymentChargeBuilderTest extends BaseTestCase
     }
 
     #[Test]
-    public function redirectToCheckoutResponse()
+    public function redirect_to_checkout_response()
     {
         $this->withMockedCreateMolliePayment(1, '3.00');
         $owner = User::factory()->create();
         $this->assertEquals(0, $owner->orderItems()->count());
         $this->assertEquals(0, $owner->orders()->count());
 
-        $item = new \Laravel\Cashier\Charge\ChargeItemBuilder($owner);
+        $item = new ChargeItemBuilder($owner);
         $item->unitPrice(new Money(100, new Currency('EUR')));
         $item->description('Test Item');
         $chargeItem = $item->make();
 
-        $item2 = new \Laravel\Cashier\Charge\ChargeItemBuilder($owner);
+        $item2 = new ChargeItemBuilder($owner);
         $item2->unitPrice(new Money(200, new Currency('EUR')));
         $item2->description('Test Item 2');
         $chargeItem2 = $item2->make();

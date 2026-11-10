@@ -8,18 +8,20 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\RefundFailed;
 use Laravel\Cashier\Events\RefundProcessed;
+use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Refunds\Refund;
 use Laravel\Cashier\Refunds\RefundItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Database\Factories\RefundFactory;
 use Mollie\Api\Types\RefundStatus as MollieRefundStatus;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 
 class RefundTest extends BaseTestCase
 {
     #[Test]
-    public function canHandleProcessedMollieRefund()
+    public function can_handle_processed_mollie_refund()
     {
         Event::fake();
 
@@ -37,12 +39,12 @@ class RefundTest extends BaseTestCase
         $refund->items()->saveMany(
             RefundItemCollection::makeFromOrderItemCollection($originalOrderItems)
         );
-        $this->assertEquals(MollieRefundStatus::PENDING, $refund->mollie_refund_status);
+        $this->assertEquals(MollieRefundStatus::Pending->value, $refund->mollie_refund_status);
 
         $refund = $refund->handleProcessed();
 
         $this->assertNotNull($refund->order_id);
-        $this->assertEquals(MollieRefundStatus::REFUNDED, $refund->mollie_refund_status);
+        $this->assertEquals(MollieRefundStatus::Refunded->value, $refund->mollie_refund_status);
         $this->assertMoneyEURCents(29524, $originalOrder->refresh()->getAmountRefunded());
 
         $order = $refund->order;
@@ -57,7 +59,7 @@ class RefundTest extends BaseTestCase
     }
 
     #[Test]
-    public function handlesDuplicateProcessedRefundFromStaleRefundOnce()
+    public function handles_duplicate_processed_refund_from_stale_refund_once()
     {
         Event::fake();
 
@@ -83,7 +85,7 @@ class RefundTest extends BaseTestCase
         $secondRefundInstance->handleProcessed();
 
         $refund->refresh();
-        $this->assertEquals(MollieRefundStatus::REFUNDED, $refund->mollie_refund_status);
+        $this->assertEquals(MollieRefundStatus::Refunded->value, $refund->mollie_refund_status);
         $this->assertNotNull($refund->order_id);
         $this->assertEquals(2, Cashier::$orderModel::count());
         $this->assertMoneyEURCents(29524, $originalOrder->refresh()->getAmountRefunded());
@@ -91,7 +93,8 @@ class RefundTest extends BaseTestCase
     }
 
     #[Test]
-    public function canHandleFailedMollieRefund()
+    #[DataProvider('unprocessedRefundStatuses')]
+    public function can_handle_failed_mollie_refund(string $initialStatus)
     {
         Event::fake();
 
@@ -104,17 +107,18 @@ class RefundTest extends BaseTestCase
         $refund = RefundFactory::new()->create([
             'total' => 29524,
             'currency' => 'EUR',
+            'mollie_refund_status' => $initialStatus,
         ]);
 
         $refund->items()->saveMany(
             RefundItemCollection::makeFromOrderItemCollection($originalOrderItems)
         );
-        $this->assertEquals(MollieRefundStatus::PENDING, $refund->mollie_refund_status);
+        $this->assertEquals($initialStatus, $refund->mollie_refund_status);
 
         $refund = $refund->handleFailed();
 
         $this->assertNull($refund->order_id);
-        $this->assertEquals(MollieRefundStatus::FAILED, $refund->mollie_refund_status);
+        $this->assertEquals(MollieRefundStatus::Failed->value, $refund->mollie_refund_status);
         $this->assertMoneyEURCents(0, $originalOrder->refresh()->getAmountRefunded());
 
         $this->assertNull($refund->order);
@@ -125,7 +129,7 @@ class RefundTest extends BaseTestCase
     }
 
     #[Test]
-    public function handlesDuplicateFailedRefundFromStaleRefundOnce()
+    public function handles_duplicate_failed_refund_from_stale_refund_once()
     {
         Event::fake();
 
@@ -151,10 +155,154 @@ class RefundTest extends BaseTestCase
         $secondRefundInstance->handleFailed();
 
         $refund->refresh();
-        $this->assertEquals(MollieRefundStatus::FAILED, $refund->mollie_refund_status);
+        $this->assertEquals(MollieRefundStatus::Failed->value, $refund->mollie_refund_status);
         $this->assertNull($refund->order_id);
         $this->assertEquals(1, Cashier::$orderModel::count());
         $this->assertMoneyEURCents(0, $originalOrder->refresh()->getAmountRefunded());
         Event::assertDispatchedTimes(RefundFailed::class, 1);
+    }
+
+    #[Test]
+    public function restores_used_credit_when_the_refund_is_processed()
+    {
+        Event::fake();
+
+        $user = $this->getCustomerUser();
+        $originalOrder = $this->createOrderPaidPartlyWithCredit($user);
+        $this->assertFalse($user->hasCredit('EUR'));
+
+        $refund = $this->createPendingRefundForWholeOrder($originalOrder);
+
+        $refund->handleProcessed();
+
+        // EUR 17.00 came back through Mollie, the EUR 5.00 paid from credit goes back
+        // to the balance.
+        $this->assertEquals(500, $user->fresh()->credit('EUR')->value);
+        $this->assertMoneyEURCents(2200, $originalOrder->refresh()->getAmountRefunded());
+        $this->assertMoneyEURCents(500, $originalOrder->getCreditUsedRestored());
+    }
+
+    #[Test]
+    public function does_not_restore_used_credit_when_the_refund_fails()
+    {
+        Event::fake();
+
+        $user = $this->getCustomerUser();
+        $originalOrder = $this->createOrderPaidPartlyWithCredit($user);
+
+        $refund = $this->createPendingRefundForWholeOrder($originalOrder);
+
+        $refund->handleFailed();
+
+        // Nothing was handed back, so there is nothing to reclaim. The balance cannot be
+        // left with credit for a refund that never happened, nor be pushed negative.
+        $this->assertFalse($user->fresh()->hasCredit('EUR'));
+        $this->assertMoneyEURCents(0, $originalOrder->refresh()->getAmountRefunded());
+    }
+
+    #[Test]
+    public function does_not_restore_used_credit_twice_on_duplicate_processed_deliveries()
+    {
+        Event::fake();
+
+        $user = $this->getCustomerUser();
+        $originalOrder = $this->createOrderPaidPartlyWithCredit($user);
+
+        $refund = $this->createPendingRefundForWholeOrder($originalOrder);
+
+        Cashier::$refundModel::find($refund->id)->handleProcessed();
+        Cashier::$refundModel::find($refund->id)->handleProcessed();
+
+        $this->assertEquals(500, $user->fresh()->credit('EUR')->value);
+    }
+
+    #[Test]
+    public function restores_used_credit_only_once_across_successive_partial_refunds()
+    {
+        Event::fake();
+
+        $user = $this->getCustomerUser();
+        $originalOrder = $this->createOrderPaidPartlyWithCredit($user);
+
+        // EUR 12.00 then EUR 10.00, together reversing the full EUR 22.00 order.
+        $first = $this->createPendingRefund($originalOrder, 1200);
+        $second = $this->createPendingRefund($originalOrder, 1000);
+
+        $first->handleProcessed();
+
+        // Still within the EUR 17.00 charged through Mollie, so no credit moves yet.
+        $this->assertFalse($user->fresh()->hasCredit('EUR'));
+
+        $second->handleProcessed();
+
+        // The EUR 5.00 paid from credit comes back exactly once.
+        $this->assertEquals(500, $user->fresh()->credit('EUR')->value);
+        $this->assertMoneyEURCents(2200, $originalOrder->refresh()->getAmountRefunded());
+    }
+
+    /**
+     * An EUR 22.00 order, paid with EUR 5.00 credit and EUR 17.00 through Mollie.
+     */
+    protected function createOrderPaidPartlyWithCredit($user)
+    {
+        $orderItems = $user->orderItems()->createMany([
+            OrderItemFactory::new()->make([
+                'unit_price' => 2200,
+                'tax_percentage' => 0,
+                'quantity' => 1,
+            ])->toArray(),
+        ]);
+
+        $order = Cashier::$orderModel::createProcessedFromItems(new OrderItemCollection($orderItems));
+
+        $order->update([
+            'mollie_payment_status' => 'paid',
+            'mollie_payment_id' => 'tr_dummy_payment_id',
+            'balance_before' => 500,
+            'credit_used' => 500,
+            'total_due' => 1700,
+        ]);
+
+        return $order;
+    }
+
+    protected function createPendingRefundForWholeOrder($originalOrder): Refund
+    {
+        /** @var Refund $refund */
+        $refund = RefundFactory::new()->create([
+            'original_order_id' => $originalOrder->id,
+            'total' => 2200,
+            'currency' => 'EUR',
+        ]);
+
+        $refund->items()->saveMany(
+            RefundItemCollection::makeFromOrderItemCollection($originalOrder->items)
+        );
+
+        return $refund;
+    }
+
+    protected function createPendingRefund($originalOrder, int $total): Refund
+    {
+        /** @var Refund $refund */
+        $refund = RefundFactory::new()->create([
+            'original_order_id' => $originalOrder->id,
+            'total' => $total,
+            'currency' => 'EUR',
+        ]);
+
+        $refund->items()->saveMany(
+            RefundItemCollection::makeFromOrderItemCollection(
+                $originalOrder->items,
+                ['unit_price' => $total, 'tax_percentage' => 0, 'quantity' => 1]
+            )
+        );
+
+        return $refund;
+    }
+
+    public static function unprocessedRefundStatuses(): array
+    {
+        return [['pending'], ['queued'], ['processing']];
     }
 }

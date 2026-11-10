@@ -37,32 +37,32 @@ class ApplySubscriptionCouponToPaymentTest extends BaseTestCase
     }
 
     #[Test]
-    public function testGetTotalReturnsDiscountSubtotal()
+    public function test_get_total_returns_discount_subtotal()
     {
         $this->assertMoneyEURCents(-500, $this->action->getTotal());
     }
 
     #[Test]
-    public function testTaxDefaultsToZero()
+    public function test_tax_defaults_to_zero()
     {
         $this->assertEquals(0, $this->action->getTaxPercentage());
         $this->assertMoneyEURCents(0, $this->action->getTax());
     }
 
     #[Test]
-    public function testCreateFromPayloadReturnsNull()
+    public function test_create_from_payload_returns_null()
     {
         $this->assertNull(Action::createFromPayload(['foo' => 'bar'], User::factory()->make()));
     }
 
     #[Test]
-    public function testGetPayloadReturnsNull()
+    public function test_get_payload_returns_null()
     {
         $this->assertNull($this->action->getPayload());
     }
 
     #[Test]
-    public function testExecuteReturnsEmptyOrderItemCollection()
+    public function test_execute_returns_empty_order_item_collection()
     {
         $result = $this->action->execute();
         $this->assertEquals(new OrderItemCollection, $result);

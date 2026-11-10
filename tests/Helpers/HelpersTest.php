@@ -2,15 +2,14 @@
 
 namespace Laravel\Cashier\Tests\Helpers;
 
-use Money\Currency;
 use Money\Money;
-use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
 
 class HelpersTest extends TestCase
 {
     #[Test]
-    public function testMoney()
+    public function test_money()
     {
         $money = money(1234, 'EUR');
 
@@ -19,14 +18,14 @@ class HelpersTest extends TestCase
     }
 
     #[Test]
-    public function testDecimalToMoney()
+    public function test_decimal_to_money()
     {
         $money = decimal_to_money('12.34', 'EUR');
         $this->assertTrue(Money::EUR(1234)->equals($money));
     }
 
     #[Test]
-    public function testMoneyToMollieArray()
+    public function test_money_to_mollie_array()
     {
         $moneyEUR = Money::EUR(1234);
         $moneyUSD = Money::USD(9876);
@@ -46,7 +45,7 @@ class HelpersTest extends TestCase
     }
 
     #[Test]
-    public function testMollieArrayToMoney()
+    public function test_mollie_array_to_money()
     {
         $arrayEUR = [
             'currency' => 'EUR',
@@ -66,7 +65,7 @@ class HelpersTest extends TestCase
     }
 
     #[Test]
-    public function testMollieObjectToMoney()
+    public function test_mollie_object_to_money()
     {
         $objectEUR = (object) [
             'currency' => 'EUR',

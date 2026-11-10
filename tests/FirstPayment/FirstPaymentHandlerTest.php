@@ -10,6 +10,7 @@ use Laravel\Cashier\FirstPayment\Actions\StartSubscription;
 use Laravel\Cashier\FirstPayment\FirstPaymentHandler;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
+use Mollie\Api\Http\Data\Money;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
@@ -18,7 +19,7 @@ use PHPUnit\Framework\Attributes\Test;
 class FirstPaymentHandlerTest extends BaseTestCase
 {
     #[Test]
-    public function handlesMolliePayments()
+    public function handles_mollie_payments()
     {
         Event::fake();
 
@@ -87,7 +88,7 @@ class FirstPaymentHandlerTest extends BaseTestCase
     }
 
     #[Test]
-    public function startsSubscriptionWhenMandateIsStillPending()
+    public function starts_subscription_when_mandate_is_still_pending()
     {
         // End-to-end regression for issue #289: this exercises the path
         // FirstPaymentWebhookController → FirstPaymentHandler::execute()
@@ -129,8 +130,8 @@ class FirstPaymentHandlerTest extends BaseTestCase
         $payment->id = 'tr_unique_start_subscription_payment_id';
         $payment->customerId = 'cst_unique_customer_id';
         $payment->mandateId = 'mdt_unique_mandate_id';
-        $payment->amount = (object) ['value' => '10.00', 'currency' => 'EUR'];
-        $payment->status = PaymentStatus::PAID;
+        $payment->amount = Money::fromArray(['value' => '10.00', 'currency' => 'EUR']);
+        $payment->status = PaymentStatus::Paid;
         $payment->metadata = json_decode(json_encode([
             'owner' => [
                 'type' => User::class,
@@ -157,13 +158,13 @@ class FirstPaymentHandlerTest extends BaseTestCase
 
     protected function getMandatePaymentStub(): MolliePayment
     {
-        $payment = new MolliePayment(new MollieApiClient());
+        $payment = new MolliePayment(new MollieApiClient);
         $payment->sequenceType = 'first';
         $payment->id = 'tr_unique_mandate_payment_id';
         $payment->customerId = 'cst_unique_customer_id';
         $payment->mandateId = 'mdt_unique_mandate_id';
-        $payment->amount = (object) ['value' => '10.00', 'currency' => 'EUR'];
-        $payment->status = PaymentStatus::PAID;
+        $payment->amount = Money::fromArray(['value' => '10.00', 'currency' => 'EUR']);
+        $payment->status = PaymentStatus::Paid;
         $payment->metadata = json_decode(json_encode([
             'owner' => [
                 'type' => User::class,

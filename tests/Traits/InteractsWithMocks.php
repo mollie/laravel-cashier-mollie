@@ -14,29 +14,32 @@ use Laravel\Cashier\Mollie\Contracts\GetMollieMethodMinimumAmount;
 use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Mollie\GetMollieMethodMaximumAmount;
+use Laravel\Cashier\Tests\BaseTestCase;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Http\Response;
+use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Mandate;
 use Mollie\Api\Resources\Payment;
 use Money\Currency;
 use Money\Money;
-use Mollie\Api\MollieApiClient;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\StreamInterface;
 
 /**
- * @mixin \Laravel\Cashier\Tests\BaseTestCase
+ * @mixin BaseTestCase
  */
 trait InteractsWithMocks
 {
     public function setUpInteractsWithMocks(): void
     {
-        if (!$this->interactWithMollieAPI) {
+        if (! $this->interactWithMollieAPI) {
             // Disable the Mollie API
             $this->mock(MollieApiClient::class, null);
         }
     }
 
     /**
-     * @param  \Laravel\Cashier\Coupon\Coupon  $coupon
      * @param  null  $couponHandler
      * @param  null  $context
      * @return CouponRepository The mocked coupon repository
@@ -71,7 +74,6 @@ trait InteractsWithMocks
     }
 
     /**
-     * @param  \Laravel\Cashier\Coupon\Coupon  $coupon
      * @param  null  $couponHandler
      * @param  null  $context
      * @return CouponRepository The mocked coupon repository
@@ -143,7 +145,7 @@ trait InteractsWithMocks
                 'mandateId' => 'mdt_unique_mandate_id',
                 'customerId' => 'cst_unique_customer_id',
                 'status' => 'pending',
-            ]
+            ],
         ]);
     }
 
@@ -154,7 +156,7 @@ trait InteractsWithMocks
                 'mandateId' => 'mdt_unique_mandate_id',
                 'customerId' => 'cst_unique_customer_id',
                 'status' => 'valid',
-            ]
+            ],
         ]
     ): void {
         $this->mock(GetMollieMandate::class, function ($mock) use ($times, $attributes) {
@@ -230,10 +232,10 @@ trait InteractsWithMocks
         $this->mock(CreateMolliePayment::class, function ($mock) use ($times, $amount, $paymentId) {
             $payment = new Payment(resolve(MollieApiClient::class));
             $payment->id = $paymentId;
-            $payment->amount = (object) [
+            $payment->amount = \Mollie\Api\Http\Data\Money::fromArray([
                 'currency' => 'EUR',
                 'value' => $amount,
-            ];
+            ]);
             $payment->_links = json_decode(json_encode([
                 'checkout' => [
                     'href' => 'https://foo-redirect-bar.com',
@@ -257,10 +259,10 @@ trait InteractsWithMocks
         $this->mock(UpdateMolliePayment::class, function ($mock) use ($times, $amount, $paymentId, $redirectUrl) {
             $payment = new Payment(resolve(MollieApiClient::class));
             $payment->id = $paymentId;
-            $payment->amount = (object) [
+            $payment->amount = \Mollie\Api\Http\Data\Money::fromArray([
                 'currency' => 'EUR',
                 'value' => $amount,
-            ];
+            ]);
             $payment->redirectUrl = $redirectUrl;
             $payment->mandateId = 'mdt_dummy_mandate_id';
 
@@ -292,10 +294,10 @@ trait InteractsWithMocks
                 ->with($wrongId, [])
                 ->times($times)
                 ->andThrow(new ApiException(
-                    \Mockery::mock(\Mollie\Api\Http\Response::class, [
+                    \Mockery::mock(Response::class, [
                         'json' => (object) ['status' => 404, 'title' => 'Not Found', '_links' => (object) []],
-                        'getPsrRequest' => \Mockery::mock(\Psr\Http\Message\RequestInterface::class, [
-                            'getBody' => \Mockery::mock(\Psr\Http\Message\StreamInterface::class, [
+                        'getPsrRequest' => \Mockery::mock(RequestInterface::class, [
+                            'getBody' => \Mockery::mock(StreamInterface::class, [
                                 '__toString' => '',
                             ]),
                         ]),

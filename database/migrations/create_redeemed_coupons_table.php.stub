@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRedeemedCouponsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -21,6 +21,7 @@ class CreateRedeemedCouponsTable extends Migration
             $table->string('owner_type');
             $table->unsignedBigInteger('owner_id');
             $table->unsignedInteger('times_left')->default(1);
+            $table->text('metadata')->nullable();
             $table->timestamps();
         });
     }
@@ -34,4 +35,4 @@ class CreateRedeemedCouponsTable extends Migration
     {
         Schema::dropIfExists('redeemed_coupons');
     }
-}
+};

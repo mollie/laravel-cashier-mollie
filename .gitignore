@@ -10,3 +10,5 @@ vendor
 .idea
 .phpstorm.meta.php
 .php-cs-fixer.cache
+
+/docs/.vuepress/dist/

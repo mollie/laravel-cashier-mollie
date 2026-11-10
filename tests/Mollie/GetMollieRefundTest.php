@@ -13,7 +13,7 @@ class GetMollieRefundTest extends BaseMollieInteraction
 {
     #[Test]
     #[Group('mollie_integration')]
-    public function testExecute()
+    public function test_execute()
     {
         /** @var GetMollieRefund $action */
         $action = $this->app->make(GetMollieRefund::class);

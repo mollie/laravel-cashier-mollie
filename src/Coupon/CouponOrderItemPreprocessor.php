@@ -10,8 +10,7 @@ use Laravel\Cashier\Order\OrderItemCollection;
 class CouponOrderItemPreprocessor extends BaseOrderItemPreprocessor
 {
     /**
-     * @param  \Laravel\Cashier\Order\OrderItemCollection  $items
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function handle(OrderItemCollection $items)
     {
@@ -30,8 +29,6 @@ class CouponOrderItemPreprocessor extends BaseOrderItemPreprocessor
     }
 
     /**
-     * @param $modelType
-     * @param $modelId
      * @return mixed
      */
     protected function getActiveCoupons($modelType, $modelId)

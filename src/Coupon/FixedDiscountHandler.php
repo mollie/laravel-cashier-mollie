@@ -10,8 +10,7 @@ use Money\Money;
 class FixedDiscountHandler extends BaseCouponHandler
 {
     /**
-     * @param  \Laravel\Cashier\Order\OrderItemCollection  $items
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function getDiscountOrderItems(OrderItemCollection $items)
     {
@@ -41,8 +40,8 @@ class FixedDiscountHandler extends BaseCouponHandler
     }
 
     /**
-     * @param  \Money\Money  $base The amount the discount is applied to.
-     * @return \Money\Money
+     * @param  Money  $base  The amount the discount is applied to.
+     * @return Money
      */
     protected function unitPrice(Money $base)
     {
@@ -56,7 +55,6 @@ class FixedDiscountHandler extends BaseCouponHandler
     }
 
     /**
-     * @param  \Laravel\Cashier\Order\OrderItem  $firstItem
      * @return int
      */
     protected function quantity(OrderItem $firstItem)
@@ -67,7 +65,6 @@ class FixedDiscountHandler extends BaseCouponHandler
     }
 
     /**
-     * @param  \Laravel\Cashier\Order\OrderItem  $firstItem
      * @return float|int
      */
     protected function taxPercentage(OrderItem $firstItem)

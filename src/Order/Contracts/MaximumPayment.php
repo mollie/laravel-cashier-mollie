@@ -3,13 +3,12 @@
 namespace Laravel\Cashier\Order\Contracts;
 
 use Mollie\Api\Resources\Mandate;
+use Money\Money;
 
 interface MaximumPayment
 {
     /**
-     * @param  \Mollie\Api\Resources\Mandate  $mandate
-     * @param $currency
-     * @return \Money\Money
+     * @return Money
      */
     public static function forMollieMandate(Mandate $mandate, $currency);
 }

@@ -25,25 +25,28 @@ use Mollie\Api\Types\RefundStatus;
  * @property int|null original_order_item_id
  * @property int|null original_order_id
  * @property int|null order_id
- * @property \Laravel\Cashier\Refunds\RefundItemCollection items
+ * @property RefundItemCollection items
  * @property Order order
  * @property Order originalOrder
+ * @property array|null metadata
  */
 class Refund extends Model
 {
     use HasOwner;
 
+    public const UNPROCESSED_STATUSES = ['pending', 'queued', 'processing'];
+
     protected $guarded = [];
 
     protected $casts = [
         'total' => 'int',
+        'metadata' => 'array',
     ];
 
     /**
      * Create a new Refund Collection instance.
      *
-     * @param  array  $models
-     * @return \Laravel\Cashier\Refunds\RefundCollection
+     * @return RefundCollection
      */
     public function newCollection(array $models = [])
     {
@@ -53,12 +56,16 @@ class Refund extends Model
     /**
      * Scope the query to only include unprocessed refunds.
      *
-     * @param $query
      * @return Builder
      */
     public function scopeWhereUnprocessed(Builder $query)
     {
-        return $query->where('mollie_refund_status', RefundStatus::PENDING);
+        return $query->whereIn('mollie_refund_status', self::UNPROCESSED_STATUSES);
+    }
+
+    public function isLocal(): bool
+    {
+        return str_starts_with($this->mollie_refund_id, 'local_');
     }
 
     public function items(): HasMany
@@ -86,7 +93,7 @@ class Refund extends Model
             /** @var static $refund */
             $refund = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
-            if ($refund->mollie_refund_status !== RefundStatus::PENDING) {
+            if (! in_array($refund->mollie_refund_status, self::UNPROCESSED_STATUSES, true)) {
                 return;
             }
 
@@ -95,20 +102,39 @@ class Refund extends Model
             $order = Cashier::$orderModel::createProcessedFromItems($orderItems);
 
             $refund->order_id = $order->id;
-            $refund->mollie_refund_status = RefundStatus::REFUNDED;
+            $refund->mollie_refund_status = RefundStatus::Refunded->value;
 
             $refund->save();
 
             $refundItems->each(function (RefundItem $refundItem) {
                 $originalOrderItem = $refundItem->originalOrderItem;
 
-                if( $originalOrderItem && method_exists($originalOrderItem, 'handlePaymentRefunded') )
-                {
+                if ($originalOrderItem && method_exists($originalOrderItem, 'handlePaymentRefunded')) {
                     $originalOrderItem->handlePaymentRefunded($refundItem);
                 }
             });
 
-            $refund->originalOrder->increment('amount_refunded', (int) $refundItems->getTotal()->getAmount());
+            // Lock the order too: concurrent refunds on the same order would otherwise both
+            // read the same amount_refunded and restore the same credit twice.
+            /** @var Order $originalOrder */
+            $originalOrder = Cashier::$orderModel::whereKey($refund->original_order_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $creditRestoredBefore = $originalOrder->getCreditUsedRestored();
+
+            $originalOrder->increment('amount_refunded', (int) $refundItems->getTotal()->getAmount());
+
+            // Whatever this refund reverses beyond the amount charged through Mollie was paid
+            // from the owner's credit balance, so it goes back there. Deriving it from
+            // amount_refunded means a refund that never gets processed never moves credit.
+            $creditRestored = $originalOrder->refresh()
+                ->getCreditUsedRestored()
+                ->subtract($creditRestoredBefore);
+
+            if ($creditRestored->isPositive()) {
+                $refund->owner->addCredit($creditRestored);
+            }
 
             $handled = true;
         });
@@ -132,12 +158,12 @@ class Refund extends Model
             /** @var static $refund */
             $refund = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
-            if ($refund->mollie_refund_status !== RefundStatus::PENDING) {
+            if (! in_array($refund->mollie_refund_status, self::UNPROCESSED_STATUSES, true)) {
                 return;
             }
 
             $refundItems = $refund->items;
-            $refund->mollie_refund_status = RefundStatus::FAILED;
+            $refund->mollie_refund_status = RefundStatus::Failed->value;
 
             $refund->save();
 

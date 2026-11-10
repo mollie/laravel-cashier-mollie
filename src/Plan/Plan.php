@@ -6,6 +6,7 @@ namespace Laravel\Cashier\Plan;
 
 use Laravel\Cashier\FirstPayment\Traits\PaymentMethodString;
 use Laravel\Cashier\Order\OrderItemPreprocessorCollection;
+use Laravel\Cashier\Plan\Contracts\IntervalGeneratorContract;
 use Laravel\Cashier\Plan\Contracts\Plan as PlanContract;
 use Money\Money;
 
@@ -23,14 +24,14 @@ class Plan implements PlanContract
     /**
      * The amount of the payment.
      *
-     * @var \Money\Money
+     * @var Money
      */
     protected $amount;
 
     /**
      * The billing interval generator
      *
-     * @var \Laravel\Cashier\Plan\Contracts\IntervalGeneratorContract
+     * @var IntervalGeneratorContract
      */
     protected $interval;
 
@@ -46,7 +47,7 @@ class Plan implements PlanContract
     /**
      * The amount used for a mandate payment.
      *
-     * @var \Money\Money
+     * @var Money
      */
     protected $firstPaymentAmount;
 
@@ -80,13 +81,11 @@ class Plan implements PlanContract
      */
     protected $firstPaymentWebhookUrl;
 
-    /** @var \Laravel\Cashier\Order\OrderItemPreprocessorCollection */
+    /** @var OrderItemPreprocessorCollection */
     protected $orderItemPreprocessors;
 
     /**
      * Plan constructor.
-     *
-     * @param  string  $name
      */
     public function __construct(string $name)
     {
@@ -103,7 +102,6 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  string  $name
      * @return $this
      */
     public function setName(string $name)
@@ -114,7 +112,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function amount()
     {
@@ -122,7 +120,6 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  \Money\Money  $amount
      * @return $this
      */
     public function setAmount(Money $amount)
@@ -141,7 +138,6 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  string  $description
      * @return $this
      */
     public function setDescription(string $description)
@@ -173,7 +169,7 @@ class Plan implements PlanContract
     /**
      * The amount the customer is charged for a mandate payment.
      *
-     * @return \Money\Money
+     * @return Money
      */
     public function firstPaymentAmount()
     {
@@ -181,7 +177,6 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  \Money\Money  $firstPaymentAmount
      * @return $this
      */
     public function setFirstPaymentAmount(Money $firstPaymentAmount)
@@ -202,7 +197,6 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  string  $firstPaymentDescription
      * @return $this
      */
     public function setFirstPaymentDescription(string $firstPaymentDescription)
@@ -213,7 +207,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @return \Laravel\Cashier\Plan\Contracts\IntervalGeneratorContract
+     * @return IntervalGeneratorContract
      */
     public function interval()
     {
@@ -240,7 +234,6 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  string  $redirectUrl
      * @return $this
      */
     public function setFirstPaymentRedirectUrl(string $redirectUrl)
@@ -259,7 +252,6 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  string  $webhookUrl
      * @return PlanContract
      */
     public function setFirstPaymentWebhookUrl(string $webhookUrl)
@@ -270,7 +262,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @return \Laravel\Cashier\Order\OrderItemPreprocessorCollection
+     * @return OrderItemPreprocessorCollection
      */
     public function orderItemPreprocessors()
     {
@@ -278,8 +270,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @param  \Laravel\Cashier\Order\OrderItemPreprocessorCollection  $preprocessors
-     * @return \Laravel\Cashier\Plan\Contracts\Plan
+     * @return PlanContract
      */
     public function setOrderItemPreprocessors(OrderItemPreprocessorCollection $preprocessors)
     {

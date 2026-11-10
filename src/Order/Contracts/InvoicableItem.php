@@ -2,20 +2,22 @@
 
 namespace Laravel\Cashier\Order\Contracts;
 
+use Money\Money;
+
 interface InvoicableItem
 {
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getUnitPrice();
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getTotal();
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getSubtotal();
 
@@ -27,7 +29,7 @@ interface InvoicableItem
     public function getTaxPercentage();
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getTax();
 }

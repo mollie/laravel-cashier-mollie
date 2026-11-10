@@ -3,8 +3,11 @@
 namespace Laravel\Cashier\Coupon;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Laravel\Cashier\Coupon\Contracts\AcceptsCoupons;
+use Laravel\Cashier\Coupon\Contracts\CouponHandler;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\Order\OrderItemCollection;
 
@@ -17,6 +20,7 @@ use Laravel\Cashier\Order\OrderItemCollection;
  * @property mixed model_id
  * @property string name
  * @property int times_left
+ * @property array|null metadata
  */
 class RedeemedCoupon extends Model
 {
@@ -27,10 +31,12 @@ class RedeemedCoupon extends Model
      */
     protected $guarded = [];
 
+    protected $casts = [
+        'metadata' => 'array',
+    ];
+
     /**
-     * @param  \Laravel\Cashier\Coupon\Coupon  $coupon
-     * @param  \Laravel\Cashier\Coupon\Contracts\AcceptsCoupons  $model
-     * @return \Illuminate\Database\Eloquent\Model|\Laravel\Cashier\Coupon\RedeemedCoupon
+     * @return Model|RedeemedCoupon
      */
     public static function record(Coupon $coupon, AcceptsCoupons $model)
     {
@@ -56,7 +62,7 @@ class RedeemedCoupon extends Model
     }
 
     /**
-     * @return \Laravel\Cashier\Coupon\Contracts\CouponHandler
+     * @return CouponHandler
      */
     public function handler()
     {
@@ -66,7 +72,7 @@ class RedeemedCoupon extends Model
     /**
      * Get the model relation the coupon was redeemed for.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     * @return MorphTo
      */
     public function model()
     {
@@ -74,8 +80,7 @@ class RedeemedCoupon extends Model
     }
 
     /**
-     * @param  \Laravel\Cashier\Order\OrderItemCollection  $items
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function applyTo(OrderItemCollection $items)
     {
@@ -105,8 +110,7 @@ class RedeemedCoupon extends Model
     /**
      * Scope a query to only include coupons which are being processed
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return Builder
      */
     public function scopeActive(Builder $query)
     {
@@ -114,9 +118,6 @@ class RedeemedCoupon extends Model
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string  $modelType
-     * @param $modelId
      * @return mixed
      */
     public function scopeWhereModel(Builder $query, string $modelType, $modelId)
@@ -135,8 +136,7 @@ class RedeemedCoupon extends Model
     /**
      * Create a new Eloquent Collection instance.
      *
-     * @param  array  $models
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public function newCollection(array $models = [])
     {

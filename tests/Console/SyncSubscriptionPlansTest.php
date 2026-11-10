@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Tests\Console;
 
 use Laravel\Cashier\Console\Commands\SyncSubscriptionPlans;
 use Laravel\Cashier\Order\OrderItem;
+use Laravel\Cashier\Plan\Contracts\PlanRepository;
 use Laravel\Cashier\Plan\Plan;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
@@ -21,11 +22,11 @@ class SyncSubscriptionPlansTest extends BaseTestCase
         $subscription = SubscriptionFactory::new()->create([
             'owner_id' => $owner->id,
             'owner_type' => get_class($owner),
-            'plan' => 'monthly-10-1'
+            'plan' => 'monthly-10-1',
         ]);
         $oldPlanPrice = Money::EUR(1000);
         $oldDescription = 'Old plan description';
-        
+
         $orderItem = OrderItem::create([
             'process_at' => now(),
             'orderable_type' => get_class($subscription),
@@ -45,7 +46,7 @@ class SyncSubscriptionPlansTest extends BaseTestCase
         $plan = new Plan('monthly-10-1');
         $plan->setAmount($newPlanPrice);
         $plan->setDescription($newDescription);
-        $this->mock(\Laravel\Cashier\Plan\Contracts\PlanRepository::class)
+        $this->mock(PlanRepository::class)
             ->shouldReceive('findOrFail')
             ->with('monthly-10-1')
             ->andReturn($plan);
@@ -67,11 +68,11 @@ class SyncSubscriptionPlansTest extends BaseTestCase
         $subscription = SubscriptionFactory::new()->create([
             'owner_id' => $owner->id,
             'owner_type' => get_class($owner),
-            'plan' => 'monthly-10-1'
+            'plan' => 'monthly-10-1',
         ]);
         $oldPlanPrice = Money::EUR(1000);
         $oldDescription = 'Old plan description';
-        
+
         $orderItem = OrderItem::create([
             'process_at' => now(),
             'orderable_type' => get_class($subscription),
@@ -92,7 +93,7 @@ class SyncSubscriptionPlansTest extends BaseTestCase
         $plan = new Plan('monthly-10-1');
         $plan->setAmount($newPlanPrice);
         $plan->setDescription($newDescription);
-        $this->mock(\Laravel\Cashier\Plan\Contracts\PlanRepository::class)
+        $this->mock(PlanRepository::class)
             ->shouldReceive('findOrFail')
             ->with('monthly-10-1')
             ->never(); // Should never be called since item is processed
@@ -123,7 +124,7 @@ class SyncSubscriptionPlansTest extends BaseTestCase
             'description' => 'Generic product',
         ]);
 
-        $this->mock(\Laravel\Cashier\Plan\Contracts\PlanRepository::class)
+        $this->mock(PlanRepository::class)
             ->shouldReceive('findOrFail')
             ->never(); // Plan repository should never be called
 

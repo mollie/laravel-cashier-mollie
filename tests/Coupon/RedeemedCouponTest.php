@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier\Tests\Coupon;
 
-use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\RedeemedCoupon;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\RedeemedCouponFactory;
@@ -11,7 +10,7 @@ use PHPUnit\Framework\Attributes\Test;
 class RedeemedCouponTest extends BaseTestCase
 {
     #[Test]
-    public function canBeRevoked()
+    public function can_be_revoked()
     {
         /** @var RedeemedCoupon $redeemedCoupon */
         $redeemedCoupon = RedeemedCouponFactory::new()->create(['times_left' => 5]);

@@ -8,15 +8,15 @@ use Laravel\Cashier\Events\FirstPaymentFailed;
 use Laravel\Cashier\Events\FirstPaymentPaid;
 use Laravel\Cashier\FirstPayment\FirstPaymentHandler;
 use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
+use Mollie\Api\Exceptions\ApiException;
 use Symfony\Component\HttpFoundation\Response;
 
 class FirstPaymentWebhookController extends BaseWebhookController
 {
     /**
-     * @param  Request  $request
      * @return Response
      *
-     * @throws \Mollie\Api\Exceptions\ApiException Only in debug mode
+     * @throws ApiException Only in debug mode
      */
     public function handleWebhook(Request $request)
     {

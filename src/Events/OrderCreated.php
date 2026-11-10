@@ -18,8 +18,6 @@ class OrderCreated
 
     /**
      * Creates a new OrderCreated event.
-     *
-     * @param $order
      */
     public function __construct($order)
     {

@@ -11,9 +11,6 @@ class RefundInitiated
 {
     use SerializesModels;
 
-    /**
-     * @var \Laravel\Cashier\Refunds\Refund
-     */
     public Refund $refund;
 
     public function __construct(Refund $refund)

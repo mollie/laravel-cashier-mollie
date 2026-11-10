@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier\Tests\Coupon;
 
-use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\Coupon\Coupon;
 use Laravel\Cashier\Coupon\CouponOrderItemPreprocessor;
@@ -16,7 +15,7 @@ use PHPUnit\Framework\Attributes\Test;
 class PercentageCouponTest extends BaseTestCase
 {
     #[Test]
-    public function couponCalculatesTheRightPrice()
+    public function coupon_calculates_the_right_price()
     {
         $couponHandler = new PercentageDiscountHandler;
 
@@ -38,10 +37,10 @@ class PercentageCouponTest extends BaseTestCase
         $item = OrderItemFactory::new()->make();
         $subscription->orderItems()->save($item);
 
-        /** @var \Laravel\Cashier\Coupon\Coupon $coupon */
+        /** @var Coupon $coupon */
         $coupon = app()->make(CouponRepository::class)->findOrFail('percentage-coupon');
         $redeemedCoupon = $coupon->redeemFor($subscription);
-        $preprocessor = new CouponOrderItemPreprocessor();
+        $preprocessor = new CouponOrderItemPreprocessor;
 
         $result = $preprocessor->handle($item->toCollection());
 
@@ -52,7 +51,7 @@ class PercentageCouponTest extends BaseTestCase
     }
 
     #[Test]
-    public function percentageCouponWithNoTaxCalculatesDiscountFromSubtotalNotTotal()
+    public function percentage_coupon_with_no_tax_calculates_discount_from_subtotal_not_total()
     {
         // 50% coupon on €150 item with 21% VAT
         // Expected: Discount should be -€75 (50% of €150 subtotal)
@@ -90,10 +89,10 @@ class PercentageCouponTest extends BaseTestCase
         $this->assertMoneyEURCents(3150, $item->getTax()); // €31.50 (21% of €150)
         $this->assertMoneyEURCents(18150, $item->getTotal()); // €181.50
 
-        /** @var \Laravel\Cashier\Coupon\Coupon $coupon */
+        /** @var Coupon $coupon */
         $coupon = app()->make(CouponRepository::class)->findOrFail('percentage-50-off');
         $redeemedCoupon = $coupon->redeemFor($subscription);
-        $preprocessor = new CouponOrderItemPreprocessor();
+        $preprocessor = new CouponOrderItemPreprocessor;
 
         $result = $preprocessor->handle($item->toCollection());
 
@@ -126,7 +125,7 @@ class PercentageCouponTest extends BaseTestCase
     }
 
     #[Test]
-    public function percentageCouponWithTaxCalculatesDiscountFromSubtotalNotTotal()
+    public function percentage_coupon_with_tax_calculates_discount_from_subtotal_not_total()
     {
         // 50% coupon on €150 item with 21% VAT, no_tax = false
         // Expected: Discount should be -€75 (50% of €150 subtotal), then tax is applied to the discount
@@ -159,10 +158,10 @@ class PercentageCouponTest extends BaseTestCase
         ]);
         $subscription->orderItems()->save($item);
 
-        /** @var \Laravel\Cashier\Coupon\Coupon $coupon */
+        /** @var Coupon $coupon */
         $coupon = app()->make(CouponRepository::class)->findOrFail('percentage-50-off-taxed');
         $redeemedCoupon = $coupon->redeemFor($subscription);
-        $preprocessor = new CouponOrderItemPreprocessor();
+        $preprocessor = new CouponOrderItemPreprocessor;
 
         $result = $preprocessor->handle($item->toCollection());
 

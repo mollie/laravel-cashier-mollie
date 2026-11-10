@@ -4,13 +4,12 @@ namespace Laravel\Cashier\Tests\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Testing\TestResponse;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\OrderPaymentFailed;
 use Laravel\Cashier\Events\OrderPaymentPaid;
 use Laravel\Cashier\Events\SubscriptionCancelled;
 use Laravel\Cashier\Http\Controllers\WebhookController;
-use Laravel\Cashier\Mollie\Contracts\GetMolliePayment;
-use Laravel\Cashier\Mollie\Contracts\UpdateMolliePayment;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
@@ -18,14 +17,16 @@ use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Laravel\Cashier\Types\SubscriptionCancellationReason;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Http\Data\Money;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
+use Mollie\Api\Types\PaymentStatus;
 use PHPUnit\Framework\Attributes\Test;
 
 class WebhookControllerTest extends BaseTestCase
 {
     #[Test]
-    public function retrievesPaymentResource()
+    public function retrieves_payment_resource()
     {
         $payment = new MolliePayment(resolve(MollieApiClient::class));
         $payment->id = 'tr_123xyz';
@@ -36,7 +37,7 @@ class WebhookControllerTest extends BaseTestCase
     }
 
     #[Test]
-    public function MollieApiExceptionIsCatchedWhenDebugDisabled()
+    public function mollie_api_exception_is_catched_when_debug_disabled()
     {
         $wrongId = 'sub_xxxxxxxxxxx';
         $this->withMockedGetMolliePaymentThrowingException(1, $wrongId);
@@ -46,7 +47,7 @@ class WebhookControllerTest extends BaseTestCase
     }
 
     #[Test]
-    public function MollieApiExceptionIsThrownWhenDebugEnabled()
+    public function mollie_api_exception_is_thrown_when_debug_enabled()
     {
         $wrongId = 'sub_xxxxxxxxxxx';
         $this->withMockedGetMolliePaymentThrowingException(1, $wrongId);
@@ -58,7 +59,7 @@ class WebhookControllerTest extends BaseTestCase
     }
 
     #[Test]
-    public function handlesUnexistingIdGracefully()
+    public function handles_unexisting_id_gracefully()
     {
         $wrongId = 'sub_xxxxxxxxxxx';
         $request = $this->getWebhookRequest($wrongId);
@@ -70,7 +71,7 @@ class WebhookControllerTest extends BaseTestCase
     }
 
     #[Test]
-    public function handlesPaymentFailed()
+    public function handles_payment_failed()
     {
         $this->withConfiguredPlans();
         $this->withTestNow('2019-01-01');
@@ -98,15 +99,15 @@ class WebhookControllerTest extends BaseTestCase
 
         $payment = new MolliePayment(new MollieApiClient);
         $payment->id = $paymentId;
-        $payment->status = 'open';
-        $payment->amount = (object) [
+        $payment->status = PaymentStatus::Open;
+        $payment->amount = Money::fromArray([
             'currency' => 'EUR',
             'value' => '10.00',
-        ];
+        ]);
         $payment->mandateId = 'mdt_dummy_mandate_id';
 
         Cashier::$paymentModel::createFromMolliePayment($payment, $user);
-        $payment->status = 'failed';
+        $payment->status = PaymentStatus::Failed;
 
         $this->withMockedGetMolliePayment(1, $payment);
 
@@ -142,7 +143,7 @@ class WebhookControllerTest extends BaseTestCase
     }
 
     #[Test]
-    public function handlesPaymentPaid()
+    public function handles_payment_paid()
     {
         $this->withConfiguredPlans();
         Event::fake();
@@ -166,14 +167,14 @@ class WebhookControllerTest extends BaseTestCase
 
         $payment = new MolliePayment(new MollieApiClient);
         $payment->id = $paymentId;
-        $payment->status = 'open';
-        $payment->amount = (object) [
+        $payment->status = PaymentStatus::Open;
+        $payment->amount = Money::fromArray([
             'currency' => 'EUR',
             'value' => '10.00',
-        ];
+        ]);
         $payment->mandateId = 'mdt_dummy_mandate_id';
         Cashier::$paymentModel::createFromMolliePayment($payment, $user);
-        $payment->status = 'paid';
+        $payment->status = PaymentStatus::Paid;
 
         $this->withMockedGetMolliePayment(1, $payment);
         $this->withMockedUpdateMolliePayment();
@@ -193,7 +194,7 @@ class WebhookControllerTest extends BaseTestCase
     }
 
     #[Test]
-    public function skipsIfPaymentStatusUnchanged()
+    public function skips_if_payment_status_unchanged()
     {
         Event::fake();
 
@@ -208,7 +209,7 @@ class WebhookControllerTest extends BaseTestCase
 
         $payment = new MolliePayment(new MollieApiClient);
         $payment->id = $paymentId;
-        $payment->status = 'paid';
+        $payment->status = PaymentStatus::Paid;
         $payment->mandateId = 'mdt_dummy_mandate_id';
         $this->withMockedGetMolliePayment(1, $payment);
 
@@ -227,7 +228,6 @@ class WebhookControllerTest extends BaseTestCase
     /**
      * Get a request that mimics Mollie calling the webhook.
      *
-     * @param $id
      * @return Request
      */
     protected function getWebhookRequest($id)
@@ -243,6 +243,6 @@ class WebhookControllerTest extends BaseTestCase
         }
 
         // Laravel v7
-        return new \Illuminate\Testing\TestResponse($response);
+        return new TestResponse($response);
     }
 }

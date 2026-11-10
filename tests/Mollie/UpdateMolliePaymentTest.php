@@ -15,13 +15,13 @@ class UpdateMolliePaymentTest extends BaseMollieInteraction
 {
     #[Test]
     #[Group('mollie_integration')]
-    public function testExecute()
+    public function test_execute()
     {
         /** @var UpdateMolliePayment $action */
         $action = $this->app->make(UpdateMolliePayment::class);
         $payment = Mollie::api()->payments->get($this->getUpdatablePaymentId());
         $oldWebhookUrl = $payment->webhookUrl;
-        $newWebhookUrl = 'https://example.com/' . Str::uuid();
+        $newWebhookUrl = 'https://example.com/'.Str::uuid();
         $payment->webhookUrl = $newWebhookUrl;
 
         $result = $action->execute($payment);

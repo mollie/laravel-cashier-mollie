@@ -16,6 +16,7 @@ use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder;
 use Laravel\Cashier\SubscriptionBuilder\RedirectToCheckoutResponse;
 use Laravel\Cashier\Tests\BaseTestCase;
+use Mollie\Api\Http\Data\Money;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use PHPUnit\Framework\Attributes\Test;
@@ -37,7 +38,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     #[Test]
-    public function createsAFirstPaymentForSubscription()
+    public function creates_a_first_payment_for_subscription()
     {
         $firstPayment = config('cashier_plans.defaults.first_payment');
         $firstPayment['redirect_url'] = 'https://foo-redirect-bar.com';
@@ -99,7 +100,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     #[Test]
-    public function handlesQuantity()
+    public function handles_quantity()
     {
         config(['cashier.locale' => 'nl_NL']);
 
@@ -126,7 +127,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     #[Test]
-    public function handlesAPaidFirstPayment()
+    public function handles_a_paid_first_payment()
     {
         $this->withoutExceptionHandling();
 
@@ -171,7 +172,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     #[Test]
-    public function ignoresADuplicatePaidFirstPaymentWebhook()
+    public function ignores_a_duplicate_paid_first_payment_webhook()
     {
         Event::fake();
 
@@ -206,7 +207,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     #[Test]
-    public function testWithCouponNoTrialValidatesCoupon()
+    public function test_with_coupon_no_trial_validates_coupon()
     {
         $this->expectException(CouponException::class);
         $this->withMockedCouponRepository(null, new InvalidatingCouponHandler);
@@ -214,7 +215,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     #[Test]
-    public function testWithCouponWithTrialValidatesCoupon()
+    public function test_with_coupon_with_trial_validates_coupon()
     {
         $this->expectException(CouponException::class);
         $this->withMockedCouponRepository(null, new InvalidatingCouponHandler);
@@ -222,7 +223,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     #[Test]
-    public function testWithCouponNoTrialModifiesThePaymentAmount()
+    public function test_with_coupon_no_trial_modifies_the_payment_amount()
     {
         $this->withMockedCouponRepository();
         $this->withMockedCreateMolliePayment();
@@ -238,7 +239,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     #[Test]
-    public function testHandlesTrialDays()
+    public function test_handles_trial_days()
     {
         $this->withMockedCreateMolliePayment();
         $this->withMockedGetMollieCustomer(2);
@@ -253,7 +254,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     #[Test]
-    public function testHandlesNoTrialMode()
+    public function test_handles_no_trial_mode()
     {
         $this->withMockedCreateMolliePayment();
         $this->withMockedGetMollieCustomer(2);
@@ -273,10 +274,10 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
         $molliePayment->id = 'tr_unique_payment_id';
         $molliePayment->paidAt = Carbon::now()->toIso8601String();
         $molliePayment->mandateId = 'mdt_unique_mandate_id';
-        $molliePayment->amount = (object) [
+        $molliePayment->amount = Money::fromArray([
             'currency' => 'EUR',
             'value' => '0.05',
-        ];
+        ]);
         $molliePayment->metadata = json_decode(json_encode([
             'owner' => [
                 'type' => get_class($this->user),
@@ -313,7 +314,7 @@ class FirstPaymentSubscriptionBuilderTest extends BaseTestCase
     }
 
     /**
-     * @return \Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder
+     * @return FirstPaymentSubscriptionBuilder
      */
     protected function getBuilder()
     {

@@ -9,7 +9,7 @@ use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 
 class OrderItemTest extends BaseTestCase
 {
-    public function testGetSubtotalAttribute()
+    public function test_get_subtotal_attribute()
     {
         $item = new Cashier::$orderItemModel;
         $item->currency = 'EUR';
@@ -23,7 +23,7 @@ class OrderItemTest extends BaseTestCase
         $this->assertMoneyEURCents(440, $item->getSubtotal());
     }
 
-    public function testGetTaxAttribute()
+    public function test_get_tax_attribute()
     {
         $item = new Cashier::$orderItemModel;
         $item->currency = 'EUR';
@@ -37,7 +37,7 @@ class OrderItemTest extends BaseTestCase
         $this->assertMoneyEURCents(95, $item->getTax());
     }
 
-    public function testGetTotalAttribute()
+    public function test_get_total_attribute()
     {
         $item = new Cashier::$orderItemModel;
         $item->currency = 'EUR';
@@ -51,7 +51,7 @@ class OrderItemTest extends BaseTestCase
         $this->assertMoneyEURCents(535, $item->getTotal());
     }
 
-    public function testGetAttributesAsMoney()
+    public function test_get_attributes_as_money()
     {
         $item = new Cashier::$orderItemModel;
         $item->currency = 'EUR';
@@ -64,7 +64,7 @@ class OrderItemTest extends BaseTestCase
         $this->assertMoneyEURCents(95, $item->getTax());
     }
 
-    public function testScopeProcessed()
+    public function test_scope_processed()
     {
         OrderItemFactory::new()->times(3)->create([
             'order_id' => null,
@@ -78,7 +78,7 @@ class OrderItemTest extends BaseTestCase
         $this->assertEquals(3, Cashier::$orderItemModel::processed(false)->count());
     }
 
-    public function testScopeUnprocessed()
+    public function test_scope_unprocessed()
     {
         OrderItemFactory::new()->times(3)->create([
             'order_id' => null,
@@ -92,7 +92,7 @@ class OrderItemTest extends BaseTestCase
         $this->assertEquals(2, Cashier::$orderItemModel::unprocessed(false)->count());
     }
 
-    public function testScopeShouldProcess()
+    public function test_scope_should_process()
     {
         OrderItemFactory::new()->times(2)->create([
             'order_id' => 1,
@@ -110,7 +110,7 @@ class OrderItemTest extends BaseTestCase
         $this->assertEquals(3, Cashier::$orderItemModel::shouldProcess()->count());
     }
 
-    public function testScopeDue()
+    public function test_scope_due()
     {
         OrderItemFactory::new()->times(2)->create([
             'process_at' => now()->subHour(),
@@ -122,13 +122,13 @@ class OrderItemTest extends BaseTestCase
         $this->assertEquals(2, Cashier::$orderItemModel::due()->count());
     }
 
-    public function testNewCollection()
+    public function test_new_collection()
     {
         $collection = OrderItemFactory::new()->times(2)->make();
         $this->assertInstanceOf(OrderItemCollection::class, $collection);
     }
 
-    public function testIsProcessed()
+    public function test_is_processed()
     {
         $unprocessedItem = OrderItemFactory::new()->make(['order_id' => null]);
         $processedItem = OrderItemFactory::new()->make(['order_id' => 1]);
@@ -138,5 +138,13 @@ class OrderItemTest extends BaseTestCase
 
         $this->assertTrue($processedItem->isProcessed());
         $this->assertFalse($processedItem->isProcessed(false));
+    }
+
+    public function test_scope_scheduled()
+    {
+        OrderItemFactory::new()->times(3)->create(['order_id' => null]);
+        OrderItemFactory::new()->times(3)->create(['order_id' => 1]);
+
+        $this->assertEquals(3, Cashier::$orderItemModel::scheduled()->count());
     }
 }

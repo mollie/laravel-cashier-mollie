@@ -3,6 +3,8 @@
 namespace Laravel\Cashier\Events;
 
 use Illuminate\Queue\SerializesModels;
+use Laravel\Cashier\Order\Order;
+use Laravel\Cashier\Payment;
 
 class OrderPaymentPaid
 {
@@ -11,22 +13,19 @@ class OrderPaymentPaid
     /**
      * The paid order.
      *
-     * @var \Laravel\Cashier\Order\Order
+     * @var Order
      */
     public $order;
 
     /**
      * The paid payment.
      *
-     * @var \Laravel\Cashier\Payment
+     * @var Payment
      */
     public $payment;
 
     /**
      * Creates a new OrderPaymentPaid event.
-     *
-     * @param $order
-     * @param $payment
      */
     public function __construct($order, $payment)
     {

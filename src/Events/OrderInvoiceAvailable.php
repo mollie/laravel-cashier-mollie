@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Events;
 
 use Illuminate\Queue\SerializesModels;
+use Laravel\Cashier\Order\Order;
 
 class OrderInvoiceAvailable
 {
@@ -11,14 +12,12 @@ class OrderInvoiceAvailable
     /**
      * The created order.
      *
-     * @var \Laravel\Cashier\Order\Order
+     * @var Order
      */
     public $order;
 
     /**
      * Creates a new OrderInvoiceAvailable event.
-     *
-     * @param $order
      */
     public function __construct($order)
     {

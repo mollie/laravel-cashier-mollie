@@ -2,6 +2,8 @@
 
 namespace Laravel\Cashier\Plan;
 
+use Carbon\Carbon;
+use Carbon\Traits\Modifiers;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Plan\Contracts\IntervalGeneratorContract;
@@ -23,8 +25,7 @@ class AdvancedIntervalGenerator extends BaseIntervalGenerator implements Interva
     }
 
     /**
-     * @param  \Laravel\Cashier\Subscription|null  $subscription
-     * @return \Carbon\Carbon|\Carbon\Traits\Modifiers
+     * @return Carbon|Modifiers
      */
     public function getEndOfNextSubscriptionCycle(?Subscription $subscription = null)
     {

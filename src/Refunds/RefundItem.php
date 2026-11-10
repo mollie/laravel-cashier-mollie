@@ -24,6 +24,7 @@ use Money\Money;
  * @property string description
  * @property array<string> description_extra_lines
  * @property OrderItem originalOrderItem
+ * @property array|null metadata
  *
  * @method static create(array $array)
  * @method static make(array $array)
@@ -45,6 +46,7 @@ class RefundItem extends Model
         'subtotal' => 'int',
         'tax' => 'int',
         'total' => 'int',
+        'metadata' => 'array',
     ];
 
     /**
@@ -55,8 +57,6 @@ class RefundItem extends Model
     protected $guarded = [];
 
     /**
-     * @param  \Laravel\Cashier\Order\OrderItem  $orderItem
-     * @param  array  $overrides
      * @return static
      */
     public static function makeFromOrderItem(OrderItem $orderItem, array $overrides = []): self
@@ -80,9 +80,6 @@ class RefundItem extends Model
 
     /**
      * Create a new RefundItemCollection instance.
-     *
-     * @param  array  $models
-     * @return \Laravel\Cashier\Refunds\RefundItemCollection
      */
     public function newCollection(array $models = []): RefundItemCollection
     {
@@ -91,8 +88,6 @@ class RefundItem extends Model
 
     /**
      * Get the unit price before taxes and discounts.
-     *
-     * @return \Money\Money
      */
     public function getUnitPrice(): Money
     {
@@ -101,8 +96,6 @@ class RefundItem extends Model
 
     /**
      * Get the order item total after taxes and discounts.
-     *
-     * @return \Money\Money
      */
     public function getTotal(): Money
     {
@@ -111,8 +104,6 @@ class RefundItem extends Model
 
     /**
      * Get the order item total before taxes and discounts.
-     *
-     * @return \Money\Money
      */
     public function getSubtotal(): Money
     {
@@ -133,8 +124,6 @@ class RefundItem extends Model
 
     /**
      * The order item tax as a money value.
-     *
-     * @return \Money\Money
      */
     public function getTax(): Money
     {
@@ -143,8 +132,6 @@ class RefundItem extends Model
 
     /**
      * Get the order item total before taxes.
-     *
-     * @return int
      */
     public function getSubtotalAttribute(): int
     {
@@ -153,8 +140,6 @@ class RefundItem extends Model
 
     /**
      * Get the order item tax money value.
-     *
-     * @return int
      */
     public function getTaxAttribute(): int
     {
@@ -167,8 +152,6 @@ class RefundItem extends Model
 
     /**
      * Get the order item total after taxes.
-     *
-     * @return int
      */
     public function getTotalAttribute(): int
     {
@@ -177,9 +160,6 @@ class RefundItem extends Model
         return (int) $beforeTax->add($this->getTax())->getAmount();
     }
 
-    /**
-     * @return string
-     */
     public function getCurrency(): string
     {
         return $this->currency;

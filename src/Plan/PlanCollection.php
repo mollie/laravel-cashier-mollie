@@ -6,6 +6,4 @@ namespace Laravel\Cashier\Plan;
 
 use Illuminate\Support\Collection;
 
-class PlanCollection extends Collection
-{
-}
+class PlanCollection extends Collection {}

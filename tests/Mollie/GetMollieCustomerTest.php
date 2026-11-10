@@ -13,7 +13,7 @@ class GetMollieCustomerTest extends BaseMollieInteraction
 {
     #[Test]
     #[Group('mollie_integration')]
-    public function testExecute()
+    public function test_execute()
     {
         /** @var GetMollieCustomer $action */
         $action = $this->app->make(GetMollieCustomer::class);

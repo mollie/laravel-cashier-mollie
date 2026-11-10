@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\Test;
 class ManageChargesTest extends BaseTestCase
 {
     #[Test]
-    public function usingMandatedChargeBuilderWhenValidMandate()
+    public function using_mandated_charge_builder_when_valid_mandate()
     {
         $owner = User::factory()->create();
 
@@ -23,7 +23,7 @@ class ManageChargesTest extends BaseTestCase
     }
 
     #[Test]
-    public function useNewMandatedCharge()
+    public function use_new_mandated_charge()
     {
         $this->withMockedGetMollieCustomer(2);
         $this->withMockedGetMollieMandateAccepted(2);
@@ -36,7 +36,7 @@ class ManageChargesTest extends BaseTestCase
     }
 
     #[Test]
-    public function mandatedChargeStillRejectsPendingMandate()
+    public function mandated_charge_still_rejects_pending_mandate()
     {
         // Regression test for issue #289: while the first-payment flow accepts
         // a pending mandate (Mollie has already collected that payment),

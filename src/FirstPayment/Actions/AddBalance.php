@@ -3,17 +3,13 @@
 namespace Laravel\Cashier\FirstPayment\Actions;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Cashier\Order\OrderItemCollection;
 use Money\Money;
 
 class AddBalance extends AddGenericOrderItem
 {
     /**
      * AddBalance constructor.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
-     * @param  \Money\Money  $subtotal
-     * @param  int  $quantity
-     * @param  string  $description
      */
     public function __construct(Model $owner, Money $subtotal, int $quantity, string $description)
     {
@@ -25,7 +21,7 @@ class AddBalance extends AddGenericOrderItem
     /**
      * Execute this action and return the created OrderItemCollection.
      *
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function execute()
     {

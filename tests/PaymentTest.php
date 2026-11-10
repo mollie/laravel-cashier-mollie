@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Tests;
 
 use Laravel\Cashier\Cashier;
+use Mollie\Api\Http\Data\Money;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use PHPUnit\Framework\Attributes\Test;
@@ -10,15 +11,15 @@ use PHPUnit\Framework\Attributes\Test;
 class PaymentTest extends BaseTestCase
 {
     #[Test]
-    public function canCreateFromBasicMolliePayment()
+    public function can_create_from_basic_mollie_payment()
     {
         $molliePayment = new MolliePayment(new MollieApiClient);
         $molliePayment->id = 'tr_dummy_payment_id';
         $molliePayment->status = 'dummy_status';
-        $molliePayment->amount = (object) [
+        $molliePayment->amount = Money::fromArray([
             'currency' => 'EUR',
             'value' => '12.34',
-        ];
+        ]);
         $molliePayment->amountRefunded = null;
         $molliePayment->amountChargedBack = null;
         $molliePayment->mandateId = 'mdt_dummy_mandate_id';
@@ -37,23 +38,23 @@ class PaymentTest extends BaseTestCase
     }
 
     #[Test]
-    public function canCreateFromMolliePaymentWithRefundsAndChargebacks()
+    public function can_create_from_mollie_payment_with_refunds_and_chargebacks()
     {
         $molliePayment = new MolliePayment(new MollieApiClient);
         $molliePayment->id = 'tr_dummy_payment_id';
         $molliePayment->status = 'dummy_status';
-        $molliePayment->amount = (object) [
+        $molliePayment->amount = Money::fromArray([
             'currency' => 'EUR',
             'value' => '12.34',
-        ];
-        $molliePayment->amountRefunded = (object) [
+        ]);
+        $molliePayment->amountRefunded = Money::fromArray([
             'currency' => 'EUR',
             'value' => '3.21',
-        ];
-        $molliePayment->amountChargedBack = (object) [
+        ]);
+        $molliePayment->amountChargedBack = Money::fromArray([
             'currency' => 'EUR',
             'value' => '5.43',
-        ];
+        ]);
         $molliePayment->mandateId = 'mdt_dummy_mandate_id';
         $user = $this->getMandatedUser();
 

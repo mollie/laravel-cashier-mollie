@@ -73,7 +73,7 @@ class SyncSubscriptionPlans extends Command
                         $item->unit_price,
                         $planAmount,
                         $planCurrency,
-                        $descriptionChanged ? ' and from "' . $item->description . '" to "' . $planDescription . '"' : '',
+                        $descriptionChanged ? ' and from "'.$item->description.'" to "'.$planDescription.'"' : '',
                     ));
                 }
             }

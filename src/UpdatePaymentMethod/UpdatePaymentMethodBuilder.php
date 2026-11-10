@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\UpdatePaymentMethod;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
 use Laravel\Cashier\FirstPayment\Actions\AddBalance;
 use Laravel\Cashier\FirstPayment\Actions\AddGenericOrderItem;
 use Laravel\Cashier\FirstPayment\FirstPaymentBuilder;
@@ -19,7 +20,7 @@ class UpdatePaymentMethodBuilder implements Contract
     /**
      * The billable model.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var Model
      */
     protected $owner;
 
@@ -30,8 +31,6 @@ class UpdatePaymentMethodBuilder implements Contract
 
     /**
      * UpdatePaymentMethodBuilder constructor.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
      */
     public function __construct(Model $owner)
     {
@@ -39,7 +38,7 @@ class UpdatePaymentMethodBuilder implements Contract
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function create()
     {
@@ -82,7 +81,7 @@ class UpdatePaymentMethodBuilder implements Contract
     }
 
     /**
-     * @return \Laravel\Cashier\FirstPayment\Actions\AddBalance[]|\Laravel\Cashier\FirstPayment\Actions\AddGenericOrderItem[]
+     * @return AddBalance[]|AddGenericOrderItem[]
      */
     protected function getPaymentActions()
     {
@@ -94,7 +93,7 @@ class UpdatePaymentMethodBuilder implements Contract
     }
 
     /**
-     * @return \Laravel\Cashier\FirstPayment\Actions\AddBalance
+     * @return AddBalance
      */
     protected function addToBalanceAction()
     {
@@ -108,7 +107,7 @@ class UpdatePaymentMethodBuilder implements Contract
     }
 
     /**
-     * @return \Laravel\Cashier\FirstPayment\Actions\AddGenericOrderItem
+     * @return AddGenericOrderItem
      */
     protected function addGenericItemAction()
     {
@@ -121,9 +120,7 @@ class UpdatePaymentMethodBuilder implements Contract
     }
 
     /**
-     * @param  \Money\Money  $total
-     * @param  float  $taxPercentage
-     * @return \Money\Money
+     * @return Money
      */
     protected function subtotalForTotalIncludingTax(Money $total, float $taxPercentage)
     {

@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Laravel\Cashier\Mollie;
 
+use Mollie\Api\MollieApiClient;
 use Mollie\Api\MollieApiClient as Mollie;
 
 abstract class BaseMollieInteraction
 {
     /**
-     * @var \Mollie\Api\MollieApiClient
+     * @var MollieApiClient
      */
     protected $mollie;
 

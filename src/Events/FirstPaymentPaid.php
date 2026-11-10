@@ -4,13 +4,14 @@ namespace Laravel\Cashier\Events;
 
 use Illuminate\Queue\SerializesModels;
 use Laravel\Cashier\Order\Order;
+use Mollie\Api\Resources\Payment;
 
 class FirstPaymentPaid
 {
     use SerializesModels;
 
     /**
-     * @var \Mollie\Api\Resources\Payment
+     * @var Payment
      */
     public $payment;
 

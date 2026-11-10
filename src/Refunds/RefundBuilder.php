@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Laravel\Cashier\Refunds;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\RefundInitiated;
 use Laravel\Cashier\Mollie\Contracts\CreateMollieRefund;
@@ -12,22 +14,15 @@ use Laravel\Cashier\Order\OrderItem;
 use Laravel\Cashier\Order\OrderItemCollection;
 use LogicException;
 use Mollie\Api\Types\PaymentStatus;
+use Mollie\Api\Types\RefundStatus;
+use Money\Money;
 
 class RefundBuilder
 {
-    /**
-     * @var \Laravel\Cashier\Order\Order
-     */
     protected Order $order;
 
-    /**
-     * @var \Laravel\Cashier\Refunds\RefundItemCollection
-     */
     protected RefundItemCollection $items;
 
-    /**
-     * @var CreateMollieRefund
-     */
     protected CreateMollieRefund $createMollieRefund;
 
     public function __construct(Order $order)
@@ -79,35 +74,146 @@ class RefundBuilder
     protected static function guardOrderIsPaid(Order $order)
     {
         throw_unless(
-            $order->mollie_payment_status === PaymentStatus::PAID,
+            $order->mollie_payment_status === PaymentStatus::Paid->value,
             new LogicException('Only paid orders can be refunded')
         );
     }
 
+    /**
+     * The amount that will be charged back through Mollie. An order can be paid partly from
+     * the owner's credit balance, in which case only the amount that was actually charged
+     * (total_due) can be refunded through Mollie. The remainder is returned to the balance
+     * once Mollie confirms the refund.
+     */
+    public function getMollieRefundAmount(): Money
+    {
+        return Money::min($this->items->getTotal(), $this->order->getTotalDueRefundable());
+    }
+
     public function create(): Refund
     {
+        $refund = DB::transaction(function () {
+            // Refresh stale builders and serialize refund initiation for this order. Until a
+            // refund finishes, its cash/credit split cannot be derived from amount_refunded.
+            $this->order = Cashier::$orderModel::whereKey($this->order->getKey())->lockForUpdate()->firstOrFail();
+            static::guardOrderIsPaid($this->order);
+
+            throw_if(
+                $this->order->refunds()->whereNotIn('mollie_refund_status', [
+                    RefundStatus::Refunded->value,
+                    RefundStatus::Failed->value,
+                    RefundStatus::Canceled->value,
+                ])->exists(),
+                new LogicException('Wait for the outstanding refund to finish before refunding this order again.')
+            );
+
+            return $this->createLocked();
+        });
+
+        // A remote refund is already recorded if a listener fails. Retrying must not send
+        // a second refund to Mollie. Local refunds dispatch inside their atomic transaction.
+        if (! $refund->isLocal()) {
+            event(new RefundInitiated($refund));
+        }
+
+        return $refund;
+    }
+
+    protected function createLocked(): Refund
+    {
         $currency = $this->order->getCurrency();
+        $refundAmount = $this->items->getTotal();
+        $mollieRefundAmount = $this->getMollieRefundAmount();
+
+        // A refund reverses order value, so it can never reverse more than the order has
+        // left. Capping only the Mollie amount would still record the full item total
+        // against the order, inflating amount_refunded and the credit orders built from it.
+        $this->guardDoesNotExceedRemainingOrderValue($refundAmount, $currency);
+
+        if (! $mollieRefundAmount->isPositive()) {
+            return DB::transaction(function () use ($refundAmount) {
+                $this->order = Cashier::$orderModel::whereKey($this->order->getKey())
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                throw_unless(
+                    $this->isCreditOnlyFollowUp($refundAmount),
+                    new LogicException(
+                        'There is nothing left to refund through Mollie for order '.$this->order->getKey().'. '.
+                        'An order that was paid entirely using credit, or that was already fully refunded, '.
+                        'cannot be refunded through Mollie.'
+                    )
+                );
+
+                $refundRecord = $this->createRefundRecord(
+                    'local_'.Str::uuid(),
+                    RefundStatus::Pending->value,
+                    $this->order->getCurrency(),
+                    new RefundItemCollection(
+                        $this->items->map(fn (RefundItem $item) => $item->replicate())->all()
+                    )
+                );
+
+                return $refundRecord->handleProcessed();
+            });
+        }
 
         $mollieRefund = $this->createMollieRefund->execute($this->order->mollie_payment_id, [
             'amount' => [
-                'value' => money_to_decimal($this->items->getTotal()),
+                'value' => money_to_decimal($mollieRefundAmount),
                 'currency' => $currency,
             ],
         ]);
 
+        return $this->createRefundRecord($mollieRefund->id, mollie_enum_value($mollieRefund->status), $currency, dispatchEvent: false);
+    }
+
+    protected function guardDoesNotExceedRemainingOrderValue(Money $refundAmount, string $currency): void
+    {
+        $refundable = $this->order->getTotalRefundable();
+
+        throw_unless(
+            $refundAmount->lessThanOrEqual($refundable),
+            new LogicException(
+                'Cannot refund '.money_to_decimal($refundAmount).' '.$currency.
+                ' for order '.$this->order->getKey().': only '.money_to_decimal($refundable).
+                ' '.$currency.' of the order value is still refundable.'
+            )
+        );
+    }
+
+    protected function isCreditOnlyFollowUp(Money $refundAmount): bool
+    {
+        $amountRefundable = $this->order->getTotalRefundable();
+
+        return $this->order->getAmountRefunded()->isPositive()
+            && $refundAmount->isPositive()
+            && $amountRefundable->isPositive()
+            && $refundAmount->lessThanOrEqual($amountRefundable);
+    }
+
+    protected function createRefundRecord(
+        string $mollieRefundId,
+        string $status,
+        string $currency,
+        ?RefundItemCollection $items = null,
+        bool $dispatchEvent = true
+    ): Refund {
         $refundRecord = Cashier::$refundModel::create([
             'owner_type' => $this->order->owner_type,
             'owner_id' => $this->order->owner_id,
             'original_order_id' => $this->order->getKey(),
             'total' => $this->items->getTotal()->getAmount(),
             'currency' => $currency,
-            'mollie_refund_id' => $mollieRefund->id,
-            'mollie_refund_status' => $mollieRefund->status,
+            'mollie_refund_id' => $mollieRefundId,
+            'mollie_refund_status' => $status,
         ]);
 
-        $refundRecord->items()->saveMany($this->items);
+        $refundRecord->items()->saveMany($items ?? $this->items);
 
-        event(new RefundInitiated($refundRecord));
+        if ($dispatchEvent) {
+            event(new RefundInitiated($refundRecord));
+        }
 
         return $refundRecord;
     }

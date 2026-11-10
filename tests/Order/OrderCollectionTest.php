@@ -11,7 +11,7 @@ use PHPUnit\Framework\Attributes\Test;
 class OrderCollectionTest extends BaseTestCase
 {
     #[Test]
-    public function canGetInvoices()
+    public function can_get_invoices()
     {
         $user = User::factory()->create();
         $orders = $user->orders()->saveMany(OrderFactory::new()->times(2)->make());

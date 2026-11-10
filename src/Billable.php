@@ -3,39 +3,51 @@
 namespace Laravel\Cashier;
 
 use Dompdf\Options;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Laravel\Cashier\Charge\ManagesCharges;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
+use Laravel\Cashier\Coupon\Coupon;
 use Laravel\Cashier\Events\MandateClearedFromBillable;
+use Laravel\Cashier\Exceptions\CouponException;
+use Laravel\Cashier\Exceptions\CouponNotFoundException;
 use Laravel\Cashier\Exceptions\InvalidMandateException;
 use Laravel\Cashier\Exceptions\MandateIsNotYetFinalizedException;
+use Laravel\Cashier\Exceptions\PlanNotFoundException;
 use Laravel\Cashier\Mollie\Contracts\CreateMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieCustomer;
 use Laravel\Cashier\Mollie\Contracts\GetMollieMandate;
 use Laravel\Cashier\Order\Invoice;
 use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Plan\Contracts\PlanRepository;
+use Laravel\Cashier\SubscriptionBuilder\Contracts\SubscriptionBuilder;
 use Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder;
 use Laravel\Cashier\SubscriptionBuilder\MandatedSubscriptionBuilder;
 use Laravel\Cashier\Traits\PopulatesMollieCustomerFields;
 use Laravel\Cashier\UpdatePaymentMethod\UpdatePaymentMethodBuilder;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Customer;
+use Mollie\Api\Resources\Mandate;
 use Mollie\Api\Types\MandateMethod;
 use Money\Money;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait Billable
 {
-    use PopulatesMollieCustomerFields;
     use ManagesCharges;
+    use PopulatesMollieCustomerFields;
 
     /**
      * Get all of the subscriptions for the billable model.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function subscriptions()
     {
@@ -46,16 +58,16 @@ trait Billable
      * Get a subscription instance by name for the billable model.
      *
      * @param  string  $subscription
-     * @return \Laravel\Cashier\Subscription|null
+     * @return Subscription|null
      */
     public function subscription($subscription = 'default')
     {
         return $this->subscriptions->sortByDesc(function ($value) {
             return $value->created_at->getTimestamp();
         })
-        ->first(function ($value) use ($subscription) {
-            return $value->name === $subscription;
-        });
+            ->first(function ($value) use ($subscription) {
+                return $value->name === $subscription;
+            });
     }
 
     /**
@@ -65,10 +77,10 @@ trait Billable
      * @param  string  $subscription
      * @param  string  $plan
      * @param  array  $firstPaymentOptions
-     * @return \Laravel\Cashier\SubscriptionBuilder\Contracts\SubscriptionBuilder
+     * @return SubscriptionBuilder
      *
-     * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
-     * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
+     * @throws InvalidMandateException
+     * @throws PlanNotFoundException
      * @throws \Throwable
      */
     public function newSubscription($subscription, $plan, $firstPaymentOptions = [])
@@ -95,12 +107,10 @@ trait Billable
      * Begin creating a new subscription. The customer will always be redirected to Mollie's checkout to make the first
      * mandate payment.
      *
-     * @param $subscription
-     * @param $plan
      * @param  array  $firstPaymentOptions
-     * @return \Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder
+     * @return FirstPaymentSubscriptionBuilder
      *
-     * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
+     * @throws PlanNotFoundException
      */
     public function newSubscriptionViaMollieCheckout($subscription, $plan, $firstPaymentOptions = [])
     {
@@ -113,10 +123,10 @@ trait Billable
      * @param  string  $mandateId
      * @param  string  $subscription
      * @param  string  $plan
-     * @return \Laravel\Cashier\SubscriptionBuilder\MandatedSubscriptionBuilder
+     * @return MandatedSubscriptionBuilder
      *
-     * @throws \Laravel\Cashier\Exceptions\PlanNotFoundException
-     * @throws \Throwable|\Laravel\Cashier\Exceptions\InvalidMandateException
+     * @throws PlanNotFoundException
+     * @throws \Throwable|InvalidMandateException
      */
     public function newSubscriptionForMandateId($mandateId, $subscription, $plan)
     {
@@ -157,7 +167,6 @@ trait Billable
     /**
      * Create a Mollie customer for the billable model.
      *
-     * @param  array  $override_options
      * @return Customer
      */
     public function createAsMollieCustomer(array $override_options = [])
@@ -261,8 +270,6 @@ trait Billable
 
     /**
      * Determine if the billable model has any active subscription.
-     *
-     * @return bool
      */
     public function hasActiveSubscription(): bool
     {
@@ -271,8 +278,8 @@ trait Billable
             ->whereActive()
             ->exists();
     }
+
     /**
-     * @param $plans
      * @param  string  $subscription
      * @return bool
      */
@@ -301,7 +308,7 @@ trait Billable
     /**
      * Get all of the Orders for the billable model.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function orders()
     {
@@ -311,7 +318,7 @@ trait Billable
     /**
      * Get all of the Order Items for the billable model.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function orderItems()
     {
@@ -321,7 +328,7 @@ trait Billable
     /**
      * Get the balances for the billable model. A separate balance is kept for each currency.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function credits()
     {
@@ -351,8 +358,7 @@ trait Billable
     /**
      * Retrieve the credit balance for the billable model for a specific currency.
      *
-     * @param $currency
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return Model
      */
     public function credit($currency)
     {
@@ -371,7 +377,6 @@ trait Billable
     /**
      * Add a credit amount for the billable model balance.
      *
-     * @param  \Money\Money  $amount
      * @return $this
      */
     public function addCredit(Money $amount)
@@ -384,7 +389,6 @@ trait Billable
     /**
      * Use this model's max amount of credit.
      *
-     * @param  \Money\Money  $amount
      * @return Money
      */
     public function maxOutCredit(Money $amount)
@@ -407,7 +411,7 @@ trait Billable
     /**
      * Get the invoice instances for this model.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public function invoices()
     {
@@ -417,11 +421,9 @@ trait Billable
     /**
      * Create an invoice download response.
      *
-     * @param $orderId
      * @param  null|array  $data
      * @param  string  $view
-     * @param  \Dompdf\Options|null  $options
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function downloadInvoice($orderId, $data = [], $view = Invoice::DEFAULT_VIEW, ?Options $options = null)
     {
@@ -452,9 +454,9 @@ trait Billable
     /**
      * Retrieve the Mollie Mandate for the billable model.
      *
-     * @return \Mollie\Api\Resources\Mandate|null
+     * @return Mandate|null
      *
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws ApiException
      */
     public function mollieMandate()
     {
@@ -509,7 +511,7 @@ trait Billable
      *
      * @return bool
      *
-     * @throws \Laravel\Cashier\Exceptions\MandateIsNotYetFinalizedException
+     * @throws MandateIsNotYetFinalizedException
      */
     public function validateMollieMandate(bool $acceptPending = false)
     {
@@ -518,7 +520,7 @@ trait Billable
                 return true;
             }
 
-            throw new MandateIsNotYetFinalizedException();
+            throw new MandateIsNotYetFinalizedException;
         }
 
         if ($this->validMollieMandate()) {
@@ -533,18 +535,18 @@ trait Billable
     /**
      * @return bool
      *
-     * @throws \Laravel\Cashier\Exceptions\InvalidMandateException
-     * @throws \Laravel\Cashier\Exceptions\MandateIsNotYetFinalizedException
+     * @throws InvalidMandateException
+     * @throws MandateIsNotYetFinalizedException
      */
     public function guardMollieMandate(bool $acceptPending = false)
     {
-        throw_unless($this->validateMollieMandate($acceptPending), new InvalidMandateException());
+        throw_unless($this->validateMollieMandate($acceptPending), new InvalidMandateException);
 
         return true;
     }
 
     /**
-     * @return \Laravel\Cashier\Billable
+     * @return Billable
      */
     public function clearMollieMandate()
     {
@@ -570,9 +572,9 @@ trait Billable
      * @param  bool  $revokeOtherCoupons
      * @return $this
      *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     * @throws \Laravel\Cashier\Exceptions\CouponNotFoundException
-     * @throws \Throwable|\Laravel\Cashier\Exceptions\CouponException
+     * @throws BindingResolutionException
+     * @throws CouponNotFoundException
+     * @throws \Throwable|CouponException
      */
     public function redeemCoupon($coupon, $subscription = 'default', $revokeOtherCoupons = true)
     {
@@ -582,7 +584,7 @@ trait Billable
             throw new InvalidArgumentException('Unable to apply coupon. Subscription does not exist.');
         }
 
-        /** @var \Laravel\Cashier\Coupon\Coupon $coupon */
+        /** @var Coupon $coupon */
         $coupon = app()->make(CouponRepository::class)->findOrFail($coupon);
         $coupon->validateFor($subscription);
 
@@ -601,7 +603,7 @@ trait Billable
     /**
      * Retrieve the redeemed coupons.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function redeemedCoupons()
     {
@@ -609,7 +611,7 @@ trait Billable
     }
 
     /**
-     * @return \Laravel\Cashier\UpdatePaymentMethod\UpdatePaymentMethodBuilder
+     * @return UpdatePaymentMethodBuilder
      */
     public function updatePaymentMethod()
     {
@@ -619,10 +621,9 @@ trait Billable
     /**
      * Find an invoice using an order number.
      *
-     * @param $orderNumber
-     * @return \Laravel\Cashier\Order\Invoice|null
+     * @return Invoice|null
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     * @throws AccessDeniedHttpException
      */
     public function findInvoice($orderNumber)
     {
@@ -643,11 +644,10 @@ trait Billable
     /**
      * Find an invoice using an order number or throw a NotFoundHttpException.
      *
-     * @param $orderNumber
-     * @return \Laravel\Cashier\Order\Invoice
+     * @return Invoice
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     * @throws NotFoundHttpException
+     * @throws AccessDeniedHttpException
      */
     public function findInvoiceOrFail($orderNumber)
     {
@@ -663,10 +663,9 @@ trait Billable
     /**
      * Find an invoice by order id.
      *
-     * @param $orderId
-     * @return \Laravel\Cashier\Order\Invoice|null
+     * @return Invoice|null
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     * @throws AccessDeniedHttpException
      */
     public function findInvoiceByOrderId($orderId)
     {
@@ -685,11 +684,10 @@ trait Billable
     }
 
     /**
-     * @param $orderId
-     * @return \Laravel\Cashier\Order\Invoice
+     * @return Invoice
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws AccessDeniedHttpException
+     * @throws NotFoundHttpException
      */
     public function findInvoiceByOrderIdOrFail($orderId)
     {

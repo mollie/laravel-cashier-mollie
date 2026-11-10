@@ -9,7 +9,10 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\ChargebackReceived;
 use Laravel\Cashier\Order\Order;
+use Laravel\Cashier\Payment;
 use Laravel\Cashier\Refunds\Refund;
+use Laravel\Cashier\Refunds\RefundCollection;
+use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Resources\Refund as MollieRefund;
 use Mollie\Api\Types\RefundStatus;
@@ -20,10 +23,9 @@ use Symfony\Component\HttpFoundation\Response;
 class AftercareWebhookController extends BaseWebhookController
 {
     /**
-     * @param  Request  $request
      * @return Response
      *
-     * @throws \Mollie\Api\Exceptions\ApiException Only in debug mode
+     * @throws ApiException Only in debug mode
      */
     public function handleWebhook(Request $request)
     {
@@ -33,7 +35,7 @@ class AftercareWebhookController extends BaseWebhookController
             /** @var Order|null $order */
             $order = Cashier::$orderModel::findByMolliePaymentId($molliePayment->id);
 
-            if (!$order) {
+            if (! $order) {
                 return new Response(null, config('app.debug') ? 404 : 200);
             }
 
@@ -41,10 +43,10 @@ class AftercareWebhookController extends BaseWebhookController
         }
 
         if ($molliePayment && $molliePayment->hasChargebacks()) {
-            /** @var \Laravel\Cashier\Payment|null $localPayment */
+            /** @var Payment|null $localPayment */
             $localPayment = Cashier::$paymentModel::findByPaymentId($molliePayment->id);
 
-            if (!$localPayment) {
+            if (! $localPayment) {
                 return new Response(null, config('app.debug') ? 404 : 200);
             }
 
@@ -61,7 +63,7 @@ class AftercareWebhookController extends BaseWebhookController
                 // A transaction alone does not lock rows that were read earlier. Re-read this
                 // payment with `SELECT ... FOR UPDATE` so concurrent aftercare deliveries cannot
                 // both compute the same old charged-back total and dispatch the event twice.
-                /** @var \Laravel\Cashier\Payment|null $localPayment */
+                /** @var Payment|null $localPayment */
                 $localPayment = Cashier::$paymentModel::whereKey($localPayment->getKey())->lockForUpdate()->first();
 
                 if (! $localPayment) {
@@ -93,7 +95,7 @@ class AftercareWebhookController extends BaseWebhookController
 
     protected function handleRefunds(Order $order, MolliePayment $molliePayment)
     {
-        /** @var \Laravel\Cashier\Refunds\RefundCollection $localRefunds */
+        /** @var RefundCollection $localRefunds */
         $localRefunds = $order->refunds()->whereUnprocessed()->get();
         $mollieRefunds = collect($molliePayment->refunds());
 
@@ -102,10 +104,10 @@ class AftercareWebhookController extends BaseWebhookController
             $mollieRefund = $this->extractMatchingMollieRefundForLocalRefund($localRefund, $mollieRefunds);
 
             if ($mollieRefund) {
-                if ($mollieRefund->isTransferred() && $localRefund->mollie_refund_status !== RefundStatus::REFUNDED) {
+                if ($mollieRefund->isTransferred() && $localRefund->mollie_refund_status !== RefundStatus::Refunded->value) {
                     $localRefund->handleProcessed();
                     $paymentAmountRefundedHasChanged = true;
-                } elseif ($mollieRefund->isFailed() && $localRefund->mollie_refund_status !== RefundStatus::FAILED) {
+                } elseif (($mollieRefund->isFailed() || $mollieRefund->isCanceled()) && $localRefund->mollie_refund_status !== RefundStatus::Failed->value) {
                     $localRefund->handleFailed();
                     $paymentAmountRefundedHasChanged = true;
                 }
@@ -124,8 +126,6 @@ class AftercareWebhookController extends BaseWebhookController
     }
 
     /**
-     * @param  \Laravel\Cashier\Refunds\Refund  $localRefund
-     * @param  \Illuminate\Support\Collection  $mollieRefunds
      * @return MollieRefund|null
      */
     protected function extractMatchingMollieRefundForLocalRefund(Refund $localRefund, Collection $mollieRefunds)

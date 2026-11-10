@@ -10,16 +10,14 @@ class MandateUpdated
 {
     use SerializesModels;
 
-    /** @var \Illuminate\Database\Eloquent\Model */
+    /** @var Model */
     public $owner;
 
-    /** @var \Mollie\Api\Resources\Payment */
+    /** @var Payment */
     public $payment;
 
     /**
      * MandateUpdated constructor.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
      */
     public function __construct(Model $owner, Payment $payment)
     {

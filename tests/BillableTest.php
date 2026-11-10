@@ -4,24 +4,22 @@ namespace Laravel\Cashier\Tests;
 
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Coupon\RedeemedCouponCollection;
-use Laravel\Cashier\Subscription;
-use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
-use Laravel\Cashier\Tests\Database\Factories\RedeemedCouponFactory;
 use Laravel\Cashier\Events\MandateClearedFromBillable;
 use Laravel\Cashier\Exceptions\MandateIsNotYetFinalizedException;
 use Laravel\Cashier\Order\Invoice;
 use Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder;
 use Laravel\Cashier\SubscriptionBuilder\MandatedSubscriptionBuilder;
-use Laravel\Cashier\Tests\Database\Factories\SubscriptionFactory;
+use Laravel\Cashier\Tests\Database\Factories\OrderFactory;
+use Laravel\Cashier\Tests\Database\Factories\RedeemedCouponFactory;
 use Laravel\Cashier\Tests\Fixtures\User;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use PHPUnit\Framework\Attributes\Test;
 
 class BillableTest extends BaseTestCase
 {
     #[Test]
-    public function testTaxPercentage()
+    public function test_tax_percentage()
     {
         $user = User::factory()->create([
             'tax_percentage' => 21.5,
@@ -31,7 +29,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function returnsFirstPaymentSubscriptionBuilderIfMandateIdOnOwnerIsNull()
+    public function returns_first_payment_subscription_builder_if_mandate_id_on_owner_is_null()
     {
         $this->withConfiguredPlans();
         $user = $this->getUser(false, ['mollie_mandate_id' => null]);
@@ -42,7 +40,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function returnsFirstPaymentSubscriptionBuilderIfOwnerMandateIsInvalid()
+    public function returns_first_payment_subscription_builder_if_owner_mandate_is_invalid()
     {
         $this->withConfiguredPlans();
         $this->withMockedGetMollieCustomer();
@@ -59,7 +57,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function throwExceptionIfMandateIsInPendingState()
+    public function throw_exception_if_mandate_is_in_pending_state()
     {
         $this->expectException(MandateIsNotYetFinalizedException::class);
 
@@ -72,7 +70,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function validateMollieMandateAcceptsPendingWhenOptedIn()
+    public function validate_mollie_mandate_accepts_pending_when_opted_in()
     {
         // Regression test for issue #289: callers in the first-payment flow can
         // opt in to treating a pending mandate as valid, because Mollie has
@@ -85,7 +83,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function validateMollieMandateStillRejectsPendingByDefault()
+    public function validate_mollie_mandate_still_rejects_pending_by_default()
     {
         $this->expectException(MandateIsNotYetFinalizedException::class);
 
@@ -97,7 +95,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function returnsDefaultSubscriptionBuilderIfOwnerHasValidMandateId()
+    public function returns_default_subscription_builder_if_owner_has_valid_mandate_id()
     {
         $this->withConfiguredPlans();
         $this->withMockedGetMollieCustomer();
@@ -113,7 +111,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function canRetrieveRedeemedCoupons()
+    public function can_retrieve_redeemed_coupons()
     {
         $user = User::factory()->create();
 
@@ -123,7 +121,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function canRedeemCouponForExistingSubscription()
+    public function can_redeem_coupon_for_existing_subscription()
     {
         $this->withConfiguredPlans();
         $this->withMockedCouponRepository(); // 'test-coupon'
@@ -146,7 +144,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function canRedeemCouponAndRevokeOtherCoupons()
+    public function can_redeem_coupon_and_revoke_other_coupons()
     {
         $this->withConfiguredPlans();
         $this->withMockedCouponRepository(); // 'test-coupon'
@@ -172,7 +170,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function clearMollieMandate()
+    public function clear_mollie_mandate()
     {
         Event::fake();
         $user = $this->getUser(true, ['mollie_mandate_id' => 'foo-bar']);
@@ -190,7 +188,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function canFindInvoice()
+    public function can_find_invoice()
     {
         $user = $this->getUser();
         OrderFactory::times(2)->create([
@@ -205,7 +203,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function findInvoiceReturnsNullIfInvoiceDoesNotExist()
+    public function find_invoice_returns_null_if_invoice_does_not_exist()
     {
         $user = $this->getUser();
 
@@ -215,7 +213,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function findInvoiceThrowsExceptionIfInvoiceExistButIsAssociatedWithOtherBillableModel()
+    public function find_invoice_throws_exception_if_invoice_exist_but_is_associated_with_other_billable_model()
     {
         $userA = $this->getUser();
         OrderFactory::new()->create([
@@ -231,7 +229,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function canFindInvoiceUsingFindInvoiceOrFail()
+    public function can_find_invoice_using_find_invoice_or_fail()
     {
         $user = $this->getUser();
         OrderFactory::times(2)->create([
@@ -246,7 +244,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function findInvoiceOrFailThrowsExceptionWhenNotFindingTheInvoice()
+    public function find_invoice_or_fail_throws_exception_when_not_finding_the_invoice()
     {
         $user = $this->getUser();
 
@@ -256,7 +254,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function findInvoiceOrFailThrowsExceptionIfInvoiceExistButIsAssociatedWithOtherBillableModel()
+    public function find_invoice_or_fail_throws_exception_if_invoice_exist_but_is_associated_with_other_billable_model()
     {
         $userA = $this->getUser();
         OrderFactory::new()->create([
@@ -272,7 +270,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function canFindInvoiceByOrderId()
+    public function can_find_invoice_by_order_id()
     {
         $user = $this->getUser();
 
@@ -294,7 +292,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function canFindInvoiceByOrderIdUsingFindInvoiceByOrderIdOrFail()
+    public function can_find_invoice_by_order_id_using_find_invoice_by_order_id_or_fail()
     {
         $user = $this->getUser();
 
@@ -316,7 +314,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function testHasActiveSubscription()
+    public function test_has_active_subscription()
     {
         $this->withConfiguredPlans();
         $this->withMockedCouponRepository(); // 'test-coupon'
@@ -333,7 +331,7 @@ class BillableTest extends BaseTestCase
     }
 
     #[Test]
-    public function testHasActiveSubscriptionsFalse()
+    public function test_has_active_subscriptions_false()
     {
         $user = User::factory()->create();
 

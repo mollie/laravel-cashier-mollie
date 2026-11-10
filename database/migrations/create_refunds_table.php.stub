@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRefundsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -23,6 +23,7 @@ class CreateRefundsTable extends Migration
             $table->string('mollie_refund_status');
             $table->integer('total');
             $table->string('currency', 3);
+            $table->text('metadata')->nullable();
             $table->timestamps();
         });
     }
@@ -36,4 +37,4 @@ class CreateRefundsTable extends Migration
     {
         Schema::dropIfExists('refunds');
     }
-}
+};

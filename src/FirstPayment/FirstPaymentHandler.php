@@ -2,23 +2,27 @@
 
 namespace Laravel\Cashier\FirstPayment;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\MandateUpdated;
 use Laravel\Cashier\FirstPayment\Actions\BaseAction;
+use Laravel\Cashier\Order\Order;
 use Laravel\Cashier\Order\OrderItemCollection;
+use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Payment as MolliePayment;
 
 class FirstPaymentHandler
 {
-    /** @var \Illuminate\Database\Eloquent\Model */
+    /** @var Model */
     protected $owner;
 
-    /** @var \Mollie\Api\Resources\Payment */
+    /** @var Payment */
     protected $molliePayment;
 
-    /** @var \Illuminate\Support\Collection */
+    /** @var Collection */
     protected $actions;
 
     /** @var bool */
@@ -26,8 +30,6 @@ class FirstPaymentHandler
 
     /**
      * FirstPaymentHandler constructor.
-     *
-     * @param  \Mollie\Api\Resources\Payment  $molliePayment
      */
     public function __construct(MolliePayment $molliePayment)
     {
@@ -39,7 +41,7 @@ class FirstPaymentHandler
     /**
      * Execute all actions for the mandate payment and return the created Order.
      *
-     * @return \Laravel\Cashier\Order\Order
+     * @return Order
      */
     public function execute()
     {
@@ -64,7 +66,7 @@ class FirstPaymentHandler
 
             $order = Cashier::$orderModel::createProcessedFromItems($orderItems, [
                 'mollie_payment_id' => $this->molliePayment->id,
-                'mollie_payment_status' => $this->molliePayment->status,
+                'mollie_payment_status' => mollie_enum_value($this->molliePayment->status),
             ]);
 
             // It's possible a payment from Cashier v1 is not yet tracked in the Cashier database.
@@ -77,7 +79,7 @@ class FirstPaymentHandler
 
             $localPayment->update([
                 'order_id' => $order->id,
-                'mollie_payment_status' => $this->molliePayment->status,
+                'mollie_payment_status' => mollie_enum_value($this->molliePayment->status),
                 'mollie_mandate_id' => $this->molliePayment->mandateId,
             ]);
 
@@ -104,7 +106,7 @@ class FirstPaymentHandler
     /**
      * Fetch the owner model using the mandate payment metadata.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return Model
      */
     protected function extractOwner()
     {
@@ -119,7 +121,7 @@ class FirstPaymentHandler
     /**
      * Build the action objects from the payment metadata.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     protected function extractActions()
     {
@@ -143,11 +145,11 @@ class FirstPaymentHandler
      * Execute the Actions and return a collection of the resulting OrderItems.
      * These OrderItems are already paid for using the mandate payment.
      *
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     protected function executeActions()
     {
-        $orderItems = new OrderItemCollection();
+        $orderItems = new OrderItemCollection;
 
         $this->actions->each(function (BaseAction $action) use (&$orderItems) {
             $orderItems = $orderItems->concat($action->execute());
@@ -159,7 +161,7 @@ class FirstPaymentHandler
     /**
      * Retrieve the owner object.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return Model
      */
     public function getOwner()
     {
@@ -169,7 +171,7 @@ class FirstPaymentHandler
     /**
      * Retrieve all Action objects.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function getActions()
     {

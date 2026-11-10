@@ -15,7 +15,7 @@ class CreateMollieCustomerTest extends BaseMollieInteraction
 
     #[Test]
     #[Group('mollie_integration')]
-    public function testExecute()
+    public function test_execute()
     {
         /** @var CreateMollieCustomer $action */
         $action = $this->app->make(CreateMollieCustomer::class);

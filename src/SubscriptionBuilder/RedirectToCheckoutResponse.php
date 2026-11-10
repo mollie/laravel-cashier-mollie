@@ -10,18 +10,16 @@ class RedirectToCheckoutResponse extends RedirectResponse
     /** @var array */
     protected $context = [];
 
-    /** @var \Mollie\Api\Resources\Payment */
+    /** @var Payment */
     protected $payment;
 
     /**
-     * @var \Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder
+     * @var FirstPaymentSubscriptionBuilder
      */
     protected $firstPaymentSubscriptionBuilder;
 
     /**
-     * @param  \Mollie\Api\Resources\Payment  $payment
-     * @param  array  $context
-     * @return \Laravel\Cashier\SubscriptionBuilder\RedirectToCheckoutResponse
+     * @return RedirectToCheckoutResponse
      */
     public static function forPayment(Payment $payment, array $context = [])
     {
@@ -33,9 +31,7 @@ class RedirectToCheckoutResponse extends RedirectResponse
     }
 
     /**
-     * @param  \Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder  $builder
-     * @param  array  $context
-     * @return \Laravel\Cashier\SubscriptionBuilder\RedirectToCheckoutResponse
+     * @return RedirectToCheckoutResponse
      */
     public static function forFirstPaymentSubscriptionBuilder(FirstPaymentSubscriptionBuilder $builder, array $context = [])
     {
@@ -48,7 +44,7 @@ class RedirectToCheckoutResponse extends RedirectResponse
     }
 
     /**
-     * @return \Mollie\Api\Resources\Payment
+     * @return Payment
      */
     public function payment()
     {
@@ -64,8 +60,7 @@ class RedirectToCheckoutResponse extends RedirectResponse
     }
 
     /**
-     * @param  \Mollie\Api\Resources\Payment  $payment
-     * @return \Laravel\Cashier\SubscriptionBuilder\RedirectToCheckoutResponse
+     * @return RedirectToCheckoutResponse
      */
     protected function setPayment(Payment $payment)
     {
@@ -75,7 +70,6 @@ class RedirectToCheckoutResponse extends RedirectResponse
     }
 
     /**
-     * @param  array  $context
      * @return $this
      */
     public function setContext(array $context)
@@ -86,7 +80,6 @@ class RedirectToCheckoutResponse extends RedirectResponse
     }
 
     /**
-     * @param  \Laravel\Cashier\SubscriptionBuilder\FirstPaymentSubscriptionBuilder  $builder
      * @return $this
      */
     protected function setBuilder(FirstPaymentSubscriptionBuilder $builder)

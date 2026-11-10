@@ -11,7 +11,7 @@ use PHPUnit\Framework\Attributes\Test;
 class CreditTest extends BaseTestCase
 {
     #[Test]
-    public function testAddAmountForOwner()
+    public function test_add_amount_for_owner()
     {
         $user = User::factory()->create();
 
@@ -31,7 +31,7 @@ class CreditTest extends BaseTestCase
     }
 
     #[Test]
-    public function testMaxOutForOwner()
+    public function test_max_out_for_owner()
     {
         $user = User::factory()->create();
 

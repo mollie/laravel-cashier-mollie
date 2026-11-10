@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier\Tests\Order;
 
-use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\OrderItemCollection;
 use Laravel\Cashier\Order\OrderItemPreprocessorCollection;
 use Laravel\Cashier\Tests\BaseTestCase;
@@ -12,7 +11,7 @@ use PHPUnit\Framework\Attributes\Test;
 class OrderItemPreprocessorCollectionTest extends BaseTestCase
 {
     #[Test]
-    public function handlesOrderItem()
+    public function handles_order_item()
     {
         $fakePreprocessor = $this->getFakePreprocessor(OrderItemFactory::new()->times(2)->make());
         $preprocessors = new OrderItemPreprocessorCollection([$fakePreprocessor]);
@@ -26,7 +25,7 @@ class OrderItemPreprocessorCollectionTest extends BaseTestCase
     }
 
     #[Test]
-    public function invokesPreprocessorsOneByOne()
+    public function invokes_preprocessors_one_by_one()
     {
         $preprocessor1 = $this->getFakePreprocessor(OrderItemFactory::new()->times(1)->make());
         $preprocessor2 = $this->getFakePreprocessor(OrderItemFactory::new()->times(2)->make());
@@ -40,7 +39,7 @@ class OrderItemPreprocessorCollectionTest extends BaseTestCase
     }
 
     #[Test]
-    public function handlesEmptyPreprocessorCollection()
+    public function handles_empty_preprocessor_collection()
     {
         $preprocessors = new OrderItemPreprocessorCollection;
         $item = OrderItemFactory::new()->make();
@@ -53,8 +52,7 @@ class OrderItemPreprocessorCollectionTest extends BaseTestCase
     }
 
     /**
-     * @param  \Laravel\Cashier\Order\OrderItemCollection  $items
-     * @return \Laravel\Cashier\Tests\Order\FakeOrderItemPreprocessor
+     * @return FakeOrderItemPreprocessor
      */
     protected function getFakePreprocessor(OrderItemCollection $items)
     {

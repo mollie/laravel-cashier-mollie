@@ -4,6 +4,7 @@ namespace Laravel\Cashier;
 
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Laravel\Cashier\Coupon\AppliedCoupon;
 use Laravel\Cashier\Coupon\RedeemedCoupon;
 use Laravel\Cashier\Credit\Credit;
@@ -125,7 +126,7 @@ class Cashier
     /**
      * Process scheduled OrderItems
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public static function run()
     {
@@ -145,7 +146,7 @@ class Cashier
      * @param  string|null  $symbol
      * @return void
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public static function useCurrency($currency, $symbol = null)
     {
@@ -182,7 +183,7 @@ class Cashier
      * @param  string  $currency
      * @return string
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected static function guessCurrencySymbol($currency)
     {
@@ -233,7 +234,6 @@ class Cashier
     /**
      * Set the custom currency formatter.
      *
-     * @param  callable  $callback
      * @return void
      */
     public static function formatCurrencyUsing(callable $callback)
@@ -244,7 +244,6 @@ class Cashier
     /**
      * Format the given amount into a displayable currency.
      *
-     * @param  \Money\Money  $money
      * @return string
      */
     public static function formatAmount(Money $money)
@@ -359,7 +358,6 @@ class Cashier
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @return null|string
      */
     public static function getLocale(Model $owner)
