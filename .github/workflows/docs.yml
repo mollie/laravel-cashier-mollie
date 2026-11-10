@@ -1,0 +1,18 @@
+name: Documentation
+
+on:
+    pull_request:
+        paths: ['docs/**', 'package.json', '.github/workflows/docs.yml']
+    push:
+        branches: [v3_develop]
+        paths: ['docs/**', 'package.json', '.github/workflows/docs.yml']
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v6
+            - run: npm install --no-audit --no-fund
+            - run: npm run build
+              env:
+                  NODE_OPTIONS: --openssl-legacy-provider

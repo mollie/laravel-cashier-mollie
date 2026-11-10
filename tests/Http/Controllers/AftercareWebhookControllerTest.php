@@ -27,6 +27,7 @@ use Mollie\Api\Resources\Refund as MollieRefund;
 use Mollie\Api\Resources\RefundCollection;
 use Mollie\Api\Types\PaymentStatus as MolliePaymentStatus;
 use Mollie\Api\Types\RefundStatus as MollieRefundStatus;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 
 class AftercareWebhookControllerTest extends BaseTestCase
@@ -122,7 +123,8 @@ class AftercareWebhookControllerTest extends BaseTestCase
     }
 
     #[Test]
-    public function it_detects_new_refunds()
+    #[DataProvider('unprocessedRefundStatuses')]
+    public function it_detects_new_refunds(string $initialStatus)
     {
         Event::fake();
         $this->withConfiguredPlans();
@@ -151,7 +153,7 @@ class AftercareWebhookControllerTest extends BaseTestCase
             'owner_id' => $user->id,
             'owner_type' => get_class($user),
             'mollie_refund_id' => $mollieRefundId,
-            'mollie_refund_status' => MollieRefundStatus::Pending->value,
+            'mollie_refund_status' => $initialStatus,
             'total' => 1000,
             'currency' => 'EUR',
         ]);
@@ -245,5 +247,10 @@ class AftercareWebhookControllerTest extends BaseTestCase
     protected function getWebhookRequest($id)
     {
         return Request::create('/', 'POST', ['id' => $id]);
+    }
+
+    public static function unprocessedRefundStatuses(): array
+    {
+        return [['pending'], ['queued'], ['processing']];
     }
 }

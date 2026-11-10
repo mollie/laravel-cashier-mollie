@@ -92,6 +92,35 @@ class RefundBuilder
 
     public function create(): Refund
     {
+        $refund = DB::transaction(function () {
+            // Refresh stale builders and serialize refund initiation for this order. Until a
+            // refund finishes, its cash/credit split cannot be derived from amount_refunded.
+            $this->order = Cashier::$orderModel::whereKey($this->order->getKey())->lockForUpdate()->firstOrFail();
+            static::guardOrderIsPaid($this->order);
+
+            throw_if(
+                $this->order->refunds()->whereNotIn('mollie_refund_status', [
+                    RefundStatus::Refunded->value,
+                    RefundStatus::Failed->value,
+                    RefundStatus::Canceled->value,
+                ])->exists(),
+                new LogicException('Wait for the outstanding refund to finish before refunding this order again.')
+            );
+
+            return $this->createLocked();
+        });
+
+        // A remote refund is already recorded if a listener fails. Retrying must not send
+        // a second refund to Mollie. Local refunds dispatch inside their atomic transaction.
+        if (! $refund->isLocal()) {
+            event(new RefundInitiated($refund));
+        }
+
+        return $refund;
+    }
+
+    protected function createLocked(): Refund
+    {
         $currency = $this->order->getCurrency();
         $refundAmount = $this->items->getTotal();
         $mollieRefundAmount = $this->getMollieRefundAmount();
@@ -136,7 +165,7 @@ class RefundBuilder
             ],
         ]);
 
-        return $this->createRefundRecord($mollieRefund->id, mollie_enum_value($mollieRefund->status), $currency);
+        return $this->createRefundRecord($mollieRefund->id, mollie_enum_value($mollieRefund->status), $currency, dispatchEvent: false);
     }
 
     protected function guardDoesNotExceedRemainingOrderValue(Money $refundAmount, string $currency): void
@@ -167,7 +196,8 @@ class RefundBuilder
         string $mollieRefundId,
         string $status,
         string $currency,
-        ?RefundItemCollection $items = null
+        ?RefundItemCollection $items = null,
+        bool $dispatchEvent = true
     ): Refund {
         $refundRecord = Cashier::$refundModel::create([
             'owner_type' => $this->order->owner_type,
@@ -181,7 +211,9 @@ class RefundBuilder
 
         $refundRecord->items()->saveMany($items ?? $this->items);
 
-        event(new RefundInitiated($refundRecord));
+        if ($dispatchEvent) {
+            event(new RefundInitiated($refundRecord));
+        }
 
         return $refundRecord;
     }

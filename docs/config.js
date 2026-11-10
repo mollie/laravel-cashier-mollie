@@ -1,5 +1,5 @@
 module.exports = {
-    title: 'Laravel Cashier Mollie v2',
+    title: 'Laravel Cashier Mollie',
     description: 'Laravel Cashier provides an expressive, fluent interface to subscriptions using Mollie\'s billing services.',
     head: [
         ['link', { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png"}],
@@ -34,25 +34,11 @@ module.exports = {
         editLinkText: 'Improve this page (submit a PR)',
         domain: 'https://www.cashiermollie.com',
         displayAllHeaders: true,
-        sidebar: [
-            ['/', 'Introduction'],
-            '/01-installation',
-            '/13-upgrade',
-            '/16-configuration',
-            '/02-subscriptions',
-            '/03-trials',
-            '/04-charges',
-            '/05-metered',
-            '/06-customer',
-            '/07-invoices',
-            '/08-refunds',
-            '/14-retry',
-            '/09-events',
-            '/15-localization',
-            '/10-webhook',
-            '/11-testing',
-            '/12-faq',
-        ]
+        nav: [{ text: 'Version', items: [{ text: 'v3 (release candidate)', link: '/v3/' }, { text: 'v2', link: '/' }] }],
+        sidebar: {
+            '/v3/': ['/v3/', '/v3/01-installation', '/v3/13-upgrade', '/v3/16-configuration', '/v3/02-subscriptions', '/v3/03-trials', '/v3/04-charges', '/v3/05-metered', '/v3/06-customer', '/v3/07-invoices', '/v3/08-refunds', '/v3/14-retry', '/v3/09-events', '/v3/15-localization', '/v3/10-webhook', '/v3/11-testing', '/v3/12-faq', '/v3/17-release-notes'],
+            '/': ['/', '/01-installation', '/13-upgrade', '/16-configuration', '/02-subscriptions', '/03-trials', '/04-charges', '/05-metered', '/06-customer', '/07-invoices', '/08-refunds', '/14-retry', '/09-events', '/15-localization', '/10-webhook', '/11-testing', '/12-faq']
+        }
     },
     base: '/',
     plugins: [

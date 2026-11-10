@@ -59,6 +59,7 @@ class RefundsBuilderTest extends BaseTestCase
         $order = Cashier::$orderModel::createProcessedFromItems(new OrderItemCollection($orderItems));
         $order->mollie_payment_status = 'paid';
         $order->mollie_payment_id = 'tr_dummy_payment_id';
+        $order->save();
         $this->assertMoneyEURCents(2200, $order->getTotalDue());
 
         $refundBuilder = RefundBuilder::forWholeOrder($order);
@@ -273,6 +274,7 @@ class RefundsBuilderTest extends BaseTestCase
             ->create();
 
         $this->assertStringStartsWith('local_', $secondRefund->mollie_refund_id);
+        $this->assertTrue($secondRefund->isLocal());
         $this->assertEquals(MollieRefundStatus::Refunded->value, $secondRefund->mollie_refund_status);
         $this->assertMoneyEURCents(2200, $order->refresh()->getAmountRefunded());
         $this->assertEquals(500, $user->fresh()->credit('EUR')->value);
@@ -397,7 +399,7 @@ class RefundsBuilderTest extends BaseTestCase
             $staleCompetingBuilder->create();
             $this->fail('The stale competing builder was not rejected.');
         } catch (LogicException $exception) {
-            $this->assertStringContainsString('There is nothing left to refund through Mollie', $exception->getMessage());
+            $this->assertStringContainsString('only 0.00 EUR of the order value is still refundable', $exception->getMessage());
         }
 
         $this->assertSame(2, Cashier::$refundModel::count());
@@ -465,6 +467,49 @@ class RefundsBuilderTest extends BaseTestCase
     /**
      * An EUR 22.00 order, paid with EUR 5.00 credit and EUR 17.00 through Mollie.
      */
+    #[Test]
+    public function outstanding_refunds_block_stale_builders_before_another_api_call(): void
+    {
+        Event::fake();
+        $order = $this->createPaidOrderUsingCredit($this->getUser());
+        $staleBuilder = RefundBuilder::forWholeOrder($order->fresh());
+        $this->mock(CreateMollieRefund::class, function ($mock) {
+            $refund = new MollieRefund(new MollieApiClient);
+            $refund->id = 're_pending';
+            $refund->status = MollieRefundStatus::Queued;
+            $mock->shouldReceive('execute')->once()->andReturn($refund);
+        });
+        RefundBuilder::forWholeOrder($order)->create();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Wait for the outstanding refund');
+        $staleBuilder->create();
+    }
+
+    #[Test]
+    public function a_remote_refund_stays_recorded_when_an_initiated_listener_throws(): void
+    {
+        $order = $this->createPaidOrderUsingCredit($this->getUser());
+        $this->mock(CreateMollieRefund::class, function ($mock) {
+            $refund = new MollieRefund(new MollieApiClient);
+            $refund->id = 're_recorded';
+            $refund->status = MollieRefundStatus::Pending;
+            $mock->shouldReceive('execute')->once()->andReturn($refund);
+        });
+        Event::listen(RefundInitiated::class, fn () => throw new RuntimeException('listener failed'));
+
+        try {
+            RefundBuilder::forWholeOrder($order)->create();
+            $this->fail('Expected the listener to fail.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('listener failed', $exception->getMessage());
+        }
+        $this->assertDatabaseHas('refunds', ['mollie_refund_id' => 're_recorded']);
+        $this->assertSame(2, Cashier::$refundItemModel::count());
+        $this->expectException(LogicException::class);
+        RefundBuilder::forWholeOrder($order)->create();
+    }
+
     protected function createPaidOrderUsingCredit($user)
     {
         $orderItems = $user->orderItems()->createMany([

@@ -29,7 +29,7 @@ class CashierUpdate extends Command
     {
         if (app()->environment('production')) {
             $this->alert('Running in production mode.');
-            if ($this->confirm('Proceed updating Cashier?')) {
+            if (! $this->confirm('Proceed updating Cashier?')) {
                 return;
             }
         }

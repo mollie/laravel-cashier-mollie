@@ -422,6 +422,7 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
             $this->fill([
                 'cycle_ends_at' => $this->ends_at,
                 'ends_at' => null,
+                'cancellation_reason' => null,
                 'scheduled_order_item_id' => $item->id,
             ])->save();
 
@@ -636,11 +637,17 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
      */
     public static function handlePaymentFailed(OrderItem $item)
     {
-        $subscription = $item->orderable;
+        DB::transaction(function () use ($item) {
+            $subscription = $item->orderable()->lockForUpdate()->firstOrFail();
 
-        $endsAt = $subscription->onTrial() ? $subscription->trial_ends_at : now();
+            if ($subscription->cancelled() && $subscription->cancellation_reason === SubscriptionCancellationReason::REQUESTED) {
+                return;
+            }
 
-        $subscription->cancelAt($endsAt, SubscriptionCancellationReason::PAYMENT_FAILED);
+            $endsAt = $subscription->onTrial() ? $subscription->trial_ends_at : now();
+
+            $subscription->cancelAt($endsAt, SubscriptionCancellationReason::PAYMENT_FAILED);
+        });
     }
 
     /**
@@ -650,21 +657,27 @@ class Subscription extends Model implements AcceptsCoupons, InteractsWithOrderIt
      */
     public static function handlePaymentPaid(OrderItem $item)
     {
-        $subscription = $item->orderable;
+        DB::transaction(function () use ($item) {
+            $subscription = $item->orderable()->lockForUpdate()->firstOrFail();
 
-        if ($subscription->ends_at !== null) {
-            DB::transaction(function () use ($item, $subscription) {
-                if (! $subscription->scheduled_order_item_id) {
-                    $item = $subscription->scheduleNewOrderItemAt($subscription->ends_at);
-                }
+            if ($subscription->ends_at !== null && $subscription->cancellation_reason !== SubscriptionCancellationReason::REQUESTED) {
+                // A recovered payment settles an existing cycle. Resume billing at the next
+                // future boundary rather than charging that cycle again at the cancellation date.
+                $nextCycle = $subscription->onTrial()
+                    ? $subscription->trial_ends_at
+                    : $subscription->plan()->interval()->getEndOfNextSubscriptionCycle($subscription);
+
+                $scheduledItem = $subscription->scheduledOrderItem
+                    ?? $subscription->scheduleNewOrderItemAt($nextCycle);
 
                 $subscription->fill([
-                    'cycle_ends_at' => $subscription->plan()->interval()->getEndOfNextSubscriptionCycle($subscription),
+                    'cycle_ends_at' => $scheduledItem->process_at,
                     'ends_at' => null,
-                    'scheduled_order_item_id' => $item->id,
+                    'cancellation_reason' => null,
+                    'scheduled_order_item_id' => $scheduledItem->id,
                 ])->save();
-            });
-        }
+            }
+        });
     }
 
     public static function handlePaymentRefunded(RefundItem $refundItem)

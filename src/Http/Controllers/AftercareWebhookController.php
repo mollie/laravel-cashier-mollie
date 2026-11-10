@@ -107,7 +107,7 @@ class AftercareWebhookController extends BaseWebhookController
                 if ($mollieRefund->isTransferred() && $localRefund->mollie_refund_status !== RefundStatus::Refunded->value) {
                     $localRefund->handleProcessed();
                     $paymentAmountRefundedHasChanged = true;
-                } elseif ($mollieRefund->isFailed() && $localRefund->mollie_refund_status !== RefundStatus::Failed->value) {
+                } elseif (($mollieRefund->isFailed() || $mollieRefund->isCanceled()) && $localRefund->mollie_refund_status !== RefundStatus::Failed->value) {
                     $localRefund->handleFailed();
                     $paymentAmountRefundedHasChanged = true;
                 }

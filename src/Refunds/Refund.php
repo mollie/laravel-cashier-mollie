@@ -34,6 +34,8 @@ class Refund extends Model
 {
     use HasOwner;
 
+    public const UNPROCESSED_STATUSES = ['pending', 'queued', 'processing'];
+
     protected $guarded = [];
 
     protected $casts = [
@@ -58,7 +60,12 @@ class Refund extends Model
      */
     public function scopeWhereUnprocessed(Builder $query)
     {
-        return $query->where('mollie_refund_status', RefundStatus::Pending->value);
+        return $query->whereIn('mollie_refund_status', self::UNPROCESSED_STATUSES);
+    }
+
+    public function isLocal(): bool
+    {
+        return str_starts_with($this->mollie_refund_id, 'local_');
     }
 
     public function items(): HasMany
@@ -86,7 +93,7 @@ class Refund extends Model
             /** @var static $refund */
             $refund = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
-            if ($refund->mollie_refund_status !== RefundStatus::Pending->value) {
+            if (! in_array($refund->mollie_refund_status, self::UNPROCESSED_STATUSES, true)) {
                 return;
             }
 
@@ -151,7 +158,7 @@ class Refund extends Model
             /** @var static $refund */
             $refund = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
-            if ($refund->mollie_refund_status !== RefundStatus::Pending->value) {
+            if (! in_array($refund->mollie_refund_status, self::UNPROCESSED_STATUSES, true)) {
                 return;
             }
 

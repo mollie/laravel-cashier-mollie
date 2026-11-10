@@ -18,6 +18,7 @@ class WebhookMollieApiFailureTest extends BaseTestCase
         return [
             'first payment' => ['webhooks.mollie.first_payment'],
             'renewal order' => ['webhooks.mollie.default'],
+            'aftercare' => ['webhooks.mollie.aftercare'],
         ];
     }
 
@@ -26,10 +27,10 @@ class WebhookMollieApiFailureTest extends BaseTestCase
      * fails on Mollie's side, acknowledging the webhook drops the payment for good.
      */
     #[Test]
-    #[DataProvider('webhookRoutes')]
-    public function a_mollie_server_error_while_fetching_the_payment_is_not_acknowledged(string $route)
+    #[DataProvider('retryableApiErrors')]
+    public function a_mollie_server_error_while_fetching_the_payment_is_not_acknowledged(string $route, int $status)
     {
-        $this->withMockedGetMolliePaymentFailingWithStatus('tr_paid_payment', 502);
+        $this->withMockedGetMolliePaymentFailingWithStatus('tr_paid_payment', $status);
         $this->assertFalse(config('app.debug'));
 
         $response = $this->post(route($route), ['id' => 'tr_paid_payment']);
@@ -46,6 +47,15 @@ class WebhookMollieApiFailureTest extends BaseTestCase
         $response = $this->post(route($route), ['id' => 'tr_unknown']);
 
         $response->assertStatus(200);
+    }
+
+    public static function retryableApiErrors(): iterable
+    {
+        foreach (self::webhookRoutes() as $name => [$route]) {
+            foreach ([429, 502] as $status) {
+                yield $name.' '.$status => [$route, $status];
+            }
+        }
     }
 
     protected function withMockedGetMolliePaymentFailingWithStatus(string $id, int $status)

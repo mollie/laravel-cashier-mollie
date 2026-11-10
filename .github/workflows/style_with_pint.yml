@@ -1,6 +1,6 @@
-name: Fix Code Style
+name: Code Style
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
     lint:
@@ -12,7 +12,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
@@ -25,7 +25,5 @@ jobs:
               run: composer global require laravel/pint
 
             - name: Run Pint
-              run: pint
+              run: pint --test
 
-            - name: Commit linted files
-              uses: stefanzweifel/git-auto-commit-action@v5

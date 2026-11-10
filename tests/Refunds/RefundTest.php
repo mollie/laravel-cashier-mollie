@@ -15,6 +15,7 @@ use Laravel\Cashier\Tests\BaseTestCase;
 use Laravel\Cashier\Tests\Database\Factories\OrderItemFactory;
 use Laravel\Cashier\Tests\Database\Factories\RefundFactory;
 use Mollie\Api\Types\RefundStatus as MollieRefundStatus;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 
 class RefundTest extends BaseTestCase
@@ -92,7 +93,8 @@ class RefundTest extends BaseTestCase
     }
 
     #[Test]
-    public function can_handle_failed_mollie_refund()
+    #[DataProvider('unprocessedRefundStatuses')]
+    public function can_handle_failed_mollie_refund(string $initialStatus)
     {
         Event::fake();
 
@@ -105,12 +107,13 @@ class RefundTest extends BaseTestCase
         $refund = RefundFactory::new()->create([
             'total' => 29524,
             'currency' => 'EUR',
+            'mollie_refund_status' => $initialStatus,
         ]);
 
         $refund->items()->saveMany(
             RefundItemCollection::makeFromOrderItemCollection($originalOrderItems)
         );
-        $this->assertEquals(MollieRefundStatus::Pending->value, $refund->mollie_refund_status);
+        $this->assertEquals($initialStatus, $refund->mollie_refund_status);
 
         $refund = $refund->handleFailed();
 
@@ -296,5 +299,10 @@ class RefundTest extends BaseTestCase
         );
 
         return $refund;
+    }
+
+    public static function unprocessedRefundStatuses(): array
+    {
+        return [['pending'], ['queued'], ['processing']];
     }
 }

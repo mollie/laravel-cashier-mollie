@@ -1,5 +1,7 @@
 # Installation
 
+Cashier Mollie v3 requires PHP 8.3+, Laravel 12 or 13, and the Mollie SDK v4 (through laravel-mollie v5). For an existing v2 installation, follow the [upgrade guide](./13-upgrade.md).
+
 First, make sure to add the Mollie key to your `.env` file. You can obtain an API key from the [Mollie dashboard](https://www.mollie.com/dashboard/developers/api-keys):
 
 ```dotenv
@@ -9,7 +11,7 @@ MOLLIE_KEY="test_xxxxxxxxxxx"
 Now pull the package in using composer:
 
 ```bash
-composer require mollie/laravel-cashier-mollie "^2.0"
+composer require mollie/laravel-cashier-mollie "^3.0"
 ```
 
 ## Setup
