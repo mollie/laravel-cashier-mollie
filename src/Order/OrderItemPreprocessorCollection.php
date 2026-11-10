@@ -15,7 +15,7 @@ class OrderItemPreprocessorCollection extends Collection
      * Initialize the preprocessors from a string array.
      *
      * @param  string[]  $value
-     * @return \Laravel\Cashier\Order\OrderItemPreprocessorCollection
+     * @return OrderItemPreprocessorCollection
      */
     public static function fromArray($value)
     {
@@ -27,7 +27,7 @@ class OrderItemPreprocessorCollection extends Collection
     }
 
     /**
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function handle(OrderItem $item)
     {
@@ -41,7 +41,7 @@ class OrderItemPreprocessorCollection extends Collection
     /**
      * Create an OrderItemCollection from a basic Collection.
      *
-     * @return \Laravel\Cashier\Order\OrderItemPreprocessorCollection
+     * @return OrderItemPreprocessorCollection
      */
     public static function fromBaseCollection(BaseCollection $collection)
     {

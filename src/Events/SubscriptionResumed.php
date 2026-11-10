@@ -10,7 +10,7 @@ class SubscriptionResumed
     use SerializesModels;
 
     /**
-     * @var \Laravel\Cashier\Subscription
+     * @var Subscription
      */
     public $subscription;
 

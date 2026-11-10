@@ -10,7 +10,7 @@ use Laravel\Cashier\Order\OrderItemCollection;
 interface CouponHandler
 {
     /**
-     * @return \Laravel\Cashier\Coupon\Contracts\CouponHandler
+     * @return CouponHandler
      */
     public function withContext(array $context);
 
@@ -24,12 +24,12 @@ interface CouponHandler
     /**
      * Apply the coupon to the OrderItemCollection
      *
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function handle(RedeemedCoupon $redeemedCoupon, OrderItemCollection $items);
 
     /**
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function getDiscountOrderItems(OrderItemCollection $items);
 }

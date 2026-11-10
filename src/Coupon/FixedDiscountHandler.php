@@ -10,7 +10,7 @@ use Money\Money;
 class FixedDiscountHandler extends BaseCouponHandler
 {
     /**
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function getDiscountOrderItems(OrderItemCollection $items)
     {
@@ -40,8 +40,8 @@ class FixedDiscountHandler extends BaseCouponHandler
     }
 
     /**
-     * @param  \Money\Money  $base  The amount the discount is applied to.
-     * @return \Money\Money
+     * @param  Money  $base  The amount the discount is applied to.
+     * @return Money
      */
     protected function unitPrice(Money $base)
     {

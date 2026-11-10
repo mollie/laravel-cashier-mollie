@@ -11,14 +11,14 @@ use Money\Money;
 class ApplySubscriptionCouponToPayment extends BaseNullAction
 {
     /**
-     * @var \Laravel\Cashier\Coupon\Coupon
+     * @var Coupon
      */
     protected $coupon;
 
     /**
      * The coupon's (discount) OrderItems
      *
-     * @var \Laravel\Cashier\Order\OrderItemCollection
+     * @var OrderItemCollection
      */
     protected $orderItems;
 
@@ -34,7 +34,7 @@ class ApplySubscriptionCouponToPayment extends BaseNullAction
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getSubtotal()
     {
@@ -42,7 +42,7 @@ class ApplySubscriptionCouponToPayment extends BaseNullAction
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getTax()
     {
@@ -51,7 +51,7 @@ class ApplySubscriptionCouponToPayment extends BaseNullAction
 
     /**
      * @param  int  $value
-     * @return \Money\Money
+     * @return Money
      */
     protected function toMoney($value = 0)
     {

@@ -5,7 +5,7 @@ namespace Laravel\Cashier\Order;
 abstract class BaseOrderItemPreprocessor
 {
     /**
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     abstract public function handle(OrderItemCollection $items);
 }

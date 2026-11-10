@@ -10,7 +10,7 @@ use Money\Money;
 interface Plan
 {
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function amount();
 
@@ -25,7 +25,7 @@ interface Plan
     public function description();
 
     /**
-     * @return \Laravel\Cashier\Plan\Contracts\IntervalGeneratorContract
+     * @return IntervalGeneratorContract
      */
     public function interval();
 
@@ -37,7 +37,7 @@ interface Plan
     /**
      * The amount the customer is charged for a mandate payment.
      *
-     * @return \Money\Money
+     * @return Money
      */
     public function firstPaymentAmount();
 
@@ -90,12 +90,12 @@ interface Plan
     public function setFirstPaymentWebhookUrl(string $webhookUrl);
 
     /**
-     * @return \Laravel\Cashier\Order\OrderItemPreprocessorCollection
+     * @return OrderItemPreprocessorCollection
      */
     public function orderItemPreprocessors();
 
     /**
-     * @return \Laravel\Cashier\Plan\Contracts\Plan
+     * @return Plan
      */
     public function setOrderItemPreprocessors(OrderItemPreprocessorCollection $preprocessors);
 }

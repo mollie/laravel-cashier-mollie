@@ -5,7 +5,7 @@ namespace Laravel\Cashier\Order;
 class PersistOrderItemsPreprocessor extends BaseOrderItemPreprocessor
 {
     /**
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function handle(OrderItemCollection $items)
     {

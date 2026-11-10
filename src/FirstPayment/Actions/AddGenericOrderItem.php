@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\FirstPayment\Actions;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Cashier\Order\OrderItemCollection;
 use Money\Money;
 
 class AddGenericOrderItem extends BaseAction
@@ -55,7 +56,7 @@ class AddGenericOrderItem extends BaseAction
     /**
      * Prepare a stub of OrderItems processed with the payment.
      *
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function makeProcessedOrderItems()
     {
@@ -72,7 +73,7 @@ class AddGenericOrderItem extends BaseAction
     /**
      * Execute this action and return the created OrderItemCollection.
      *
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function execute()
     {

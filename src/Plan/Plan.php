@@ -6,6 +6,7 @@ namespace Laravel\Cashier\Plan;
 
 use Laravel\Cashier\FirstPayment\Traits\PaymentMethodString;
 use Laravel\Cashier\Order\OrderItemPreprocessorCollection;
+use Laravel\Cashier\Plan\Contracts\IntervalGeneratorContract;
 use Laravel\Cashier\Plan\Contracts\Plan as PlanContract;
 use Money\Money;
 
@@ -23,14 +24,14 @@ class Plan implements PlanContract
     /**
      * The amount of the payment.
      *
-     * @var \Money\Money
+     * @var Money
      */
     protected $amount;
 
     /**
      * The billing interval generator
      *
-     * @var \Laravel\Cashier\Plan\Contracts\IntervalGeneratorContract
+     * @var IntervalGeneratorContract
      */
     protected $interval;
 
@@ -46,7 +47,7 @@ class Plan implements PlanContract
     /**
      * The amount used for a mandate payment.
      *
-     * @var \Money\Money
+     * @var Money
      */
     protected $firstPaymentAmount;
 
@@ -80,7 +81,7 @@ class Plan implements PlanContract
      */
     protected $firstPaymentWebhookUrl;
 
-    /** @var \Laravel\Cashier\Order\OrderItemPreprocessorCollection */
+    /** @var OrderItemPreprocessorCollection */
     protected $orderItemPreprocessors;
 
     /**
@@ -111,7 +112,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function amount()
     {
@@ -168,7 +169,7 @@ class Plan implements PlanContract
     /**
      * The amount the customer is charged for a mandate payment.
      *
-     * @return \Money\Money
+     * @return Money
      */
     public function firstPaymentAmount()
     {
@@ -206,7 +207,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @return \Laravel\Cashier\Plan\Contracts\IntervalGeneratorContract
+     * @return IntervalGeneratorContract
      */
     public function interval()
     {
@@ -261,7 +262,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @return \Laravel\Cashier\Order\OrderItemPreprocessorCollection
+     * @return OrderItemPreprocessorCollection
      */
     public function orderItemPreprocessors()
     {
@@ -269,7 +270,7 @@ class Plan implements PlanContract
     }
 
     /**
-     * @return \Laravel\Cashier\Plan\Contracts\Plan
+     * @return PlanContract
      */
     public function setOrderItemPreprocessors(OrderItemPreprocessorCollection $preprocessors)
     {

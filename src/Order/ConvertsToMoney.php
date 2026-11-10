@@ -9,7 +9,7 @@ trait ConvertsToMoney
 {
     /**
      * @param  int  $value
-     * @return \Money\Money
+     * @return Money
      */
     protected function toMoney($value = 0)
     {

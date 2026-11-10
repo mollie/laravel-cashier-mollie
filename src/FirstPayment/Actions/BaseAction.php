@@ -4,6 +4,7 @@ namespace Laravel\Cashier\FirstPayment\Actions;
 
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Order\OrderItemCollection;
 use Money\Money;
 
 abstract class BaseAction
@@ -14,13 +15,13 @@ abstract class BaseAction
     /** @var string */
     protected $currency;
 
-    /** @var \Money\Money */
+    /** @var Money */
     protected $unitPrice;
 
     /** var float */
     protected $taxPercentage = 0;
 
-    /** @var \Illuminate\Database\Eloquent\Model */
+    /** @var Model */
     protected $owner;
 
     /** @var int */
@@ -44,14 +45,14 @@ abstract class BaseAction
     /**
      * Prepare a stub of OrderItems processed with the payment.
      *
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     abstract public function makeProcessedOrderItems();
 
     /**
      * Execute this action and return the created OrderItemCollection.
      *
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     abstract public function execute();
 
@@ -100,7 +101,7 @@ abstract class BaseAction
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getUnitPrice()
     {
@@ -116,7 +117,7 @@ abstract class BaseAction
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getSubtotal()
     {
@@ -124,7 +125,7 @@ abstract class BaseAction
     }
 
     /**
-     * @return \Money\Money
+     * @return Money
      */
     public function getTax()
     {
@@ -138,7 +139,7 @@ abstract class BaseAction
     /**
      * The total after tax and discounts.
      *
-     * @return \Money\Money
+     * @return Money
      */
     public function getTotal()
     {

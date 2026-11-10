@@ -10,10 +10,10 @@ class MandateUpdated
 {
     use SerializesModels;
 
-    /** @var \Illuminate\Database\Eloquent\Model */
+    /** @var Model */
     public $owner;
 
-    /** @var \Mollie\Api\Resources\Payment */
+    /** @var Payment */
     public $payment;
 
     /**

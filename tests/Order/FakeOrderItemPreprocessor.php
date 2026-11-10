@@ -15,7 +15,7 @@ class FakeOrderItemPreprocessor extends BaseOrderItemPreprocessor
     protected $result;
 
     /**
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function handle(OrderItemCollection $items)
     {

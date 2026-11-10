@@ -3,8 +3,11 @@
 namespace Laravel\Cashier\Coupon;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Laravel\Cashier\Coupon\Contracts\AcceptsCoupons;
+use Laravel\Cashier\Coupon\Contracts\CouponHandler;
 use Laravel\Cashier\Coupon\Contracts\CouponRepository;
 use Laravel\Cashier\Order\OrderItemCollection;
 
@@ -33,7 +36,7 @@ class RedeemedCoupon extends Model
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Model|\Laravel\Cashier\Coupon\RedeemedCoupon
+     * @return Model|RedeemedCoupon
      */
     public static function record(Coupon $coupon, AcceptsCoupons $model)
     {
@@ -59,7 +62,7 @@ class RedeemedCoupon extends Model
     }
 
     /**
-     * @return \Laravel\Cashier\Coupon\Contracts\CouponHandler
+     * @return CouponHandler
      */
     public function handler()
     {
@@ -69,7 +72,7 @@ class RedeemedCoupon extends Model
     /**
      * Get the model relation the coupon was redeemed for.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     * @return MorphTo
      */
     public function model()
     {
@@ -77,7 +80,7 @@ class RedeemedCoupon extends Model
     }
 
     /**
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public function applyTo(OrderItemCollection $items)
     {
@@ -107,7 +110,7 @@ class RedeemedCoupon extends Model
     /**
      * Scope a query to only include coupons which are being processed
      *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return Builder
      */
     public function scopeActive(Builder $query)
     {
@@ -133,7 +136,7 @@ class RedeemedCoupon extends Model
     /**
      * Create a new Eloquent Collection instance.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public function newCollection(array $models = [])
     {

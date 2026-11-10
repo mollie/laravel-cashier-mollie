@@ -10,7 +10,7 @@ class BalanceTurnedStale
     use SerializesModels;
 
     /**
-     * @var \Laravel\Cashier\Credit\Credit
+     * @var Credit
      */
     public $credit;
 

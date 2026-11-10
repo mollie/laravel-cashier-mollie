@@ -2,15 +2,17 @@
 
 namespace Laravel\Cashier\Coupon\Contracts;
 
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+
 interface AcceptsCoupons
 {
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function redeemedCoupons();
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function appliedCoupons();
 

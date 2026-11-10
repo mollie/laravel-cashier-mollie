@@ -3,14 +3,17 @@
 namespace Laravel\Cashier\Coupon;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Order\Contracts\InteractsWithOrderItems;
 use Laravel\Cashier\Order\OrderItem;
+use Laravel\Cashier\Order\OrderItemCollection;
 
 /**
  * @method static create(array $array)
  *
- * @property \Laravel\Cashier\Order\OrderItemCollection $orderItems
+ * @property OrderItemCollection $orderItems
  * @property array|null $metadata
  */
 class AppliedCoupon extends Model implements InteractsWithOrderItems
@@ -29,7 +32,7 @@ class AppliedCoupon extends Model implements InteractsWithOrderItems
     /**
      * Get the model relation the coupon was applied to.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     * @return MorphTo
      */
     public function model()
     {
@@ -39,7 +42,7 @@ class AppliedCoupon extends Model implements InteractsWithOrderItems
     /**
      * The OrderItem relation for this applied coupon.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function orderItems()
     {
@@ -49,7 +52,7 @@ class AppliedCoupon extends Model implements InteractsWithOrderItems
     /**
      * Called right before processing the order item into an order.
      *
-     * @return \Laravel\Cashier\Order\OrderItemCollection
+     * @return OrderItemCollection
      */
     public static function preprocessOrderItem(OrderItem $item)
     {
